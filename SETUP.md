@@ -44,3 +44,20 @@ Den angezeigten `whsec_…` als `STRIPE_WEBHOOK_SECRET` eintragen.
 npm install
 npm run dev      # http://localhost:3100
 ```
+
+## 7. Deployment auf Vercel
+1. Repo zu GitHub pushen (oder Vercel direkt mit dem lokalen Repo verbinden).
+2. In Vercel „New Project" → dieses Repo importieren (Framework: Next.js, erkannt).
+3. **Environment Variables** aus `.env.local` in Vercel eintragen (alle Keys aus Abschnitt 1+2),
+   `NEXT_PUBLIC_SITE_URL` auf die Vercel-/Live-Domain setzen.
+4. Stripe-Webhook-Endpoint auf `https://DEINE-DOMAIN/api/webhooks/stripe` setzen und `whsec_…` eintragen.
+5. Deploy. Danach Test-Kauf mit Stripe-Testkarte `4242 4242 4242 4242` durchführen.
+
+## 8. Admin-Zugang
+- URL: `/admin` · Passwort = `ADMIN_PASSWORD` (in `.env.local`, bitte ändern!).
+- Bereiche: Dashboard, Bücher, Bestellungen, Gutscheine, Leads, Auto-Generator.
+
+## 9. Content nachproduzieren
+- `npm run gen:covers` – Cover für alle Bücher (public/covers).
+- `npm run gen:masters` – Mal-PDFs für Muster-Kategorien (public/masters).
+- Repräsentative Motive (Tiere etc.): Bild-Provider in `src/lib/generator` andocken (siehe CONTENT.md).
