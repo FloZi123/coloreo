@@ -1,21 +1,20 @@
 import Link from "next/link";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
-import { getCategories, tName, tDesc } from "@/lib/data";
+import { getWorlds, getCategories, tName, tDesc } from "@/lib/data";
 
 export default async function CategoriesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : "de";
   const dict = getDictionary(locale);
-  const categories = await getCategories();
-  const adult = categories.filter((c) => c.audience !== "kids");
-  const kids = categories.filter((c) => c.audience === "kids");
+  const [worlds, categories] = await Promise.all([getWorlds(), getCategories()]);
 
-  const Card = (c: (typeof categories)[number]) => (
+  const Card = (c: (typeof categories)[number], accent?: string | null) => (
     <Link
       key={c.id}
       href={`/${locale}/kategorien/${c.slug}`}
-      className="card flex items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:border-primary hover:shadow-md"
+      className="card flex items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:shadow-md"
+      style={{ borderColor: accent ? accent + "40" : undefined }}
     >
       <span className="text-4xl">{c.emoji}</span>
       <span>
@@ -30,15 +29,18 @@ export default async function CategoriesPage({ params }: { params: Promise<{ loc
       <h1 className="font-display text-3xl font-bold">{dict.categories.title}</h1>
       <p className="mt-2 text-ink-soft">{dict.categories.subtitle}</p>
 
-      <h2 className="mb-4 mt-10 font-display text-xl font-bold">🎨 {dict.common.adults}</h2>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{adult.map(Card)}</div>
-
-      {kids.length > 0 && (
-        <>
-          <h2 className="mb-4 mt-12 font-display text-xl font-bold">🧸 {dict.common.kids}</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{kids.map(Card)}</div>
-        </>
-      )}
+      {worlds.map((w) => {
+        const cats = categories.filter((c) => c.world_id === w.id);
+        if (!cats.length) return null;
+        return (
+          <section key={w.id} className="mt-10">
+            <Link href={`/${locale}/welten/${w.slug}`} className="mb-4 flex items-center gap-2 font-display text-xl font-bold hover:text-primary">
+              <span>{w.emoji}</span> {tName(w, locale)} <span className="text-sm font-normal text-muted">→</span>
+            </Link>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{cats.map((c) => Card(c, w.accent))}</div>
+          </section>
+        );
+      })}
     </div>
   );
 }

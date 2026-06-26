@@ -26,6 +26,7 @@ export default function Header({
   const switchHref = pathname.replace(/^\/(de|en)/, `/${otherLocale}`);
 
   const links = [
+    { href: p("/welten"), label: dict.nav.worlds },
     { href: p("/kategorien"), label: dict.nav.categories },
     { href: p("/bundles"), label: dict.nav.bundles },
     { href: p("/bundle-builder"), label: dict.nav.bundleBuilder },

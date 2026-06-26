@@ -141,6 +141,12 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["bundles"]["Insert"]>
         Relationships: []
       }
+      worlds: {
+        Row: { id: string; slug: string; name_de: string; name_en: string; description_de: string | null; description_en: string | null; emoji: string | null; accent: string | null; sort_order: number; is_active: boolean; created_at: string }
+        Insert: { id?: string; slug: string; name_de: string; name_en: string; description_de?: string | null; description_en?: string | null; emoji?: string | null; accent?: string | null; sort_order?: number; is_active?: boolean; created_at?: string }
+        Update: Partial<Database["public"]["Tables"]["worlds"]["Insert"]>
+        Relationships: []
+      }
       categories: {
         Row: {
           audience: Database["public"]["Enums"]["audience"]
@@ -155,6 +161,7 @@ export type Database = {
           name_en: string
           slug: string
           sort_order: number
+          world_id: string | null
         }
         Insert: {
           audience?: Database["public"]["Enums"]["audience"]
@@ -169,6 +176,7 @@ export type Database = {
           name_en: string
           slug: string
           sort_order?: number
+          world_id?: string | null
         }
         Update: Partial<Database["public"]["Tables"]["categories"]["Insert"]>
         Relationships: []

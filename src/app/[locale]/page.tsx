@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
-import { getCategories, getBooks, getRatingsForBooks, tName, tTitle } from "@/lib/data";
+import { getCategories, getWorlds, getBooks, getRatingsForBooks, tName, tDesc, tTitle } from "@/lib/data";
 import BookCard from "@/components/BookCard";
 import FreebieForm from "@/components/FreebieForm";
 import JsonLd from "@/components/JsonLd";
@@ -10,8 +10,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : "de";
   const dict = getDictionary(locale);
-  const [categories, featured] = await Promise.all([
+  const [categories, worlds, featured] = await Promise.all([
     getCategories(),
+    getWorlds(),
     getBooks({ featured: true, limit: 8 }),
   ]);
   const books = featured.length ? featured : await getBooks({ limit: 8 });
@@ -105,20 +106,26 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </section>
       )}
 
-      {/* CATEGORIES */}
+      {/* WELTEN */}
       <section className="container-page py-8">
-        <h2 className="mb-8 font-display text-2xl font-bold md:text-3xl">{dict.home.browseCategories}</h2>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-          {categories.map((c) => (
+        <h2 className="mb-8 font-display text-2xl font-bold md:text-3xl">{locale === "de" ? "Entdecke unsere Welten" : "Explore our worlds"}</h2>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {worlds.map((w) => (
             <Link
-              key={c.id}
-              href={p(`/kategorien/${c.slug}`)}
-              className="card flex flex-col items-center justify-center gap-2 p-5 text-center transition hover:-translate-y-1 hover:border-primary hover:shadow-md"
+              key={w.id}
+              href={p(`/welten/${w.slug}`)}
+              className="group card overflow-hidden p-6 transition hover:-translate-y-1 hover:shadow-lg"
+              style={{ borderColor: w.accent ?? undefined }}
             >
-              <span className="text-4xl">{c.emoji}</span>
-              <span className="font-display text-sm font-semibold">{tName(c, locale)}</span>
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl text-2xl" style={{ background: (w.accent ?? "#7C4DFF") + "22" }}>{w.emoji}</div>
+              <h3 className="mt-4 font-display text-xl font-bold">{tName(w, locale)}</h3>
+              <p className="mt-1 text-sm text-ink-soft">{tDesc(w, locale)}</p>
+              <span className="mt-3 inline-block text-sm font-semibold" style={{ color: w.accent ?? "#7C4DFF" }}>{locale === "de" ? "Entdecken" : "Explore"} →</span>
             </Link>
           ))}
+        </div>
+        <div className="mt-6 text-center">
+          <Link href={p("/kategorien")} className="text-sm font-semibold text-primary hover:underline">{dict.home.browseCategories} →</Link>
         </div>
       </section>
 

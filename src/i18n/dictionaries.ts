@@ -3,6 +3,7 @@ import type { Locale } from "./config";
 const de = {
   nav: {
     home: "Start",
+    worlds: "Welten",
     categories: "Kategorien",
     bundles: "Bundles",
     bundleBuilder: "Bundle-Builder",
@@ -135,6 +136,7 @@ type Dict = typeof de;
 const en: Dict = {
   nav: {
     home: "Home",
+    worlds: "Worlds",
     categories: "Categories",
     bundles: "Bundles",
     bundleBuilder: "Bundle Builder",

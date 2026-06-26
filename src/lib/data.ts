@@ -25,6 +25,26 @@ export async function getBrand(): Promise<{ name: string; tagline_de: string; ta
   return { name, tagline_de: v.tagline_de ?? "", tagline_en: v.tagline_en ?? "" };
 }
 
+export type World = Tables<"worlds">;
+
+export async function getWorlds(): Promise<World[]> {
+  const sb = createPublicClient();
+  const { data } = await sb.from("worlds").select("*").eq("is_active", true).order("sort_order");
+  return data ?? [];
+}
+
+export async function getWorldBySlug(slug: string): Promise<World | null> {
+  const sb = createPublicClient();
+  const { data } = await sb.from("worlds").select("*").eq("slug", slug).eq("is_active", true).maybeSingle();
+  return data ?? null;
+}
+
+export async function getCategoriesByWorld(worldId: string): Promise<Category[]> {
+  const sb = createPublicClient();
+  const { data } = await sb.from("categories").select("*").eq("world_id", worldId).eq("is_active", true).order("sort_order");
+  return data ?? [];
+}
+
 export async function getCategories(): Promise<Category[]> {
   const sb = createPublicClient();
   const { data } = await sb.from("categories").select("*").eq("is_active", true).order("sort_order");
