@@ -32,7 +32,7 @@ export default function BookCard({
   const href = `/${locale}/buch/${book.slug}`;
 
   return (
-    <div className="card group overflow-hidden transition hover:-translate-y-1 hover:shadow-lg">
+    <div className="card group flex h-full flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-lg">
       <Link href={href} className="block">
         <div className="relative aspect-[3/4] overflow-hidden">
           {book.coverUrl ? (
@@ -51,39 +51,29 @@ export default function BookCard({
           </span>
         </div>
       </Link>
-      <div className="p-4">
-        <Link href={href}>
-          <h3 className="line-clamp-2 min-h-[2.5rem] font-display text-sm font-semibold text-ink hover:text-primary">
-            {book.title}
-          </h3>
-        </Link>
+      <div className="flex flex-1 flex-col p-4">
+        <div className="flex items-start justify-between gap-2">
+          <Link href={href}>
+            <h3 className="line-clamp-2 min-h-[2.5rem] font-display text-base font-semibold leading-tight text-ink hover:text-primary">
+              {book.title}
+            </h3>
+          </Link>
+          <span className="whitespace-nowrap font-display text-lg font-bold">{formatPrice(book.priceCents, locale)}</span>
+        </div>
         {book.rating && book.rating.count > 0 && (
           <div className="mt-1 flex items-center gap-1 text-xs text-muted">
             <Stars value={book.rating.avg} size={13} />
             <span>({book.rating.count})</span>
           </div>
         )}
-        <div className="mt-3 flex items-center justify-between">
-          <span className="font-display text-lg font-bold text-primary">
-            {formatPrice(book.priceCents, locale)}
-          </span>
-          <button
-            onClick={() =>
-              addBook({
-                id: book.id,
-                slug: book.slug,
-                title: book.title,
-                coverUrl: book.coverUrl,
-                unitPriceCents: book.priceCents,
-              })
-            }
-            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-              inCart ? "bg-success text-white" : "btn-primary"
-            }`}
-          >
-            {inCart ? "✓ " + dict.common.inCart : dict.common.addToCart}
-          </button>
-        </div>
+        <button
+          onClick={() =>
+            addBook({ id: book.id, slug: book.slug, title: book.title, coverUrl: book.coverUrl, unitPriceCents: book.priceCents })
+          }
+          className={`mt-4 w-full rounded-full py-3 text-sm font-extrabold transition ${inCart ? "bg-success text-white" : "btn-dark"}`}
+        >
+          {inCart ? "✓ " + dict.common.inCart : dict.common.addToCart}
+        </button>
       </div>
     </div>
   );

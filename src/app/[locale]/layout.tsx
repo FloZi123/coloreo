@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Nunito, Quicksand } from "next/font/google";
+import { Nunito, Fredoka } from "next/font/google";
 import { notFound } from "next/navigation";
 import { isLocale, locales, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
@@ -11,8 +11,8 @@ import ChatWidget from "@/components/ChatWidget";
 import CartToast from "@/components/CartToast";
 import FirstOrderPopup from "@/components/FirstOrderPopup";
 
-const body = Nunito({ subsets: ["latin"], variable: "--font-body", display: "swap" });
-const display = Quicksand({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display", display: "swap" });
+const body = Nunito({ subsets: ["latin"], weight: ["400", "600", "700", "800"], variable: "--font-body", display: "swap" });
+const display = Fredoka({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-display", display: "swap" });
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -49,7 +49,7 @@ export default async function LocaleLayout({
         <CartProvider>
           <Header locale={l} dict={dict} brand={brand.name} />
           <main className="flex-1">{children}</main>
-          <Footer locale={l} dict={dict} brand={brand.name} />
+          <Footer locale={l} dict={dict} />
           <ChatWidget locale={l} dict={dict} />
           <CartToast locale={l} />
           <FirstOrderPopup locale={l} />

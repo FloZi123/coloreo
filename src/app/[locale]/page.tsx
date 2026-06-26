@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
-import { getCategories, getWorlds, getBooks, getRatingsForBooks, tName, tDesc, tTitle } from "@/lib/data";
+import { getWorlds, getBooks, getRatingsForBooks, tName, tDesc, tTitle } from "@/lib/data";
 import BookCard from "@/components/BookCard";
 import FreebieForm from "@/components/FreebieForm";
 import JsonLd from "@/components/JsonLd";
@@ -10,8 +10,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : "de";
   const dict = getDictionary(locale);
-  const [categories, worlds, featured] = await Promise.all([
-    getCategories(),
+  const [worlds, featured] = await Promise.all([
     getWorlds(),
     getBooks({ featured: true, limit: 8 }),
   ]);
@@ -33,46 +32,52 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     <div>
       <JsonLd data={orgLd} />
       {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary-soft via-paper to-accent-soft" />
-        <div className="container-page grid items-center gap-10 py-16 md:grid-cols-2 md:py-24">
-          <div>
-            <span className="inline-block rounded-full bg-white px-3 py-1 text-xs font-semibold text-primary shadow-sm">
-              {dict.home.trustInstant} · {dict.home.trustQuality}
-            </span>
-            <h1 className="mt-5 font-display text-4xl font-bold leading-tight text-ink md:text-5xl">
-              {dict.home.heroTitle}
-            </h1>
-            <p className="mt-4 max-w-lg text-lg text-ink-soft">{dict.home.heroSubtitle}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href={p("/kategorien")} className="btn-primary px-7 py-3.5">{dict.home.heroCta}</Link>
-              <Link href={p("/bundle-builder")} className="rounded-full border-2 border-primary px-7 py-3.5 font-semibold text-primary hover:bg-primary-soft">
-                {dict.home.heroCtaBundles}
-              </Link>
+      <section className="container-page grid items-center gap-10 py-14 md:grid-cols-2 md:py-20">
+        <div>
+          <span className="inline-flex items-center gap-2 rounded-full border bg-surface px-4 py-1.5 text-xs font-extrabold uppercase tracking-wider text-primary">
+            <span className="h-2 w-2 rounded-full bg-primary" />
+            {locale === "de" ? "Malbücher für jedes Alter" : "Coloring books for every age"}
+          </span>
+          <h1 className="mt-5 font-display text-5xl font-bold leading-[1.02] md:text-6xl">{dict.home.heroTitle}</h1>
+          <p className="mt-5 max-w-[46ch] text-lg text-muted">{dict.home.heroSubtitle}</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href={p("/welten")} className="btn-primary px-7 py-3.5">{dict.home.heroCta}</Link>
+            <Link href={p("/welten/anti-stress")} className="rounded-full border-2 border-ink px-7 py-3.5 font-extrabold text-ink transition hover:bg-ink hover:text-paper">
+              {locale === "de" ? "Für Erwachsene" : "For adults"}
+            </Link>
+          </div>
+        </div>
+        <div className="flex items-end justify-center gap-3 md:gap-4">
+          {[
+            { t: "Wimmel", c: "#FFC23C", tc: "#221E1B", r: "-rotate-6", o: "ffffff44" },
+            { t: "Tiere", c: "#FF5A4D", tc: "#ffffff", r: "z-10 scale-110", o: "ffffff55" },
+            { t: "Muster", c: "#9B6CE0", tc: "#ffffff", r: "rotate-6", o: "ffffff44" },
+          ].map((b) => (
+            <div key={b.t} className={`flex w-[34%] flex-col rounded-2xl p-4 shadow-xl ${b.r}`} style={{ background: b.c, color: b.tc, aspectRatio: "0.72" }}>
+              <span className="font-display text-sm font-bold">coloreo</span>
+              <span className="mt-1 font-display text-xl font-bold leading-none">{b.t}</span>
+              <span className="mt-auto block h-1/2 rounded-lg" style={{ background: `repeating-linear-gradient(45deg,#${b.o} 0 9px,#ffffff22 9px 18px)` }} />
             </div>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {categories.slice(0, 9).map((c) => (
-              <Link
-                key={c.id}
-                href={p(`/kategorien/${c.slug}`)}
-                className="flex aspect-square flex-col items-center justify-center rounded-2xl bg-white/80 p-2 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-              >
-                <span className="text-3xl">{c.emoji}</span>
-                <span className="mt-1 text-[11px] font-semibold text-ink-soft">{tName(c, locale)}</span>
-              </Link>
-            ))}
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* TRUST BAR */}
-      <section className="border-y bg-surface">
-        <div className="container-page flex flex-wrap items-center justify-center gap-x-10 gap-y-3 py-5 text-sm font-medium text-ink-soft">
-          <span>⚡ {dict.home.trustInstant}</span>
-          <span>🖨️ {dict.home.trustQuality}</span>
-          <span>🔒 {dict.home.trustSecure}</span>
-          <span>💸 {dict.home.bundleTeaser}</span>
+      {/* FEATURE STRIP */}
+      <section style={{ background: "var(--color-beige)" }}>
+        <div className="container-page grid gap-6 py-10 sm:grid-cols-3">
+          {[
+            { c: "#FF5A4D", t: locale === "de" ? "Dicke, klare Linien" : "Bold, clear lines", d: locale === "de" ? "Gemacht zum Ausmalen, nicht zum Verzweifeln." : "Made for coloring, not despairing." },
+            { c: "#3FBF87", t: locale === "de" ? "Sofort als PDF" : "Instant PDF", d: locale === "de" ? "Direkt nach dem Kauf herunterladen & drucken." : "Download & print right after purchase." },
+            { c: "#3B8EEA", t: locale === "de" ? "Für jedes Alter" : "For every age", d: locale === "de" ? "Von ab 3 bis Anti-Stress für Erwachsene." : "From age 3 to adult anti-stress." },
+          ].map((f) => (
+            <div key={f.t} className="flex items-start gap-3.5">
+              <span className="h-10 w-10 flex-none rounded-xl" style={{ background: f.c }} />
+              <div>
+                <div className="font-display text-lg font-semibold">{f.t}</div>
+                <div className="mt-0.5 text-sm text-muted">{f.d}</div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 

@@ -1,28 +1,31 @@
 @import "tailwindcss";
 
 @theme {
-  --color-paper: #faf6f1;
+  --color-paper: #faf7f0;
+  --color-beige: #f3ecdf;
   --color-surface: #ffffff;
-  --color-ink: #2b2540;
-  --color-ink-soft: #5b5470;
-  --color-muted: #8b8499;
-  --color-line: #ece5db;
+  --color-ink: #221e1b;
+  --color-ink-soft: #4a443d;
+  --color-muted: #6f675c;
+  --color-line: #e3dacb;
 
-  --color-primary: #7c4dff;
-  --color-primary-dark: #6437e0;
-  --color-primary-soft: #efe9ff;
+  --color-primary: #ff5a4d;
+  --color-primary-dark: #e8483c;
+  --color-primary-soft: #ffe9e6;
   --color-primary-foreground: #ffffff;
 
-  --color-accent: #ff7a59;
-  --color-accent-soft: #ffe8e0;
-  --color-gold: #ffc857;
-  --color-success: #2bbf8a;
+  --color-accent: #ffc23c;
+  --color-accent-soft: #fff3d6;
+  --color-gold: #ffc23c;
+  --color-blue: #3b8eea;
+  --color-purple: #9b6ce0;
+  --color-success: #3fbf87;
 
   --font-sans: var(--font-body);
   --font-display: var(--font-display);
 
   --radius-xl: 1.25rem;
-  --radius-2xl: 1.75rem;
+  --radius-2xl: 1.5rem;
 }
 
 :root {
@@ -37,12 +40,12 @@
 body {
   background: var(--color-paper);
   color: var(--color-ink);
-  font-family: var(--font-body), system-ui, sans-serif;
+  font-family: var(--font-body), "Nunito", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, .font-display {
-  font-family: var(--font-display), var(--font-body), system-ui, sans-serif;
+  font-family: var(--font-display), "Fredoka", system-ui, sans-serif;
   letter-spacing: -0.01em;
 }
 
@@ -50,21 +53,36 @@ h1, h2, h3, h4, .font-display {
   .container-page {
     margin-inline: auto;
     width: 100%;
-    max-width: 80rem;
-    padding-inline: 1.25rem;
+    max-width: 75rem;
+    padding-inline: clamp(1.125rem, 4vw, 2.5rem);
   }
   .card {
     background: var(--color-surface);
     border: 1px solid var(--color-line);
-    border-radius: var(--radius-2xl);
+    border-radius: 1.25rem;
   }
   .btn-primary {
     background: var(--color-primary);
     color: var(--color-primary-foreground);
     border-radius: 9999px;
-    font-weight: 600;
+    font-weight: 800;
     transition: background 0.15s ease, transform 0.1s ease;
   }
   .btn-primary:hover { background: var(--color-primary-dark); }
   .btn-primary:active { transform: translateY(1px); }
+  .btn-dark {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    border-radius: 9999px;
+    font-weight: 800;
+    transition: background 0.15s ease;
+  }
+  .btn-dark:hover { background: var(--color-primary); }
+  .eyebrow {
+    font-weight: 800;
+    font-size: 0.8125rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
 }
