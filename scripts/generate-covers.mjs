@@ -13,9 +13,12 @@ for (const line of readFileSync(join(root, ".env.local"), "utf8").split("\n")) {
   const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
   if (m) env[m[1]] = m[2].trim();
 }
-const sb = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY, {
-  auth: { persistSession: false },
-});
+// Service-Key bevorzugen, damit auch Entwürfe (draft) sichtbar sind (sonst RLS).
+const key =
+  env.SUPABASE_SERVICE_ROLE_KEY && !env.SUPABASE_SERVICE_ROLE_KEY.includes("PLACEHOLDER")
+    ? env.SUPABASE_SERVICE_ROLE_KEY
+    : env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const sb = createClient(env.NEXT_PUBLIC_SUPABASE_URL, key, { auth: { persistSession: false } });
 
 function esc(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

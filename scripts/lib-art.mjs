@@ -95,6 +95,60 @@ export function mandalaPaths(seed, cx, cy, maxR) {
 }
 
 // Kreis als 4 Bézier-Segmente – rendert identisch in SVG UND pdf-lib (kein Arc).
+// Geometrisches Raster: NxN Zellen mit je einem einfachen Motiv (Linienkunst).
+export function geometricGridPaths(seed, cx, cy, half) {
+  const rnd = mulberry32(seed);
+  const paths = [];
+  const n = 4 + Math.floor(rnd() * 2); // 4..5
+  const cell = (half * 2) / n;
+  const x0 = cx - half, y0 = cy - half;
+  paths.push(`M ${f(x0)} ${f(y0)} h ${f(half * 2)} v ${f(half * 2)} h ${f(-half * 2)} Z`);
+  for (let r = 0; r < n; r++) {
+    for (let c = 0; c < n; c++) {
+      const mx = x0 + c * cell, my = y0 + r * cell;
+      const ccx = mx + cell / 2, ccy = my + cell / 2;
+      // Zellrahmen
+      paths.push(`M ${f(mx)} ${f(my)} h ${f(cell)} v ${f(cell)} h ${f(-cell)} Z`);
+      const m = Math.floor(rnd() * 4);
+      const pad = cell * 0.16;
+      if (m === 0) {
+        paths.push(circlePath(ccx, ccy, cell / 2 - pad));
+      } else if (m === 1) {
+        // Raute
+        const d = cell / 2 - pad;
+        paths.push(`M ${f(ccx)} ${f(ccy - d)} L ${f(ccx + d)} ${f(ccy)} L ${f(ccx)} ${f(ccy + d)} L ${f(ccx - d)} ${f(ccy)} Z`);
+      } else if (m === 2) {
+        // verschachtelte Quadrate
+        for (const s of [0.5, 0.3]) {
+          const d = cell * s;
+          paths.push(`M ${f(ccx - d)} ${f(ccy - d)} h ${f(d * 2)} v ${f(d * 2)} h ${f(-d * 2)} Z`);
+        }
+      } else {
+        // 4-Blatt-Blüte
+        const rr = cell * 0.22;
+        for (const [dx, dy] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
+          paths.push(circlePath(ccx + dx * rr, ccy + dy * rr, rr));
+        }
+      }
+    }
+  }
+  return paths;
+}
+
+// Stil-Dispatcher: liefert die Pfade einer Seite je nach Stil.
+export function pagePaths(style, seed, cx, cy, r) {
+  return style === "grid" ? geometricGridPaths(seed, cx, cy, r) : mandalaPaths(seed, cx, cy, r);
+}
+
+// Stil je Kategorie (deterministisch, sorgt für Abwechslung zwischen Kategorien).
+export function styleForCategory(slug) {
+  const PATTERN = ["mandalas", "achtsamkeit", "japan-zen", "paisley-henna", "schmetterlinge", "blumen-botanik", "mandala"];
+  if (PATTERN.includes(slug)) return "mandala";
+  const GRID = ["geometrisch", "vintage-steampunk", "staedte", "kawaii-food", "abc-zahlen", "fahrzeuge"];
+  if (GRID.includes(slug)) return "grid";
+  return hashSeed(slug) % 2 === 0 ? "mandala" : "grid";
+}
+
 export function circlePath(cx, cy, r) {
   const k = 0.5522847498 * r;
   return (
