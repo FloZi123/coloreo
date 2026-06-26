@@ -1,0 +1,46 @@
+# Coloreo – Setup & Go-Live
+
+Der Shop ist **voll funktionsfähig im Test-Modus**, sobald die folgenden Keys in `.env.local`
+(lokal) bzw. in den **Vercel Environment Variables** (Produktion) eingetragen sind.
+
+## 1. Pflicht-Keys (für funktionierenden Bestell-/Lieferablauf)
+
+| Variable | Wo bekommen | Zweck |
+|---|---|---|
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase Dashboard → Projekt **malbuch-shop** → Project Settings → API → `service_role` (secret) | Server schreibt Bestellungen, erzeugt Download-PDFs, Admin |
+| `STRIPE_SECRET_KEY` | Stripe Dashboard (Test-Modus) → Developers → API keys → `sk_test_…` | Zahlung |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe → `pk_test_…` | Zahlung (Client) |
+| `STRIPE_WEBHOOK_SECRET` | Stripe → Developers → Webhooks → Endpoint anlegen auf `https://DEINE-DOMAIN/api/webhooks/stripe`, Event `checkout.session.completed` → `whsec_…` | Auftragserfüllung nach Zahlung |
+
+> Bereits gesetzt: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+
+## 2. Optionale Keys (Komfortfunktionen)
+
+| Variable | Zweck | Ohne Key |
+|---|---|---|
+| `RESEND_API_KEY` + `EMAIL_FROM` | Kauf-/Freebie-Mails | Mails werden geloggt, nicht versendet (Shop funktioniert weiter; Downloads auch auf Danke-Seite/Bibliothek) |
+| `ANTHROPIC_API_KEY` | KI-Chatbot + Auto-Buch-Generierung | Chatbot meldet „nicht konfiguriert" |
+| `ADMIN_EMAILS` | Komma-Liste der Admin-Logins | Default: florian.zinkl@rolling-space.de |
+
+## 3. PayPal aktivieren
+Im Stripe-Dashboard unter **Settings → Payment methods → PayPal** aktivieren (Test-Modus möglich).
+Der Checkout bietet Karte + PayPal automatisch an.
+
+## 4. Stripe-Webhook lokal testen
+```
+stripe login
+stripe listen --forward-to localhost:3100/api/webhooks/stripe
+```
+Den angezeigten `whsec_…` als `STRIPE_WEBHOOK_SECRET` eintragen.
+
+## 5. Vor echtem Go-Live (rechtlich)
+- Echte Daten in Impressum / Datenschutz / AGB / Widerruf eintragen (Platzhalter im Admin → Rechtstexte bzw. `src/lib/legalContent.ts`).
+- Resend-Domain verifizieren (SPF/DKIM) und `EMAIL_FROM` auf eigene Domain setzen.
+- Stripe von Test- auf Live-Keys umstellen.
+- Domain in Vercel verbinden, `NEXT_PUBLIC_SITE_URL` auf Live-Domain setzen.
+
+## 6. Lokaler Start
+```
+npm install
+npm run dev      # http://localhost:3100
+```
