@@ -68,18 +68,21 @@ export async function sendOrderConfirmation(opts: {
   );
 }
 
-export async function sendFreebieEmail(opts: { email: string; locale: Locale; downloadUrl?: string }): Promise<void> {
+export async function sendFreebieEmail(opts: { email: string; locale: Locale; downloadUrl?: string; confirmUrl?: string }): Promise<void> {
   const de = opts.locale === "de";
-  const cta = opts.downloadUrl
+  const cta = opts.confirmUrl
+    ? `<p>${de ? "Bitte bestätige deine Anmeldung – dann erhältst du die Gratis-Vorlagen und Angebote:" : "Please confirm your sign-up to receive the free pages and offers:"}</p>
+       <p><a href="${opts.confirmUrl}" style="background:#7c4dff;color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:bold">${de ? "Anmeldung bestätigen" : "Confirm sign-up"}</a></p>`
+    : opts.downloadUrl
     ? `<p><a href="${opts.downloadUrl}" style="background:#7c4dff;color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:bold">${de ? "Gratis-Vorlagen herunterladen" : "Download free pages"}</a></p>`
     : `<p>${de ? "Deine Gratis-Vorlagen sind unterwegs." : "Your free pages are on the way."}</p>`;
   const html = layout(
-    de ? "Deine Gratis-Malvorlagen 🎁" : "Your free coloring pages 🎁",
-    `${cta}<p style="color:#8b8499;font-size:13px">${de ? "Schau dich gern im Shop um – mit Bundles sparst du bis zu 40 %." : "Browse the shop – save up to 40% with bundles."}</p>`
+    de ? "Fast geschafft! 🎁" : "Almost there! 🎁",
+    `${cta}<p style="color:#8b8499;font-size:13px">${de ? "Du hast dich auf Coloreo angemeldet. Falls nicht, ignoriere diese E-Mail einfach." : "You signed up on Coloreo. If this wasn't you, just ignore this email."}</p>`
   );
   await send(
     opts.email,
-    de ? "Deine Gratis-Malvorlagen von Coloreo" : "Your free coloring pages from Coloreo",
+    de ? "Bitte bestätige deine Anmeldung – Coloreo" : "Please confirm your sign-up – Coloreo",
     html
   );
 }

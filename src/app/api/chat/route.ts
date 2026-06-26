@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import { runChat, type ChatMessage } from "@/lib/chatbot";
 import { anthropicConfigured } from "@/lib/anthropic";
 import { isLocale } from "@/i18n/config";
+import { limited } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
+  const retry = limited(req, "chat", 20);
+  if (retry) return NextResponse.json({ reply: "⏳ Zu viele Anfragen – bitte kurz warten." }, { status: 429 });
   try {
     const body = await req.json();
     const messages: ChatMessage[] = (body.messages ?? [])

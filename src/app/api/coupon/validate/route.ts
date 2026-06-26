@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { createPublicClient } from "@/lib/supabase/public";
+import { limited } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
+  const retry = limited(req, "coupon", 30);
+  if (retry) return NextResponse.json({ valid: false, error: "rate_limited" }, { status: 429 });
   const { code } = await req.json().catch(() => ({ code: "" }));
   if (!code || typeof code !== "string") {
     return NextResponse.json({ valid: false }, { status: 400 });

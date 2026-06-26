@@ -3,8 +3,11 @@ import { buildOrderFromCart, generateOrderNumber, type RawLine } from "@/lib/che
 import { getStripe, stripeConfigured } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isLocale } from "@/i18n/config";
+import { limited } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
+  const retry = limited(req, "checkout", 15);
+  if (retry) return NextResponse.json({ error: "rate_limited" }, { status: 429, headers: { "Retry-After": String(retry) } });
   try {
     const body = await req.json();
     const rawLines: RawLine[] = (body.lines ?? []).map((l: RawLine) => ({ kind: l.kind, id: l.id, quantity: l.quantity }));

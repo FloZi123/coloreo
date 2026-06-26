@@ -12,6 +12,9 @@ function detectLocale(req: NextRequest): string {
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  // Auth-Callback: kein Locale-Redirect
+  if (pathname.startsWith("/auth")) return NextResponse.next();
+
   // Admin-Bereich: eigener Schutz, kein Locale-Redirect
   if (pathname.startsWith("/admin")) {
     if (pathname === "/admin/login") return NextResponse.next();
