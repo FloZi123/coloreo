@@ -1,6 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAnthropic, anthropicConfigured, MODELS } from "@/lib/anthropic";
 import { coverSvg, masterPdfBytes } from "@/lib/generator/art";
+import { imageProviderConfigured, getImageProvider } from "@/lib/generator/imageProvider";
+import { isThematicCategory, generateThematicMasterPdf } from "@/lib/generator/thematic";
 
 const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 
@@ -143,8 +145,18 @@ Antworte als JSON: {"title_de":"...","title_en":"...","description_de":"<2 Sätz
   });
   const coverUrl = `${SUPA_URL}/storage/v1/object/public/covers/${slug}.svg`;
 
-  // Master-PDF hochladen (privater Bucket)
-  const pdf = await masterPdfBytes(slug, titleDe, pages);
+  // Master-PDF: thematische KI-Linienkunst (Replicate) falls konfiguriert & repräsentative
+  // Kategorie, sonst prozedurales Muster.
+  let pdf: Uint8Array;
+  if (imageProviderConfigured() && isThematicCategory(cat?.slug)) {
+    pdf = await generateThematicMasterPdf(
+      getImageProvider(),
+      { slug, titleDe, categorySlug: cat!.slug },
+      pages
+    );
+  } else {
+    pdf = await masterPdfBytes(slug, titleDe, pages);
+  }
   await admin.storage.from("books").upload(`${slug}.pdf`, pdf, { contentType: "application/pdf", upsert: true });
 
   // Buch als Entwurf anlegen

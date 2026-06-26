@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "gen:covers": "node scripts/generate-covers.mjs",
-    "gen:masters": "node scripts/generate-masters.mjs"
+    "gen:masters": "node scripts/generate-masters.mjs",
+    "gen:thematic": "tsx scripts/generate-thematic.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.106.0",
@@ -21,6 +22,7 @@
     "pdf-lib": "^1.17.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "replicate": "^1.4.0",
     "stripe": "^22.3.0",
     "zod": "^4.4.3"
   },
@@ -33,6 +35,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
+    "tsx": "^4.22.4",
     "typescript": "^5"
   }
 }
