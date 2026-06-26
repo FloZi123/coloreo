@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useCart } from "@/lib/cart/store";
+import Logo from "@/components/Logo";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 
@@ -36,8 +37,8 @@ export default function Header({
   return (
     <header className="sticky top-0 z-40 border-b bg-paper/90 backdrop-blur">
       <div className="container-page flex h-16 items-center justify-between gap-4">
-        <Link href={p("")} className="font-display text-xl font-bold text-ink">
-          <span className="text-primary">✦</span> {brand}
+        <Link href={p("")} aria-label={brand}>
+          <Logo size={32} />
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">

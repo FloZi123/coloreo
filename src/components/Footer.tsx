@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "@/components/Logo";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 
@@ -17,10 +18,8 @@ export default function Footer({
     <footer className="mt-20 border-t bg-surface">
       <div className="container-page grid gap-8 py-12 md:grid-cols-4">
         <div>
-          <div className="font-display text-lg font-bold">
-            <span className="text-primary">✦</span> {brand}
-          </div>
-          <p className="mt-2 text-sm text-muted">{dict.home.heroSubtitle}</p>
+          <Logo size={26} />
+          <p className="mt-3 text-sm text-muted">{dict.home.heroSubtitle}</p>
         </div>
         <div>
           <h4 className="mb-3 text-sm font-semibold">{dict.nav.categories}</h4>
