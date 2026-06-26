@@ -60,6 +60,12 @@ export async function listLeads(limit = 500) {
   return data ?? [];
 }
 
+export async function listCategoriesAdmin() {
+  const admin = createAdminClient();
+  const { data } = await admin.from("categories").select("id, name_de, emoji, audience").order("sort_order");
+  return data ?? [];
+}
+
 export async function listGenerationQueue() {
   const admin = createAdminClient();
   const [{ data: items }, { data: cats }] = await Promise.all([

@@ -2,7 +2,102 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getAnthropic, anthropicConfigured, MODELS } from "@/lib/anthropic";
 import { coverSvg, masterPdfBytes } from "@/lib/generator/art";
 import { imageProviderConfigured, getImageProvider } from "@/lib/generator/imageProvider";
-import { isThematicCategory, generateThematicMasterPdf } from "@/lib/generator/thematic";
+import {
+  isThematicCategory,
+  motifsForCategory,
+  generateMasterFromMotifs,
+  generateCoverImage,
+} from "@/lib/generator/thematic";
+import { makeWatermarkedPreviews } from "@/lib/generator/previews";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/lib/database.types";
+
+type Admin = SupabaseClient<Database>;
+type Audience = "adult" | "kids" | "all";
+
+interface BookSpec {
+  titleDe: string;
+  titleEn: string;
+  descDe: string;
+  descEn: string;
+  categoryId: string | null;
+  categoryName: string;
+  categorySlug: string;
+  audience: Audience;
+  motifs: string[];
+  heroMotif: string;
+  priceCents?: number;
+}
+
+/**
+ * Erzeugt Cover (Stil B, falls Bild-Provider konfiguriert), Master-PDF (KI-Linienkunst oder
+ * prozedural), Wasserzeichen-Vorschauen und legt das Buch als Entwurf an. Liefert die Buch-ID.
+ */
+async function materializeBook(admin: Admin, spec: BookSpec): Promise<string> {
+  const slug = `${slugify(spec.titleDe)}-${Math.floor(Math.random() * 9000 + 1000)}`;
+  const pages = 24;
+  const useAI = imageProviderConfigured();
+
+  // Cover
+  let coverUrl: string;
+  if (useAI) {
+    const png = await generateCoverImage(getImageProvider(), {
+      title: spec.titleDe,
+      categoryName: `${spec.categoryName}`,
+      heroMotif: spec.heroMotif,
+      pages,
+    });
+    await admin.storage.from("covers").upload(`${slug}.png`, png, { contentType: "image/png", upsert: true });
+    coverUrl = `${SUPA_URL}/storage/v1/object/public/covers/${slug}.png`;
+  } else {
+    const svg = coverSvg(slug, spec.titleDe, spec.categoryName, "🎨", pages);
+    await admin.storage.from("covers").upload(`${slug}.svg`, new TextEncoder().encode(svg), { contentType: "image/svg+xml", upsert: true });
+    coverUrl = `${SUPA_URL}/storage/v1/object/public/covers/${slug}.svg`;
+  }
+
+  // Master-PDF
+  const pdf = useAI
+    ? await generateMasterFromMotifs(getImageProvider(), { slug, titleDe: spec.titleDe, audience: spec.audience }, spec.motifs, pages)
+    : await masterPdfBytes(slug, spec.titleDe, pages);
+  await admin.storage.from("books").upload(`${slug}.pdf`, pdf, { contentType: "application/pdf", upsert: true });
+
+  // Wasserzeichen-Vorschauen (best effort)
+  let previewUrls: string[] = [];
+  try {
+    const previews = await makeWatermarkedPreviews(pdf, 5);
+    previewUrls = [];
+    for (let i = 0; i < previews.length; i++) {
+      const path = `${slug}/p${i + 1}.webp`;
+      await admin.storage.from("previews").upload(path, previews[i], { contentType: "image/webp", upsert: true });
+      previewUrls.push(`${SUPA_URL}/storage/v1/object/public/previews/${path}`);
+    }
+  } catch (e) {
+    console.warn("[autogen] Vorschau-Erzeugung übersprungen:", e instanceof Error ? e.message : e);
+  }
+
+  const { data: book, error } = await admin
+    .from("books")
+    .insert({
+      slug,
+      category_id: spec.categoryId,
+      title_de: spec.titleDe,
+      title_en: spec.titleEn,
+      description_de: spec.descDe,
+      description_en: spec.descEn,
+      price_cents: spec.priceCents ?? 599,
+      page_count: pages,
+      cover_url: coverUrl,
+      pdf_path: `${slug}.pdf`,
+      preview_urls: previewUrls,
+      status: "draft",
+      source: "ai_generated",
+      tags: [spec.categorySlug || "ki", "malbuch", "pdf"],
+    })
+    .select("id")
+    .single();
+  if (error || !book) throw error ?? new Error("book_insert_failed");
+  return book.id;
+}
 
 const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 
@@ -101,7 +196,9 @@ export async function generateBookDraft(queueId: string): Promise<{ bookId: stri
 
   await admin.from("book_generation_queue").update({ status: "generating" }).eq("id", queueId);
 
-  const { data: cat } = await admin.from("categories").select("name_de, name_en, emoji, slug").eq("id", item.category_id ?? "").maybeSingle();
+  const { data: cat } = await admin.from("categories").select("name_de, name_en, emoji, slug, audience").eq("id", item.category_id ?? "").maybeSingle();
+  const audience = (cat?.audience ?? "adult") as Audience;
+  const catSlug = cat?.slug ?? "";
 
   let titleDe = item.suggested_title_de;
   let titleEn = item.suggested_title_en;
@@ -134,53 +231,94 @@ Antworte als JSON: {"title_de":"...","title_en":"...","description_de":"<2 Sätz
     }
   }
 
-  const slug = `${slugify(titleDe)}-${Math.floor(Math.random() * 9000 + 1000)}`;
-  const pages = 24;
-
-  // Cover hochladen (öffentlicher Bucket)
-  const svg = coverSvg(slug, titleDe, cat?.name_de ?? "", cat?.emoji ?? "🎨", pages);
-  await admin.storage.from("covers").upload(`${slug}.svg`, new TextEncoder().encode(svg), {
-    contentType: "image/svg+xml",
-    upsert: true,
+  const motifs = isThematicCategory(catSlug) ? motifsForCategory(catSlug) : [];
+  const bookId = await materializeBook(admin, {
+    titleDe, titleEn, descDe, descEn,
+    categoryId: item.category_id,
+    categoryName: cat?.name_de ?? "",
+    categorySlug: catSlug,
+    audience,
+    motifs,
+    heroMotif: motifs[0] ?? titleDe,
   });
-  const coverUrl = `${SUPA_URL}/storage/v1/object/public/covers/${slug}.svg`;
 
-  // Master-PDF: thematische KI-Linienkunst (Replicate) falls konfiguriert & repräsentative
-  // Kategorie, sonst prozedurales Muster.
-  let pdf: Uint8Array;
-  if (imageProviderConfigured() && isThematicCategory(cat?.slug)) {
-    pdf = await generateThematicMasterPdf(
-      getImageProvider(),
-      { slug, titleDe, categorySlug: cat!.slug },
-      pages
-    );
-  } else {
-    pdf = await masterPdfBytes(slug, titleDe, pages);
+  await admin.from("book_generation_queue").update({ status: "draft_ready", generated_book_id: bookId }).eq("id", queueId);
+  return { bookId };
+}
+
+/**
+ * Buch-Generierung aus Admin-Brief: Thema + Stichpunkte (Motive) + Kategorie → vollständiger
+ * Buch-Entwurf (Cover Stil B, 24 Seiten aus den Stichpunkten, Schwierigkeit nach Zielgruppe).
+ */
+export async function generateBookFromBrief(input: {
+  theme: string;
+  bullets: string[];
+  categoryId: string;
+}): Promise<{ bookId: string }> {
+  const admin = createAdminClient();
+  const { data: cat } = await admin
+    .from("categories")
+    .select("name_de, name_en, slug, audience")
+    .eq("id", input.categoryId)
+    .maybeSingle();
+  if (!cat) throw new Error("category_not_found");
+
+  const audience = (cat.audience ?? "adult") as Audience;
+  const theme = input.theme.trim();
+  const bullets = input.bullets.map((b) => b.trim()).filter(Boolean);
+
+  let titleDe = theme;
+  let titleEn = theme;
+  let descDe = `${theme}: ein liebevoll gestaltetes Malbuch mit ${bullets.length || "vielen"} Motiven. Sofort als PDF herunterladen, ausdrucken und losmalen.`;
+  let descEn = `${theme}: a lovingly designed coloring book. Download instantly as PDF, print and start coloring.`;
+
+  // Optional: Claude verfeinert Titel/Texte und füllt Motive auf 24 auf
+  let motifs = bullets.length ? bullets : [theme];
+  if (anthropicConfigured()) {
+    try {
+      const client = getAnthropic();
+      const res = await client.messages.create({
+        model: MODELS.content,
+        max_tokens: 900,
+        messages: [
+          {
+            role: "user",
+            content: `Plane ein digitales Malbuch. Thema: "${theme}". Kategorie: ${cat.name_de}. Zielgruppe: ${audience}. Stichpunkte des Kunden: ${bullets.join("; ") || "(keine)"}.
+Antworte NUR als JSON: {"title_de":"...","title_en":"...","description_de":"<2 knackige Verkaufssätze>","description_en":"<2 sentences>","motifs":["24 unterschiedliche, konkrete Motive auf Englisch für die Malseiten, passend zu Thema und Stichpunkten"]}`,
+          },
+        ],
+      });
+      const txt = res.content.filter((b) => b.type === "text").map((b) => (b as { text: string }).text).join("");
+      const j = JSON.parse(txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1));
+      titleDe = j.title_de ?? titleDe;
+      titleEn = j.title_en ?? titleEn;
+      descDe = j.description_de ?? descDe;
+      descEn = j.description_en ?? descEn;
+      if (Array.isArray(j.motifs) && j.motifs.length) motifs = j.motifs;
+    } catch {
+      /* Brief-Daten beibehalten */
+    }
   }
-  await admin.storage.from("books").upload(`${slug}.pdf`, pdf, { contentType: "application/pdf", upsert: true });
 
-  // Buch als Entwurf anlegen
-  const { data: book, error } = await admin
-    .from("books")
-    .insert({
-      slug,
-      category_id: item.category_id,
-      title_de: titleDe,
-      title_en: titleEn,
-      description_de: descDe,
-      description_en: descEn,
-      price_cents: 599,
-      page_count: pages,
-      cover_url: coverUrl,
-      pdf_path: `${slug}.pdf`,
-      status: "draft",
-      source: "ai_generated",
-      tags: [cat?.slug ?? "ki", "malbuch", "pdf"],
-    })
-    .select("id")
-    .single();
-  if (error || !book) throw error ?? new Error("book_insert_failed");
+  const bookId = await materializeBook(admin, {
+    titleDe, titleEn, descDe, descEn,
+    categoryId: input.categoryId,
+    categoryName: cat.name_de,
+    categorySlug: cat.slug,
+    audience,
+    motifs,
+    heroMotif: motifs[0] ?? theme,
+  });
 
-  await admin.from("book_generation_queue").update({ status: "draft_ready", generated_book_id: book.id }).eq("id", queueId);
-  return { bookId: book.id };
+  await admin.from("book_generation_queue").insert({
+    suggested_title_de: titleDe,
+    suggested_title_en: titleEn,
+    category_id: input.categoryId,
+    rationale: `Manuell erzeugt aus Brief: ${theme}`,
+    status: "draft_ready",
+    generated_book_id: bookId,
+    trigger_data: { source: "admin_brief", bullets },
+  });
+
+  return { bookId };
 }

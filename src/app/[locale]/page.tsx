@@ -4,6 +4,7 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { getCategories, getBooks, tName, tTitle } from "@/lib/data";
 import BookCard from "@/components/BookCard";
 import FreebieForm from "@/components/FreebieForm";
+import JsonLd from "@/components/JsonLd";
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
@@ -16,8 +17,19 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const books = featured.length ? featured : await getBooks({ limit: 8 });
   const p = (path: string) => `/${locale}${path}`;
 
+  const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const orgLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      { "@type": "Organization", name: "Coloreo", url: site, slogan: locale === "de" ? "Mal dir deine Welt." : "Color your world." },
+      { "@type": "WebSite", name: "Coloreo", url: site, inLanguage: locale,
+        potentialAction: { "@type": "SearchAction", target: `${site}/${locale}/suche?q={search_term_string}`, "query-input": "required name=search_term_string" } },
+    ],
+  };
+
   return (
     <div>
+      <JsonLd data={orgLd} />
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary-soft via-paper to-accent-soft" />

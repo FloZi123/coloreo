@@ -8,6 +8,7 @@ import { createPublicClient } from "@/lib/supabase/public";
 import ProductBuyBox from "@/components/ProductBuyBox";
 import BookCard from "@/components/BookCard";
 import BookPreviewViewer from "@/components/BookPreviewViewer";
+import JsonLd from "@/components/JsonLd";
 
 export async function generateMetadata({
   params,
@@ -48,8 +49,28 @@ export default async function BookPage({
   const related = category ? (await getBooks({ categoryId: category.id, limit: 5 })).filter((b) => b.id !== book.id).slice(0, 4) : [];
   const previews = Array.isArray(book.preview_urls) ? (book.preview_urls as string[]) : [];
 
+  const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const absImage = book.cover_url ? (book.cover_url.startsWith("http") ? book.cover_url : `${site}${book.cover_url}`) : undefined;
+  const productLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: tTitle(book, locale),
+    description: tDesc(book, locale),
+    image: absImage ? [absImage] : undefined,
+    brand: { "@type": "Brand", name: "Coloreo" },
+    category: category ? tName(category, locale) : undefined,
+    offers: {
+      "@type": "Offer",
+      price: (book.price_cents / 100).toFixed(2),
+      priceCurrency: "EUR",
+      availability: "https://schema.org/InStock",
+      url: `${site}/${locale}/buch/${book.slug}`,
+    },
+  };
+
   return (
     <div className="container-page py-12">
+      <JsonLd data={productLd} />
       <nav className="mb-6 text-sm text-muted">
         <Link href={`/${locale}/kategorien`} className="hover:text-primary">{dict.categories.title}</Link>
         {category && (

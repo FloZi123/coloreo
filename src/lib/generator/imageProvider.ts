@@ -25,16 +25,27 @@ class ReplicateProvider implements ImageProvider {
     this.model = (process.env.REPLICATE_MODEL || DEFAULT_MODEL) as `${string}/${string}`;
   }
 
-  /** Führt die Generierung aus und wiederholt bei Rate-Limit (429) mit Backoff. */
+  /** Führt die Generierung aus und wiederholt bei Rate-Limit (429)/Netzwerkfehlern mit Backoff. */
   private async runWithRetry(prompt: string, maxRetries = 8): Promise<unknown> {
-    const input = { prompt, aspect_ratio: "3:4", num_outputs: 1, output_format: "png", megapixels: "1" };
+    const isFlux = this.model.includes("flux");
+    const isDev = this.model.includes("flux-dev");
+    const input: Record<string, unknown> = { prompt, aspect_ratio: "3:4", output_format: "png" };
+    if (isFlux) {
+      input.num_outputs = 1;
+      input.megapixels = "1";
+      if (isDev) {
+        input.num_inference_steps = 30;
+        input.guidance = 3.5;
+      }
+    }
     for (let attempt = 0; ; attempt++) {
       try {
         return await this.client.run(this.model, { input });
       } catch (e) {
-        const msg = e instanceof Error ? e.message : String(e);
-        const throttled = msg.includes("429") || /throttl/i.test(msg);
-        if (!throttled || attempt >= maxRetries) throw e;
+        const err = e as { message?: string; cause?: { code?: string } };
+        const msg = (err.message ?? String(e)) + " " + (err.cause?.code ?? "");
+        const retriable = msg.includes("429") || /throttl/i.test(msg) || /ECONNRESET|ETIMEDOUT|fetch failed|terminated|socket/i.test(msg);
+        if (!retriable || attempt >= maxRetries) throw e;
         const m = msg.match(/resets in ~?(\d+)s|retry_after"?:\s*(\d+)/i);
         const waitS = m ? Number(m[1] ?? m[2]) + 1 : Math.min(2 ** attempt, 15);
         await new Promise((r) => setTimeout(r, waitS * 1000));

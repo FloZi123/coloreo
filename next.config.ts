@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  // Native Module nicht bundeln (PDF-Rasterizer + Bildverarbeitung)
+  serverExternalPackages: ["pdf-to-img", "@napi-rs/canvas", "sharp", "pdf-lib"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "ubgjdvbnmfnirsntyslr.supabase.co" },

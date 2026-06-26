@@ -1,13 +1,13 @@
 import AdminShell from "@/components/admin/AdminShell";
 import GeneratorView from "@/components/admin/GeneratorView";
-import { listGenerationQueue } from "@/lib/admin-data";
+import { listGenerationQueue, listCategoriesAdmin } from "@/lib/admin-data";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminGenerator() {
-  let items;
+  let items, categories;
   try {
-    items = await listGenerationQueue();
+    [items, categories] = await Promise.all([listGenerationQueue(), listCategoriesAdmin()]);
   } catch {
     return (
       <AdminShell>
@@ -18,7 +18,7 @@ export default async function AdminGenerator() {
   return (
     <AdminShell>
       <h1 className="mb-6 font-display text-2xl font-bold">Auto-Generator</h1>
-      <GeneratorView items={items} />
+      <GeneratorView items={items} categories={categories} />
     </AdminShell>
   );
 }

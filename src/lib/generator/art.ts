@@ -121,7 +121,7 @@ export async function masterPdfBytes(slug: string, titleDe: string, pages: numbe
     const page = doc.addPage([595, 842]);
     const d = mandalaPaths(hashSeed(slug + "#" + p), 260, 260, 245).join(" ");
     page.drawSvgPath(d, { x: 37, y: 800, borderColor: rgb(0.1, 0.1, 0.12), borderWidth: 1.4 });
-    page.drawText(`Coloreo · ${titleDe}`, { x: 37, y: 26, size: 9, font, color: rgb(0.6, 0.6, 0.65) });
+    page.drawText(`Coloreo - ${titleDe}`.replace(/[^\x20-\xFF]/g, ""), { x: 37, y: 26, size: 9, font, color: rgb(0.6, 0.6, 0.65) });
     page.drawText(`${p + 1} / ${pages}`, { x: 520, y: 26, size: 9, font, color: rgb(0.6, 0.6, 0.65) });
   }
   return doc.save();
