@@ -27,23 +27,21 @@ export default function ProductBuyBox({
   const inCart = has(id);
 
   return (
-    <div className="card p-6">
-      <div className="font-display text-3xl font-bold text-primary">{formatPrice(priceCents, locale)}</div>
-      <p className="mt-1 text-sm text-muted">{dict.common.instantDownload}</p>
+    <div>
       <button
         onClick={() => addBook({ id, slug, title, coverUrl, unitPriceCents: priceCents })}
-        className={`mt-4 w-full rounded-full py-3.5 font-semibold ${inCart ? "bg-success text-white" : "btn-primary"}`}
+        className={`w-full rounded-full py-4 text-lg font-extrabold ${inCart ? "bg-success text-white" : "btn-primary"}`}
       >
-        {inCart ? "✓ " + dict.common.inCart : dict.common.addToCart}
+        {inCart ? "✓ " + dict.common.inCart : `${dict.common.addToCart} · ${formatPrice(priceCents, locale)}`}
       </button>
-      <Link href={`/${locale}/warenkorb`} className="mt-2 block text-center text-sm font-semibold text-primary hover:underline">
+      <Link href={`/${locale}/warenkorb`} className="mt-2 block text-center text-sm font-extrabold text-ink hover:text-primary">
         {dict.cart.proceed} →
       </Link>
-      <ul className="mt-5 space-y-2 text-sm text-ink-soft">
-        <li>✓ {dict.home.trustInstant}</li>
-        <li>✓ {dict.product.formatValue}</li>
-        <li>✓ {dict.home.trustSecure}</li>
-      </ul>
+      <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-muted">
+        <span>✓ {dict.home.trustInstant}</span>
+        <span>✓ {dict.product.formatValue}</span>
+        <span>✓ {dict.home.trustSecure}</span>
+      </div>
     </div>
   );
 }

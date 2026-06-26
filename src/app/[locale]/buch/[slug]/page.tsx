@@ -5,6 +5,7 @@ import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getBookBySlug, getBooks, getCategoryBySlug, getBookRating, getReviews, tTitle, tDesc, tName } from "@/lib/data";
 import { createPublicClient } from "@/lib/supabase/public";
+import { formatPrice } from "@/lib/pricing";
 import ProductBuyBox from "@/components/ProductBuyBox";
 import BookCard from "@/components/BookCard";
 import BookPreviewViewer from "@/components/BookPreviewViewer";
@@ -50,6 +51,7 @@ export default async function BookPage({
   const related = category ? (await getBooks({ categoryId: category.id, limit: 5 })).filter((b) => b.id !== book.id).slice(0, 4) : [];
   const previews = Array.isArray(book.preview_urls) ? (book.preview_urls as string[]) : [];
   const [rating, reviews] = await Promise.all([getBookRating(book.id), getReviews(book.id)]);
+  const audienceLabel = book.audience === "kids" ? (locale === "de" ? "Kinder" : "Kids") : book.audience === "adult" ? (locale === "de" ? "Erwachsene" : "Adults") : (locale === "de" ? "Alle" : "All");
 
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const absImage = book.cover_url ? (book.cover_url.startsWith("http") ? book.cover_url : `${site}${book.cover_url}`) : undefined;
@@ -109,7 +111,12 @@ export default async function BookPage({
 
         {/* INFO + BUY */}
         <div>
-          <h1 className="font-display text-3xl font-bold">{tTitle(book, locale)}</h1>
+          {category && (
+            <span className="inline-flex items-center rounded-full border bg-surface px-4 py-1.5 text-xs font-extrabold uppercase tracking-wider text-muted">
+              {category.emoji} {tName(category, locale)}
+            </span>
+          )}
+          <h1 className="mt-4 font-display text-4xl font-bold leading-tight">{tTitle(book, locale)}</h1>
           {rating && rating.count > 0 && (
             <div className="mt-2 flex items-center gap-2 text-sm">
               <Stars value={rating.avg} />
@@ -117,13 +124,23 @@ export default async function BookPage({
               <span className="text-muted">({rating.count})</span>
             </div>
           )}
-          <p className="mt-4 text-ink-soft">{tDesc(book, locale)}</p>
+          <div className="mt-3 font-display text-3xl font-bold">{formatPrice(book.price_cents, locale)}</div>
+          <p className="mt-4 max-w-[46ch] text-ink-soft">{tDesc(book, locale)}</p>
 
-          <dl className="mt-6 space-y-2 text-sm">
-            <div className="flex justify-between border-b py-2"><dt className="text-muted">{dict.product.pageCount}</dt><dd className="font-semibold">{book.page_count}</dd></div>
-            <div className="flex justify-between border-b py-2"><dt className="text-muted">{dict.product.format}</dt><dd className="font-semibold">{dict.product.formatValue}</dd></div>
-            {category && <div className="flex justify-between border-b py-2"><dt className="text-muted">{dict.product.category}</dt><dd className="font-semibold">{tName(category, locale)}</dd></div>}
-          </dl>
+          <div className="mt-6 grid grid-cols-3 gap-3">
+            <div className="rounded-2xl p-4" style={{ background: "var(--color-beige)" }}>
+              <div className="font-display text-xl font-bold">{book.page_count}</div>
+              <div className="text-xs text-muted">{dict.product.pageCount}</div>
+            </div>
+            <div className="rounded-2xl p-4" style={{ background: "var(--color-beige)" }}>
+              <div className="font-display text-xl font-bold">{audienceLabel}</div>
+              <div className="text-xs text-muted">{locale === "de" ? "Zielgruppe" : "Audience"}</div>
+            </div>
+            <div className="rounded-2xl p-4" style={{ background: "var(--color-beige)" }}>
+              <div className="font-display text-xl font-bold">PDF</div>
+              <div className="text-xs text-muted">A4 · {locale === "de" ? "druckfertig" : "print-ready"}</div>
+            </div>
+          </div>
 
           <div className="mt-6">
             <ProductBuyBox id={book.id} slug={book.slug} title={tTitle(book, locale)} priceCents={book.price_cents} coverUrl={book.cover_url} locale={locale} dict={dict} />
