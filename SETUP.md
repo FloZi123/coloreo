@@ -53,9 +53,20 @@ npm run dev      # http://localhost:3100
 4. Stripe-Webhook-Endpoint auf `https://DEINE-DOMAIN/api/webhooks/stripe` setzen und `whsec_…` eintragen.
 5. Deploy. Danach Test-Kauf mit Stripe-Testkarte `4242 4242 4242 4242` durchführen.
 
+## 7b. Magic-Link-Login (sichere Bibliothek)
+- Supabase Dashboard → Authentication → URL Configuration: **Redirect URLs** ergänzen:
+  `http://localhost:3100/auth/callback` und `https://DEINE-DOMAIN/auth/callback`.
+- Supabase versendet die Login-Mails über seinen eigenen Dienst (im Free-Tier limitiert);
+  für Produktion eigenes SMTP in Supabase → Auth → Emails hinterlegen.
+- Newsletter ist **Double-Opt-in** (Bestätigungsmail). Rate-Limiting der öffentlichen APIs ist
+  In-Memory (pro Instanz) – für harte Limits zentralen Store (Upstash/Supabase) andocken.
+- Willkommens-Gutschein **WILLKOMMEN10** (10 %) ist angelegt und wird im Erstkäufer-Popup beworben.
+
 ## 8. Admin-Zugang
 - URL: `/admin` · Passwort = `ADMIN_PASSWORD` (in `.env.local`, bitte ändern!).
-- Bereiche: Dashboard, Bücher, Bestellungen, Gutscheine, Leads, Auto-Generator.
+- Bereiche: Dashboard, Bücher (voll editierbar + Cover-Upload + Durchblättern), Kategorien,
+  Bundles, Bestellungen (mit Refund), Gutscheine, Leads & Newsletter, Support-Posteingang,
+  Auto-Generator (inkl. **Buch aus Brief**: Thema/Stichpunkte/Kategorie → vollautomatisch).
 
 ## 9. Content nachproduzieren
 - `npm run gen:covers` – Cover für alle Bücher (public/covers).
