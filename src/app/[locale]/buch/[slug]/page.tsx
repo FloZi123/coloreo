@@ -3,12 +3,13 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
-import { getBookBySlug, getBooks, getCategoryBySlug, tTitle, tDesc, tName } from "@/lib/data";
+import { getBookBySlug, getBooks, getCategoryBySlug, getBookRating, getReviews, tTitle, tDesc, tName } from "@/lib/data";
 import { createPublicClient } from "@/lib/supabase/public";
 import ProductBuyBox from "@/components/ProductBuyBox";
 import BookCard from "@/components/BookCard";
 import BookPreviewViewer from "@/components/BookPreviewViewer";
 import JsonLd from "@/components/JsonLd";
+import Stars from "@/components/Stars";
 
 export async function generateMetadata({
   params,
@@ -48,6 +49,7 @@ export default async function BookPage({
   const category = await categoryOf(book.category_id);
   const related = category ? (await getBooks({ categoryId: category.id, limit: 5 })).filter((b) => b.id !== book.id).slice(0, 4) : [];
   const previews = Array.isArray(book.preview_urls) ? (book.preview_urls as string[]) : [];
+  const [rating, reviews] = await Promise.all([getBookRating(book.id), getReviews(book.id)]);
 
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const absImage = book.cover_url ? (book.cover_url.startsWith("http") ? book.cover_url : `${site}${book.cover_url}`) : undefined;
@@ -66,6 +68,9 @@ export default async function BookPage({
       availability: "https://schema.org/InStock",
       url: `${site}/${locale}/buch/${book.slug}`,
     },
+    ...(rating && rating.count > 0
+      ? { aggregateRating: { "@type": "AggregateRating", ratingValue: rating.avg, reviewCount: rating.count } }
+      : {}),
   };
 
   return (
@@ -105,6 +110,13 @@ export default async function BookPage({
         {/* INFO + BUY */}
         <div>
           <h1 className="font-display text-3xl font-bold">{tTitle(book, locale)}</h1>
+          {rating && rating.count > 0 && (
+            <div className="mt-2 flex items-center gap-2 text-sm">
+              <Stars value={rating.avg} />
+              <span className="font-semibold">{rating.avg.toFixed(1)}</span>
+              <span className="text-muted">({rating.count})</span>
+            </div>
+          )}
           <p className="mt-4 text-ink-soft">{tDesc(book, locale)}</p>
 
           <dl className="mt-6 space-y-2 text-sm">
@@ -119,6 +131,23 @@ export default async function BookPage({
           <p className="mt-4 text-xs text-muted">{dict.product.watermarkNote}</p>
         </div>
       </div>
+
+      {reviews.length > 0 && (
+        <section className="mt-16">
+          <h2 className="mb-6 font-display text-2xl font-bold">{locale === "de" ? "Bewertungen" : "Reviews"}</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {reviews.map((r, i) => (
+              <div key={i} className="card p-5">
+                <div className="flex items-center justify-between">
+                  <span className="font-display font-semibold">{r.author_name}</span>
+                  <Stars value={r.rating} size={14} />
+                </div>
+                {r.body && <p className="mt-2 text-sm text-ink-soft">{r.body}</p>}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {related.length > 0 && (
         <section className="mt-16">

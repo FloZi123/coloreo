@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
-import { getCategories, getBooks, tName, tTitle } from "@/lib/data";
+import { getCategories, getBooks, getRatingsForBooks, tName, tTitle } from "@/lib/data";
 import BookCard from "@/components/BookCard";
 import FreebieForm from "@/components/FreebieForm";
 import JsonLd from "@/components/JsonLd";
@@ -15,6 +15,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     getBooks({ featured: true, limit: 8 }),
   ]);
   const books = featured.length ? featured : await getBooks({ limit: 8 });
+  const ratings = await getRatingsForBooks(books.map((b) => b.id));
   const p = (path: string) => `/${locale}${path}`;
 
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -96,6 +97,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                   priceCents: b.price_cents,
                   pageCount: b.page_count,
                   coverUrl: b.cover_url,
+                  rating: ratings.get(b.id) ?? null,
                 }}
               />
             ))}

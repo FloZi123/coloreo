@@ -8,6 +8,8 @@ import { CartProvider } from "@/lib/cart/store";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
+import CartToast from "@/components/CartToast";
+import FirstOrderPopup from "@/components/FirstOrderPopup";
 
 const body = Nunito({ subsets: ["latin"], variable: "--font-body", display: "swap" });
 const display = Quicksand({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display", display: "swap" });
@@ -49,6 +51,8 @@ export default async function LocaleLayout({
           <main className="flex-1">{children}</main>
           <Footer locale={l} dict={dict} brand={brand.name} />
           <ChatWidget locale={l} dict={dict} />
+          <CartToast locale={l} />
+          <FirstOrderPopup locale={l} />
         </CartProvider>
       </body>
     </html>

@@ -48,6 +48,28 @@ export async function getBooks(opts: { categoryId?: string; featured?: boolean; 
   return data ?? [];
 }
 
+export async function searchBooks(opts: {
+  q?: string;
+  audience?: "adult" | "kids";
+  categorySlug?: string;
+  sort?: "popular" | "price_asc" | "price_desc" | "new";
+}): Promise<Book[]> {
+  const sb = createPublicClient();
+  let q = sb.from("books").select("*").eq("status", "published");
+  if (opts.q) q = q.or(`title_de.ilike.%${opts.q}%,title_en.ilike.%${opts.q}%`);
+  if (opts.audience) q = q.eq("audience", opts.audience);
+  if (opts.categorySlug) {
+    const cat = await getCategoryBySlug(opts.categorySlug);
+    if (cat) q = q.eq("category_id", cat.id);
+  }
+  if (opts.sort === "price_asc") q = q.order("price_cents", { ascending: true });
+  else if (opts.sort === "price_desc") q = q.order("price_cents", { ascending: false });
+  else if (opts.sort === "new") q = q.order("created_at", { ascending: false });
+  else q = q.order("sales_count", { ascending: false });
+  const { data } = await q.limit(60);
+  return data ?? [];
+}
+
 export async function getBookBySlug(slug: string): Promise<Book | null> {
   const sb = createPublicClient();
   const { data } = await sb.from("books").select("*").eq("slug", slug).eq("status", "published").maybeSingle();
@@ -75,6 +97,38 @@ export async function getBundleWithBooks(slug: string): Promise<{ bundle: Bundle
     ? await sb.from("books").select("*").in("id", ids)
     : { data: [] as Book[] };
   return { bundle, books: books ?? [] };
+}
+
+export type Rating = { avg: number; count: number };
+
+export async function getBookRating(bookId: string): Promise<Rating | null> {
+  const sb = createPublicClient();
+  const { data } = await sb.from("book_ratings").select("avg_rating, review_count").eq("book_id", bookId).maybeSingle();
+  if (!data || data.review_count == null) return null;
+  return { avg: Number(data.avg_rating ?? 0), count: data.review_count };
+}
+
+export async function getReviews(bookId: string, limit = 8) {
+  const sb = createPublicClient();
+  const { data } = await sb
+    .from("reviews")
+    .select("rating, author_name, body, created_at")
+    .eq("book_id", bookId)
+    .eq("is_approved", true)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  return data ?? [];
+}
+
+export async function getRatingsForBooks(bookIds: string[]): Promise<Map<string, Rating>> {
+  const map = new Map<string, Rating>();
+  if (bookIds.length === 0) return map;
+  const sb = createPublicClient();
+  const { data } = await sb.from("book_ratings").select("book_id, avg_rating, review_count").in("book_id", bookIds);
+  for (const r of data ?? []) {
+    if (r.book_id) map.set(r.book_id, { avg: Number(r.avg_rating ?? 0), count: r.review_count ?? 0 });
+  }
+  return map;
 }
 
 export async function getPricingTiers(): Promise<PricingTier[]> {

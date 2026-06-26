@@ -17,6 +17,7 @@ interface CartState {
   clear: () => void;
   count: number;
   has: (id: string) => boolean;
+  lastAdded: { title: string; at: number } | null;
 }
 
 const CartContext = createContext<CartState | null>(null);
@@ -25,6 +26,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [couponCode, setCouponCode] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [lastAdded, setLastAdded] = useState<{ title: string; at: number } | null>(null);
 
   useEffect(() => {
     try {
@@ -44,6 +46,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [lines, couponCode, hydrated]);
 
   const addBook = useCallback((line: Omit<CartLine, "kind" | "quantity">) => {
+    setLastAdded({ title: line.title, at: Date.now() });
     setLines((prev) => {
       const existing = prev.find((l) => l.id === line.id);
       if (existing) {
@@ -54,6 +57,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addBundle = useCallback((line: Omit<CartLine, "kind" | "quantity">) => {
+    setLastAdded({ title: line.title, at: Date.now() });
     setLines((prev) => {
       if (prev.some((l) => l.id === line.id)) return prev;
       return [...prev, { ...line, kind: "bundle", quantity: 1 }];
@@ -61,6 +65,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addMany = useCallback((newLines: Array<Omit<CartLine, "kind" | "quantity">>) => {
+    if (newLines.length) setLastAdded({ title: `${newLines.length} Bücher`, at: Date.now() });
     setLines((prev) => {
       const map = new Map(prev.map((l) => [l.id, l]));
       for (const line of newLines) {
@@ -105,6 +110,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     clear,
     count,
     has,
+    lastAdded,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

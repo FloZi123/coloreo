@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
-import { getCategoryBySlug, getBooks, tName, tDesc, tTitle } from "@/lib/data";
+import { getCategoryBySlug, getBooks, getRatingsForBooks, tName, tDesc, tTitle } from "@/lib/data";
 import BookCard from "@/components/BookCard";
 
 export async function generateMetadata({
@@ -28,6 +28,7 @@ export default async function CategoryPage({
   const category = await getCategoryBySlug(slug);
   if (!category) notFound();
   const books = await getBooks({ categoryId: category.id });
+  const ratings = await getRatingsForBooks(books.map((b) => b.id));
 
   return (
     <div className="container-page py-12">
@@ -56,6 +57,7 @@ export default async function CategoryPage({
                 pageCount: b.page_count,
                 coverUrl: b.cover_url,
                 emoji: category.emoji,
+                rating: ratings.get(b.id) ?? null,
               }}
             />
           ))}

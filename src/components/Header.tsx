@@ -31,6 +31,7 @@ export default function Header({
     { href: p("/gratis"), label: dict.nav.freebies },
     { href: p("/bibliothek"), label: dict.nav.library },
   ];
+  const searchLabel = locale === "de" ? "Suche" : "Search";
 
   return (
     <header className="sticky top-0 z-40 border-b bg-paper/90 backdrop-blur">
@@ -48,6 +49,9 @@ export default function Header({
         </nav>
 
         <div className="flex items-center gap-3">
+          <Link href={p("/suche")} aria-label={searchLabel} className="rounded-full px-2 py-2 text-ink-soft hover:text-primary" title={searchLabel}>
+            🔍
+          </Link>
           <Link
             href={switchHref}
             className="rounded-full border px-2.5 py-1 text-xs font-semibold uppercase text-ink-soft hover:border-primary hover:text-primary"

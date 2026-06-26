@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCart } from "@/lib/cart/store";
 import { formatPrice } from "@/lib/pricing";
+import Stars from "@/components/Stars";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 
@@ -14,6 +15,7 @@ export interface BookCardData {
   pageCount: number;
   coverUrl: string | null;
   emoji?: string | null;
+  rating?: { avg: number; count: number } | null;
 }
 
 export default function BookCard({
@@ -55,6 +57,12 @@ export default function BookCard({
             {book.title}
           </h3>
         </Link>
+        {book.rating && book.rating.count > 0 && (
+          <div className="mt-1 flex items-center gap-1 text-xs text-muted">
+            <Stars value={book.rating.avg} size={13} />
+            <span>({book.rating.count})</span>
+          </div>
+        )}
         <div className="mt-3 flex items-center justify-between">
           <span className="font-display text-lg font-bold text-primary">
             {formatPrice(book.priceCents, locale)}

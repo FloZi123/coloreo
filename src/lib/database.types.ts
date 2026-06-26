@@ -387,8 +387,19 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["support_tickets"]["Insert"]>
         Relationships: []
       }
+      reviews: {
+        Row: { id: string; book_id: string; rating: number; author_name: string; body: string | null; is_approved: boolean; created_at: string }
+        Insert: { id?: string; book_id: string; rating: number; author_name: string; body?: string | null; is_approved?: boolean; created_at?: string }
+        Update: Partial<Database["public"]["Tables"]["reviews"]["Insert"]>
+        Relationships: []
+      }
     }
-    Views: { [_ in never]: never }
+    Views: {
+      book_ratings: {
+        Row: { book_id: string | null; avg_rating: number | null; review_count: number | null }
+        Relationships: []
+      }
+    }
     Functions: {
       validate_coupon: {
         Args: { p_code: string }
