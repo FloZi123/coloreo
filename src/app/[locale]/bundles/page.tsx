@@ -22,7 +22,7 @@ export default async function BundlesPage({ params }: { params: Promise<{ locale
             href={`/${locale}/bundles/${b.slug}`}
             className="card overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
           >
-            <div className="flex aspect-video items-center justify-center bg-gradient-to-br from-primary to-primary-dark text-5xl text-white">📦</div>
+            <div className="flex aspect-video items-center justify-center bg-primary text-5xl text-white">📦</div>
             <div className="p-5">
               <h3 className="font-display text-lg font-bold">{tTitle(b, locale)}</h3>
               <p className="mt-1 line-clamp-2 text-sm text-muted">{tDesc(b, locale)}</p>

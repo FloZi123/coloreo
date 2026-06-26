@@ -39,7 +39,7 @@ export default function BookCard({
             // eslint-disable-next-line @next/next/no-img-element
             <img src={book.coverUrl} alt={book.title} className="h-full w-full object-cover" />
           ) : (
-            <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-primary-soft to-accent-soft">
+            <div className="flex h-full w-full flex-col items-center justify-center bg-primary-soft">
               <span className="text-5xl">{book.emoji ?? "🎨"}</span>
               <span className="mt-3 px-4 text-center font-display text-sm font-semibold text-ink-soft">
                 {book.title}

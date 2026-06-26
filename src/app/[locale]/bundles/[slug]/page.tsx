@@ -24,7 +24,7 @@ export default async function BundleDetailPage({
     <div className="container-page py-12">
       <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
         <div>
-          <div className="card flex aspect-video items-center justify-center bg-gradient-to-br from-primary to-primary-dark text-7xl text-white">📦</div>
+          <div className="flex aspect-video items-center justify-center rounded-2xl bg-primary text-7xl text-white">📦</div>
           <h2 className="mb-4 mt-8 font-display text-xl font-bold">{books.length} {dict.common.books}</h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             {books.map((b) => (

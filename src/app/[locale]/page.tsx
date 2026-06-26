@@ -136,10 +136,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       {/* BUNDLE TEASER */}
       <section className="container-page py-16">
-        <div className="card flex flex-col items-center gap-4 bg-gradient-to-r from-primary to-primary-dark p-10 text-center text-white">
+        <div className="flex flex-col items-center gap-4 rounded-3xl p-12 text-center text-white" style={{ background: "var(--color-primary)" }}>
           <h2 className="font-display text-3xl font-bold">{dict.home.bundleTeaser}</h2>
-          <p className="max-w-xl text-white/90">{dict.home.bundleTeaserText}</p>
-          <Link href={p("/bundle-builder")} className="mt-2 rounded-full bg-white px-7 py-3 font-semibold text-primary hover:bg-paper">
+          <p className="max-w-xl" style={{ color: "#ffffffe6" }}>{dict.home.bundleTeaserText}</p>
+          <Link href={p("/bundle-builder")} className="mt-2 rounded-full bg-white px-7 py-3 font-extrabold text-primary hover:bg-paper">
             {dict.nav.bundleBuilder} →
           </Link>
         </div>

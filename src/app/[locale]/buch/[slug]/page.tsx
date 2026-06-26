@@ -96,7 +96,7 @@ export default async function BookPage({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={book.cover_url} alt={tTitle(book, locale)} className="h-full w-full object-cover" />
             ) : (
-              <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-primary-soft to-accent-soft">
+              <div className="flex h-full w-full flex-col items-center justify-center bg-primary-soft">
                 <span className="text-7xl">{category?.emoji ?? "🎨"}</span>
                 <span className="mt-4 px-6 text-center font-display text-lg font-semibold text-ink-soft">{tTitle(book, locale)}</span>
               </div>
