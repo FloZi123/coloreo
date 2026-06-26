@@ -1,6 +1,7 @@
 import AdminShell from "@/components/admin/AdminShell";
 import { listOrders } from "@/lib/admin-data";
 import { formatPrice } from "@/lib/pricing";
+import RefundButton from "@/components/admin/RefundButton";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,7 @@ export default async function AdminOrders() {
               <th className="p-3">Rabatt</th>
               <th className="p-3">Summe</th>
               <th className="p-3">Datum</th>
+              <th className="p-3"></th>
             </tr>
           </thead>
           <tbody>
@@ -44,6 +46,7 @@ export default async function AdminOrders() {
                 <td className="p-3 text-muted">{o.discount_cents > 0 ? "−" + formatPrice(o.discount_cents) : "–"}</td>
                 <td className="p-3 font-semibold">{formatPrice(o.total_cents)}</td>
                 <td className="p-3 text-muted">{new Date(o.created_at).toLocaleString("de-DE")}</td>
+                <td className="p-3">{o.status === "paid" && <RefundButton orderId={o.id} />}</td>
               </tr>
             ))}
           </tbody>

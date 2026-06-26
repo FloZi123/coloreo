@@ -1,13 +1,13 @@
 import AdminShell from "@/components/admin/AdminShell";
 import BooksTable from "@/components/admin/BooksTable";
-import { listBooks } from "@/lib/admin-data";
+import { listBooks, listCategoriesAdmin } from "@/lib/admin-data";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminBooks() {
-  let books;
+  let books, categories;
   try {
-    books = await listBooks();
+    [books, categories] = await Promise.all([listBooks(), listCategoriesAdmin()]);
   } catch {
     return (
       <AdminShell>
@@ -18,7 +18,7 @@ export default async function AdminBooks() {
   return (
     <AdminShell>
       <h1 className="mb-6 font-display text-2xl font-bold">Bücher ({books.length})</h1>
-      <BooksTable books={books} />
+      <BooksTable books={books} categories={categories} />
     </AdminShell>
   );
 }

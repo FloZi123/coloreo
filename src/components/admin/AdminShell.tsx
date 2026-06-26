@@ -6,9 +6,12 @@ import { usePathname, useRouter } from "next/navigation";
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: "📊" },
   { href: "/admin/buecher", label: "Bücher", icon: "📚" },
+  { href: "/admin/kategorien", label: "Kategorien", icon: "🗂️" },
+  { href: "/admin/bundles", label: "Bundles", icon: "📦" },
   { href: "/admin/bestellungen", label: "Bestellungen", icon: "🧾" },
   { href: "/admin/gutscheine", label: "Gutscheine", icon: "🏷️" },
   { href: "/admin/leads", label: "Leads & Newsletter", icon: "✉️" },
+  { href: "/admin/support", label: "Support", icon: "💬" },
   { href: "/admin/generator", label: "Auto-Generator", icon: "🤖" },
 ];
 
