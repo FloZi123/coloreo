@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Coloreo – Markenkonzept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --violet: #7C4DFF;
+    --coral: #FF7A59;
+    --gold: #FFC857;
+    --mint: #2BBF8A;
+    --ink: #2B2540;
+    --ink-soft: #5B5470;
+    --muted: #8B8499;
+    --paper: #FAF6F1;
+    --surface: #FFFFFF;
+    --line: #ECE5DB;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e9e4dc; font-family: "Nunito", sans-serif; color: var(--ink); padding: 40px 20px; }
+  .canvas {
+    width: 1000px; max-width: 100%; margin: 0 auto; background: var(--paper);
+    border-radius: 28px; border: 1px solid var(--line); overflow: hidden;
+  }
+  .section { padding: 48px 56px; border-bottom: 1px solid var(--line); }
+  .section:last-child { border-bottom: none; }
+  .eyebrow { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-bottom: 24px; }
+  h1, h2, h3, .display { font-family: "Quicksand", sans-serif; }
+
+  /* Logo lockup */
+  .lockup { display: flex; align-items: center; gap: 22px; }
+  .wordmark { font-family: "Quicksand", sans-serif; font-weight: 700; font-size: 76px; letter-spacing: -2px; color: var(--ink); line-height: 1; }
+  .tagline { font-family: "Quicksand", sans-serif; font-weight: 500; font-size: 22px; color: var(--violet); margin-top: 10px; }
+
+  /* Idea row */
+  .idea { display: flex; align-items: center; gap: 40px; flex-wrap: wrap; }
+  .idea figure { text-align: center; }
+  .idea figcaption { margin-top: 12px; font-size: 14px; color: var(--muted); font-weight: 600; }
+  .arrow { font-size: 40px; color: var(--ink); }
+  .arrow small { display: block; font-size: 13px; color: var(--ink-soft); font-weight: 600; }
+
+  /* Palette */
+  .palette { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+  .swatch { border-radius: 14px; height: 96px; display: flex; align-items: flex-end; padding: 12px; font-weight: 700; font-size: 14px; }
+  .swatch span { background: rgba(255,255,255,0.85); color: var(--ink); border-radius: 8px; padding: 2px 8px; font-size: 12px; }
+
+  /* Type */
+  .type-row { margin-bottom: 18px; }
+  .type-big { font-family: "Quicksand", sans-serif; font-weight: 700; font-size: 40px; color: var(--ink); }
+  .type-note { color: var(--muted); font-size: 15px; margin-left: 12px; font-weight: 600; }
+  .type-body { font-size: 18px; color: var(--ink); margin-top: 8px; }
+
+  /* Moods */
+  .moods { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .mood { border-radius: 18px; padding: 24px; }
+  .mood h3 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .mood p { font-size: 14px; margin-bottom: 14px; }
+  .dots { display: flex; gap: 10px; }
+  .dot { width: 22px; height: 22px; border-radius: 50%; }
+  .mood-kids { background: #E1F5EE; }
+  .mood-kids h3, .mood-kids p { color: #0F6E56; }
+  .mood-adult { background: #EEEDFE; }
+  .mood-adult h3, .mood-adult p { color: #3C3489; }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <!-- ============ LOGO ============ -->
+  <section class="section">
+    <div class="eyebrow">Logo</div>
+    <div class="lockup">
+      <!-- Icon: das "ausgemalte o" -->
+      <svg width="116" height="116" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-label="Coloreo Logo">
+        <path d="M60 60 L60 16 A44 44 0 0 1 98.1 38 Z" fill="#7C4DFF"/>
+        <path d="M60 60 L98.1 38 A44 44 0 0 1 98.1 82 Z" fill="#FF7A59"/>
+        <path d="M60 60 L98.1 82 A44 44 0 0 1 60 104 Z" fill="#FFC857"/>
+        <path d="M60 16 A44 44 0 0 0 60 104 Z" fill="#FFFFFF"/>
+        <path d="M60 29 A31 31 0 0 0 60 91" fill="none" stroke="#2B2540" stroke-width="1.6"/>
+        <path d="M60 42 A18 18 0 0 0 60 78" fill="none" stroke="#2B2540" stroke-width="1.6"/>
+        <path d="M60 51 A9 9 0 0 0 60 69" fill="none" stroke="#2B2540" stroke-width="1.6"/>
+        <line x1="60" y1="16" x2="60" y2="104" stroke="#2B2540" stroke-width="1.6"/>
+        <circle cx="60" cy="60" r="44" fill="none" stroke="#2B2540" stroke-width="3.2"/>
+        <path d="M101 18 L104.5 29 L116 28 L107 35 L111 46 L101 39 L91 46 L95 35 L86 28 L97.5 29 Z" fill="#FFC857" stroke="#2B2540" stroke-width="0.9"/>
+      </svg>
+      <div>
+        <div class="wordmark">coloreo</div>
+        <div class="tagline">Mal dir deine Welt.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ IDEE ============ -->
+  <section class="section">
+    <div class="eyebrow">Die Idee — Vorlage wird Farbe</div>
+    <div class="idea">
+      <figure>
+        <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="60" cy="60" r="44" fill="#FFFFFF" stroke="#2B2540" stroke-width="2.6"/>
+          <circle cx="60" cy="60" r="30" fill="none" stroke="#2B2540" stroke-width="1.5"/>
+          <circle cx="60" cy="60" r="17" fill="none" stroke="#2B2540" stroke-width="1.5"/>
+          <circle cx="60" cy="60" r="6" fill="none" stroke="#2B2540" stroke-width="1.5"/>
+        </svg>
+        <figcaption>Vorlage</figcaption>
+      </figure>
+      <div class="arrow">→<small>ausmalen</small></div>
+      <figure>
+        <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <path d="M60 60 L60 16 A44 44 0 0 1 98.1 38 Z" fill="#7C4DFF"/>
+          <path d="M60 60 L98.1 38 A44 44 0 0 1 98.1 82 Z" fill="#FF7A59"/>
+          <path d="M60 60 L98.1 82 A44 44 0 0 1 60 104 Z" fill="#FFC857"/>
+          <path d="M60 16 A44 44 0 0 0 60 104 Z" fill="#FFFFFF"/>
+          <path d="M60 29 A31 31 0 0 0 60 91" fill="none" stroke="#2B2540" stroke-width="1.6"/>
+          <path d="M60 42 A18 18 0 0 0 60 78" fill="none" stroke="#2B2540" stroke-width="1.6"/>
+          <line x1="60" y1="16" x2="60" y2="104" stroke="#2B2540" stroke-width="1.6"/>
+          <circle cx="60" cy="60" r="44" fill="none" stroke="#2B2540" stroke-width="3.2"/>
+        </svg>
+        <figcaption>das «o» von Coloreo</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ FARBEN ============ -->
+  <section class="section">
+    <div class="eyebrow">Farben</div>
+    <div class="palette">
+      <div class="swatch" style="background:#7C4DFF;color:#fff"><span>#7C4DFF</span></div>
+      <div class="swatch" style="background:#FF7A59;color:#fff"><span>#FF7A59</span></div>
+      <div class="swatch" style="background:#FFC857;color:#2B2540"><span>#FFC857</span></div>
+      <div class="swatch" style="background:#2BBF8A;color:#fff"><span>#2BBF8A</span></div>
+      <div class="swatch" style="background:#2B2540;color:#fff"><span>#2B2540</span></div>
+      <div class="swatch" style="background:#FFFFFF;color:#2B2540;border:1px solid var(--line)"><span>#FAF6F1</span></div>
+    </div>
+  </section>
+
+  <!-- ============ TYPOGRAFIE ============ -->
+  <section class="section">
+    <div class="eyebrow">Typografie</div>
+    <div class="type-row">
+      <span class="type-big">Quicksand</span>
+      <span class="type-note">— Überschriften, rund &amp; freundlich</span>
+    </div>
+    <div class="type-body">Nunito — klarer, gut lesbarer Fließtext für den ganzen Shop.</div>
+  </section>
+
+  <!-- ============ STIMMUNGEN ============ -->
+  <section class="section">
+    <div class="eyebrow">Dual-Mood — eine Marke, zwei Stimmungen</div>
+    <div class="moods">
+      <div class="mood mood-kids">
+        <h3>Kinder — verspielt &amp; bunt</h3>
+        <p>mehr Coral, Gold &amp; Mint, runde Formen</p>
+        <div class="dots"><div class="dot" style="background:#FF7A59"></div><div class="dot" style="background:#FFC857"></div><div class="dot" style="background:#2BBF8A"></div><div class="dot" style="background:#7C4DFF"></div></div>
+      </div>
+      <div class="mood mood-adult">
+        <h3>Erwachsene — ruhig &amp; elegant</h3>
+        <p>Violett &amp; Tinte, feine Linien, viel Weißraum</p>
+        <div class="dots"><div class="dot" style="background:#7C4DFF"></div><div class="dot" style="background:#2B2540"></div><div class="dot" style="background:#FFC857"></div></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
