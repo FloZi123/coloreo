@@ -18,7 +18,7 @@ Der Shop ist **voll funktionsfähig im Test-Modus**, sobald die folgenden Keys i
 
 | Variable | Zweck | Ohne Key |
 |---|---|---|
-| `RESEND_API_KEY` + `EMAIL_FROM` | Kauf-/Freebie-Mails | Mails werden geloggt, nicht versendet (Shop funktioniert weiter; Downloads auch auf Danke-Seite/Bibliothek) |
+| `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASS`/`SMTP_FROM` | Kauf-/Freebie-Mails (nodemailer/SMTP, wie im NCO-Projekt – z. B. All-Inkl) | Mails werden geloggt, nicht versendet (Shop funktioniert weiter; Downloads auch auf Danke-Seite/Bibliothek) |
 | `ANTHROPIC_API_KEY` | KI-Chatbot + Auto-Buch-Generierung | Chatbot meldet „nicht konfiguriert" |
 | `ADMIN_EMAILS` | Komma-Liste der Admin-Logins | Default: florian.zinkl@rolling-space.de |
 
@@ -35,7 +35,7 @@ Den angezeigten `whsec_…` als `STRIPE_WEBHOOK_SECRET` eintragen.
 
 ## 5. Vor echtem Go-Live (rechtlich)
 - Echte Daten in Impressum / Datenschutz / AGB / Widerruf eintragen (Platzhalter im Admin → Rechtstexte bzw. `src/lib/legalContent.ts`).
-- Resend-Domain verifizieren (SPF/DKIM) und `EMAIL_FROM` auf eigene Domain setzen.
+- SMTP-Postfach einrichten/verbinden (z. B. dasselbe All-Inkl wie NCO oder ein neues `noreply@coloreo…`), SPF/DKIM der Absenderdomain setzen, `SMTP_FROM` auf eigene Domain.
 - Stripe von Test- auf Live-Keys umstellen.
 - Domain in Vercel verbinden, `NEXT_PUBLIC_SITE_URL` auf Live-Domain setzen.
 

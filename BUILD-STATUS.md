@@ -19,7 +19,7 @@
   signierter Download + Bibliothek + Resend-Mail): braucht `STRIPE_*` + `SUPABASE_SERVICE_ROLE_KEY`.
 - **Admin-Daten** (Dashboard/Tabellen): brauchen `SUPABASE_SERVICE_ROLE_KEY` (zeigen sonst sauberen Hinweis).
 - **Chatbot & Auto-Gen**: brauchen `ANTHROPIC_API_KEY`.
-- **E-Mails**: brauchen `RESEND_API_KEY` (sonst werden sie geloggt).
+- **E-Mails**: brauchen `SMTP_*` (nodemailer/SMTP wie im NCO-Projekt; sonst werden sie geloggt).
 
 ## 📋 Vor echtem Go-Live (durch Florian)
 - Stripe Test→Live, PayPal in Stripe aktivieren, Webhook-Endpoint anlegen.
