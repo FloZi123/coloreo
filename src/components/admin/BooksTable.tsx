@@ -20,6 +20,8 @@ interface Row {
 export default function BooksTable({ books }: { books: Row[] }) {
   const [pending, start] = useTransition();
   const [filter, setFilter] = useState("");
+  const [previewSlug, setPreviewSlug] = useState<string | null>(null);
+  const previewBook = books.find((b) => b.slug === previewSlug);
 
   const rows = books.filter(
     (b) => b.title_de.toLowerCase().includes(filter.toLowerCase()) || (b.category?.name_de ?? "").toLowerCase().includes(filter.toLowerCase())
@@ -43,6 +45,7 @@ export default function BooksTable({ books }: { books: Row[] }) {
               <th className="p-3">Status</th>
               <th className="p-3">Featured</th>
               <th className="p-3">Verkäufe</th>
+              <th className="p-3">Vorschau</th>
             </tr>
           </thead>
           <tbody className={pending ? "opacity-60" : ""}>
@@ -91,12 +94,33 @@ export default function BooksTable({ books }: { books: Row[] }) {
                   </button>
                 </td>
                 <td className="p-3 font-semibold">{b.sales_count}</td>
+                <td className="p-3">
+                  <button
+                    onClick={() => setPreviewSlug(b.slug)}
+                    className="rounded-full border px-3 py-1 text-xs font-semibold hover:border-primary hover:text-primary"
+                    title="Buch durchblättern"
+                  >
+                    📖 Blättern
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <p className="mt-2 text-xs text-muted">Preis ändern: Wert anpassen und Feld verlassen. {formatPrice(599)} = Standard.</p>
+
+      {previewBook && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-black/60 p-4 md:p-8" onClick={() => setPreviewSlug(null)}>
+          <div className="mx-auto flex h-full w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-surface" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between border-b px-5 py-3">
+              <span className="font-display font-semibold">📖 {previewBook.title_de}</span>
+              <button onClick={() => setPreviewSlug(null)} className="rounded-full px-3 py-1 text-sm hover:bg-primary-soft">✕ Schließen</button>
+            </div>
+            <iframe src={`/api/admin/book-pdf?slug=${previewBook.slug}`} className="h-full w-full flex-1" title="Buch-Vorschau" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

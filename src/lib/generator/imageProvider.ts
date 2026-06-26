@@ -25,17 +25,25 @@ class ReplicateProvider implements ImageProvider {
     this.model = (process.env.REPLICATE_MODEL || DEFAULT_MODEL) as `${string}/${string}`;
   }
 
+  /** Führt die Generierung aus und wiederholt bei Rate-Limit (429) mit Backoff. */
+  private async runWithRetry(prompt: string, maxRetries = 8): Promise<unknown> {
+    const input = { prompt, aspect_ratio: "3:4", num_outputs: 1, output_format: "png", megapixels: "1" };
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await this.client.run(this.model, { input });
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        const throttled = msg.includes("429") || /throttl/i.test(msg);
+        if (!throttled || attempt >= maxRetries) throw e;
+        const m = msg.match(/resets in ~?(\d+)s|retry_after"?:\s*(\d+)/i);
+        const waitS = m ? Number(m[1] ?? m[2]) + 1 : Math.min(2 ** attempt, 15);
+        await new Promise((r) => setTimeout(r, waitS * 1000));
+      }
+    }
+  }
+
   async generate(prompt: string): Promise<Uint8Array> {
-    const output = await this.client.run(this.model, {
-      input: {
-        prompt,
-        aspect_ratio: "3:4",
-        num_outputs: 1,
-        output_format: "png",
-        megapixels: "1",
-        disable_safety_checker: false,
-      },
-    });
+    const output = await this.runWithRetry(prompt);
 
     // Replicate-SDK liefert je nach Version: FileOutput[], FileOutput, URL-String[] oder URL-String.
     const first = Array.isArray(output) ? output[0] : output;

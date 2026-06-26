@@ -7,6 +7,7 @@ import { getBookBySlug, getBooks, getCategoryBySlug, tTitle, tDesc, tName } from
 import { createPublicClient } from "@/lib/supabase/public";
 import ProductBuyBox from "@/components/ProductBuyBox";
 import BookCard from "@/components/BookCard";
+import BookPreviewViewer from "@/components/BookPreviewViewer";
 
 export async function generateMetadata({
   params,
@@ -74,15 +75,9 @@ export default async function BookPage({
             )}
           </div>
           {previews.length > 0 && (
-            <>
-              <h3 className="mb-3 mt-8 font-display text-lg font-bold">{dict.product.preview}</h3>
-              <div className="grid grid-cols-3 gap-3">
-                {previews.map((url, i) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img key={i} src={url} alt={`Preview ${i + 1}`} className="card aspect-[3/4] w-full object-cover" />
-                ))}
-              </div>
-            </>
+            <div className="mt-8">
+              <BookPreviewViewer images={previews} totalPages={book.page_count} locale={locale} dict={dict} />
+            </div>
           )}
         </div>
 

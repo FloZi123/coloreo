@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Beispiel-Env (ohne Secrets) committen
 !.env.example
+
+# Master-PDFs liegen in Supabase Storage (zu groß für Git/Vercel)
+/public/masters/
