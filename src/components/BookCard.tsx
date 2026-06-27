@@ -15,6 +15,7 @@ export interface BookCardData {
   pageCount: number;
   coverUrl: string | null;
   emoji?: string | null;
+  difficulty?: string | null;
   rating?: { avg: number; count: number } | null;
 }
 
@@ -49,6 +50,9 @@ export default function BookCard({
           <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2 py-1 text-[11px] font-semibold text-ink-soft">
             {book.pageCount} {dict.common.pages}
           </span>
+          {book.difficulty === "einfach" && (
+            <span className="absolute right-3 top-3 rounded-full bg-primary px-2 py-1 text-[11px] font-bold text-white">Bold &amp; Easy</span>
+          )}
         </div>
       </Link>
       <div className="flex flex-1 flex-col p-4">

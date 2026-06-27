@@ -63,6 +63,8 @@ export type Database = {
           created_at: string
           description_de: string | null
           description_en: string | null
+          difficulty: string
+          seasonal_tag: string | null
           i18n: Json
           id: string
           is_featured: boolean
@@ -86,6 +88,8 @@ export type Database = {
           created_at?: string
           description_de?: string | null
           description_en?: string | null
+          difficulty?: string
+          seasonal_tag?: string | null
           i18n?: Json
           id?: string
           is_featured?: boolean

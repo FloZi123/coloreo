@@ -102,6 +102,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                   priceCents: b.price_cents,
                   pageCount: b.page_count,
                   coverUrl: b.cover_url,
+                  difficulty: b.difficulty,
                   rating: ratings.get(b.id) ?? null,
                 }}
               />

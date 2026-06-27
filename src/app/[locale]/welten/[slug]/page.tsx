@@ -62,7 +62,7 @@ export default async function WorldPage({ params }: { params: Promise<{ locale: 
             <h2 className="mb-6 mt-12 font-display text-xl font-bold">{dict.home.featured}</h2>
             <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
               {books.map((b) => (
-                <BookCard key={b.id} locale={locale} dict={dict} book={{ id: b.id, slug: b.slug, title: tTitle(b, locale), priceCents: b.price_cents, pageCount: b.page_count, coverUrl: b.cover_url, rating: ratings.get(b.id) ?? null }} />
+                <BookCard key={b.id} locale={locale} dict={dict} book={{ id: b.id, slug: b.slug, title: tTitle(b, locale), priceCents: b.price_cents, pageCount: b.page_count, coverUrl: b.cover_url, difficulty: b.difficulty, rating: ratings.get(b.id) ?? null }} />
               ))}
             </div>
           </>

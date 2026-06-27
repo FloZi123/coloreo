@@ -57,6 +57,7 @@ export default async function CategoryPage({
                 pageCount: b.page_count,
                 coverUrl: b.cover_url,
                 emoji: category.emoji,
+                difficulty: b.difficulty,
                 rating: ratings.get(b.id) ?? null,
               }}
             />

@@ -77,7 +77,9 @@ export async function getBooks(opts: { categoryId?: string; featured?: boolean; 
 
 export async function searchBooks(opts: {
   q?: string;
-  audience?: "adult" | "kids";
+  audience?: "adult" | "kids" | "all";
+  difficulty?: "einfach" | "mittel" | "filigran";
+  seasonal?: "weihnachten" | "halloween" | "ostern";
   categorySlug?: string;
   sort?: "popular" | "price_asc" | "price_desc" | "new";
 }): Promise<Book[]> {
@@ -85,6 +87,8 @@ export async function searchBooks(opts: {
   let q = sb.from("books").select("*").eq("status", "published");
   if (opts.q) q = q.or(`title_de.ilike.%${opts.q}%,title_en.ilike.%${opts.q}%`);
   if (opts.audience) q = q.eq("audience", opts.audience);
+  if (opts.difficulty) q = q.eq("difficulty", opts.difficulty);
+  if (opts.seasonal) q = q.eq("seasonal_tag", opts.seasonal);
   if (opts.categorySlug) {
     const cat = await getCategoryBySlug(opts.categorySlug);
     if (cat) q = q.eq("category_id", cat.id);

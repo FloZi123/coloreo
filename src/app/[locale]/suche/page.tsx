@@ -11,18 +11,20 @@ export default async function SearchPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ q?: string; audience?: string; category?: string; sort?: string }>;
+  searchParams: Promise<{ q?: string; audience?: string; difficulty?: string; seasonal?: string; category?: string; sort?: string }>;
 }) {
   const { locale: raw } = await params;
   const sp = await searchParams;
   const locale: Locale = isLocale(raw) ? raw : "de";
   const dict = getDictionary(locale);
 
-  const audience = sp.audience === "adult" || sp.audience === "kids" ? sp.audience : undefined;
+  const audience = (["adult", "kids", "all"] as const).find((a) => a === sp.audience);
+  const difficulty = (["einfach", "mittel", "filigran"] as const).find((d) => d === sp.difficulty);
+  const seasonal = (["weihnachten", "halloween", "ostern"] as const).find((s) => s === sp.seasonal);
   const sort = (["popular", "price_asc", "price_desc", "new"] as const).find((s) => s === sp.sort);
 
   const [books, categories] = await Promise.all([
-    searchBooks({ q: sp.q, audience, categorySlug: sp.category, sort }),
+    searchBooks({ q: sp.q, audience, difficulty, seasonal, categorySlug: sp.category, sort }),
     getCategories(),
   ]);
   const ratings = await getRatingsForBooks(books.map((b) => b.id));
@@ -43,7 +45,7 @@ export default async function SearchPage({
               key={b.id}
               locale={locale}
               dict={dict}
-              book={{ id: b.id, slug: b.slug, title: tTitle(b, locale), priceCents: b.price_cents, pageCount: b.page_count, coverUrl: b.cover_url, rating: ratings.get(b.id) ?? null }}
+              book={{ id: b.id, slug: b.slug, title: tTitle(b, locale), priceCents: b.price_cents, pageCount: b.page_count, coverUrl: b.cover_url, difficulty: b.difficulty, rating: ratings.get(b.id) ?? null }}
             />
           ))}
         </div>

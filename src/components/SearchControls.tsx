@@ -35,6 +35,19 @@ export default function SearchControls({ locale, categories }: { locale: Locale;
         <option value="">{de ? "Alle Zielgruppen" : "All audiences"}</option>
         <option value="adult">{de ? "Erwachsene" : "Adults"}</option>
         <option value="kids">{de ? "Kinder" : "Kids"}</option>
+        <option value="all">{de ? "Familie" : "Family"}</option>
+      </select>
+      <select className={sel} value={params.get("difficulty") ?? ""} onChange={(e) => update({ difficulty: e.target.value })}>
+        <option value="">{de ? "Alle Schwierigkeiten" : "All difficulties"}</option>
+        <option value="einfach">{de ? "Einfach (Bold & Easy)" : "Easy (Bold & Easy)"}</option>
+        <option value="mittel">{de ? "Mittel" : "Medium"}</option>
+        <option value="filigran">{de ? "Filigran" : "Intricate"}</option>
+      </select>
+      <select className={sel} value={params.get("seasonal") ?? ""} onChange={(e) => update({ seasonal: e.target.value })}>
+        <option value="">{de ? "Alle Anlässe" : "All seasons"}</option>
+        <option value="weihnachten">{de ? "Weihnachten" : "Christmas"}</option>
+        <option value="halloween">{de ? "Halloween" : "Halloween"}</option>
+        <option value="ostern">{de ? "Ostern" : "Easter"}</option>
       </select>
       <select className={sel} value={params.get("category") ?? ""} onChange={(e) => update({ category: e.target.value })}>
         <option value="">{de ? "Alle Kategorien" : "All categories"}</option>
