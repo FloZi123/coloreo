@@ -39,7 +39,7 @@ function layout(title: string, inner: string): string {
     <div style="border:1px solid #e3dacb;border-top:none;padding:24px;border-radius:0 0 16px 16px;background:#faf7f0">
       <h2 style="margin-top:0;font-weight:700">${title}</h2>${inner}
     </div>
-    <p style="text-align:center;color:#9a9388;font-size:12px;margin-top:16px">© 2026 Coloreo · <a href="${SITE}" style="color:#FF5A4D;text-decoration:none">coloreo.de</a></p>
+    <p style="text-align:center;color:#9a9388;font-size:12px;margin-top:16px">© 2026 Coloreo · <a href="${SITE}" style="color:#FF5A4D;text-decoration:none">coloreo.shop</a></p>
   </div>`;
 }
 

@@ -27,7 +27,7 @@ const sb = createClient(SUPA, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { 
 
 const PIN_COUNT = 6;
 const FLIP_PAGES = 6;
-const DOMAIN = "https://coloreo.de";
+const DOMAIN = "https://coloreo.shop";
 const BUCKET = "social-assets";
 const UPLOAD = process.argv.includes("--upload");
 const FLAT = process.argv.includes("--flat"); // flache Markenfüllung statt realistischer AI-Farben

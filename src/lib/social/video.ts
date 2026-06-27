@@ -16,7 +16,7 @@ const TW = 1080, TH = 1920, FPS = 30;
 const ZOOM = 0.10; // Ken-Burns-Zoomtiefe
 const SCALE = 1.16; // Render-Headroom für den Zoom
 const SW = Math.round((TW * SCALE) / 2) * 2, SH = Math.round((TH * SCALE) / 2) * 2;
-const DOMAIN = "coloreo.de";
+const DOMAIN = "coloreo.shop";
 const MOOD = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "public", "mood");
 
 function wordmark(cx: number, y: number, size: number, base: string): string {
