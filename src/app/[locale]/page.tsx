@@ -47,18 +47,17 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </Link>
           </div>
         </div>
-        <div className="flex items-end justify-center gap-3 md:gap-4">
-          {[
-            { t: "Wimmel", c: "#FFC23C", tc: "#221E1B", r: "-rotate-6", o: "ffffff44" },
-            { t: "Tiere", c: "#FF5A4D", tc: "#ffffff", r: "z-10 scale-110", o: "ffffff55" },
-            { t: "Muster", c: "#9B6CE0", tc: "#ffffff", r: "rotate-6", o: "ffffff44" },
-          ].map((b) => (
-            <div key={b.t} className={`flex w-[34%] flex-col rounded-2xl p-4 shadow-xl ${b.r}`} style={{ background: b.c, color: b.tc, aspectRatio: "0.72" }}>
-              <span className="font-display text-sm font-bold">coloreo</span>
-              <span className="mt-1 font-display text-xl font-bold leading-none">{b.t}</span>
-              <span className="mt-auto block h-1/2 rounded-lg" style={{ background: `repeating-linear-gradient(45deg,#${b.o} 0 9px,#ffffff22 9px 18px)` }} />
-            </div>
-          ))}
+        <div className="relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/mood/hero.webp"
+            alt={locale === "de" ? "Hände malen ein Mandala in einem Malbuch aus" : "Hands coloring a mandala in a coloring book"}
+            className="aspect-[16/11] w-full rounded-[1.75rem] object-cover shadow-xl"
+          />
+          <div className="absolute -bottom-4 -left-4 hidden rounded-2xl bg-paper px-4 py-3 shadow-lg sm:block">
+            <div className="font-display text-sm font-bold" style={{ color: "#FFC23C" }}>★★★★★</div>
+            <div className="text-xs text-muted">{locale === "de" ? "Sofort-PDF · druckfertig" : "Instant PDF · print-ready"}</div>
+          </div>
         </div>
       </section>
 
@@ -111,6 +110,19 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </section>
       )}
 
+      {/* MAKRO-TRENNBANNER */}
+      <section className="relative my-6 overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/mood/macro.webp" alt="" className="h-44 w-full object-cover md:h-56" />
+        <div className="absolute inset-0 flex items-center" style={{ background: "linear-gradient(90deg, rgba(34,30,27,0.62), rgba(34,30,27,0.05))" }}>
+          <div className="container-page">
+            <p className="max-w-md font-display text-2xl font-bold text-paper md:text-3xl">
+              {locale === "de" ? "Ein Stift. Eine Linie. Deine Auszeit." : "One pencil. One line. Your time out."}
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* WELTEN */}
       <section className="container-page py-8">
         <h2 className="mb-8 font-display text-2xl font-bold md:text-3xl">{locale === "de" ? "Entdecke unsere Welten" : "Explore our worlds"}</h2>
@@ -145,14 +157,54 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </div>
       </section>
 
+      {/* USP: DIGITAL → DRUCKFERTIG */}
+      <section className="container-page py-12">
+        <div className="grid items-center gap-8 md:grid-cols-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/mood/usp-print.webp"
+            alt={locale === "de" ? "Frisch gedruckte Malbuchseite neben einem Drucker" : "Freshly printed coloring page next to a printer"}
+            className="aspect-[4/3] w-full rounded-3xl object-cover shadow-lg"
+          />
+          <div>
+            <h2 className="font-display text-2xl font-bold md:text-3xl">{locale === "de" ? "Digital kaufen, zu Hause drucken" : "Buy digital, print at home"}</h2>
+            <p className="mt-3 max-w-[42ch] text-muted">
+              {locale === "de"
+                ? "Nach dem Kauf bekommst du sofort eine druckfertige PDF. So oft ausdrucken, wie du magst – für die ganze Familie, ganz ohne Warten und Versand."
+                : "Right after purchase you get a print-ready PDF. Print it as often as you like – for the whole family, with no waiting and no shipping."}
+            </p>
+            <ul className="mt-5 space-y-2.5 text-sm font-medium text-ink-soft">
+              {[
+                locale === "de" ? "Sofort-Download direkt nach dem Kauf" : "Instant download right after purchase",
+                locale === "de" ? "Druckfertiges PDF in A4 – beliebig oft drucken" : "Print-ready A4 PDF – print as often as you like",
+                locale === "de" ? "Dicke, klare Linien für sauberes Ausmalen" : "Bold, clear lines for clean coloring",
+              ].map((t) => (
+                <li key={t} className="flex items-center gap-2.5">
+                  <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full text-xs text-white" style={{ background: "var(--color-success)" }}>✓</span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
       {/* FREEBIE */}
       <section className="container-page pb-20">
-        <div className="card flex flex-col items-center gap-4 p-10 text-center">
-          <span className="text-4xl">🎁</span>
-          <h2 className="font-display text-2xl font-bold">{dict.home.freebieTitle}</h2>
-          <p className="max-w-md text-ink-soft">{dict.home.freebieText}</p>
-          <FreebieForm locale={locale} dict={dict} />
-          <p className="text-xs text-muted">{dict.freebie.privacy}</p>
+        <div className="card grid items-stretch gap-0 overflow-hidden p-0 md:grid-cols-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/mood/cozy-evening.webp"
+            alt={locale === "de" ? "Gemütlicher Abend mit Malbuch auf dem Sofa" : "Cozy evening coloring on the sofa"}
+            className="h-full min-h-[260px] w-full object-cover"
+          />
+          <div className="flex flex-col items-center gap-4 p-10 text-center">
+            <span className="text-4xl">🎁</span>
+            <h2 className="font-display text-2xl font-bold">{dict.home.freebieTitle}</h2>
+            <p className="max-w-md text-ink-soft">{dict.home.freebieText}</p>
+            <FreebieForm locale={locale} dict={dict} />
+            <p className="text-xs text-muted">{dict.freebie.privacy}</p>
+          </div>
         </div>
       </section>
     </div>

@@ -14,6 +14,11 @@ export default async function WorldPage({ params }: { params: Promise<{ locale: 
   if (!world) notFound();
   const categories = await getCategoriesByWorld(world.id);
   const accent = world.accent ?? "#7C4DFF";
+  // Mood-Bild je Welt
+  const WORLD_IMG: Record<string, string> = {
+    kinderwelt: "family", "natur-botanik": "cafe", "vintage-lifestyle": "gift", "anti-stress": "flatlay",
+  };
+  const moodImg = WORLD_IMG[slug];
 
   let books: Book[] = [];
   if (categories.length) {
@@ -26,14 +31,18 @@ export default async function WorldPage({ params }: { params: Promise<{ locale: 
   return (
     <div>
       <section style={{ background: accent + "18" }}>
-        <div className="container-page py-12">
+        <div className="container-page grid items-center gap-8 py-12 md:grid-cols-[1.3fr_1fr]">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl text-4xl" style={{ background: accent + "30" }}>{world.emoji}</div>
+            <div className="flex h-16 w-16 flex-none items-center justify-center rounded-2xl text-4xl" style={{ background: accent + "30" }}>{world.emoji}</div>
             <div>
               <h1 className="font-display text-3xl font-bold">{tName(world, locale)}</h1>
               <p className="text-ink-soft">{tDesc(world, locale)}</p>
             </div>
           </div>
+          {moodImg && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={`/mood/${moodImg}.webp`} alt="" className="hidden aspect-[3/2] w-full rounded-2xl object-cover shadow-md md:block" />
+          )}
         </div>
       </section>
 
