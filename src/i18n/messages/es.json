@@ -5,7 +5,7 @@
     "categories": "Categorías",
     "bundles": "Paquetes",
     "bundleBuilder": "Crea tu paquete",
-    "freebies": "Páginas gratis",
+    "freebies": "Páginas gratuitas",
     "library": "Mi biblioteca",
     "cart": "Carrito",
     "help": "Ayuda"
@@ -35,23 +35,43 @@
     "newsletter": "Boletín"
   },
   "home": {
-    "heroTitle": "Preciosos libros para colorear, listos para imprimir al instante",
-    "heroSubtitle": "Más de 20 categorías de tendencia para adultos y niños. Descarga tu PDF en segundos – sin esperas ni envíos.",
+    "heroTitle": "Hermosos libros para colorear, listos para imprimir al instante",
+    "heroSubtitle": "Más de 20 categorías de tendencia para adultos y niños. Descarga el PDF en segundos – sin esperas ni envíos.",
     "heroCta": "Explorar ahora",
     "heroCtaBundles": "Paquetes y descuentos",
+    "heroAgeBadge": "Libros para colorear para todas las edades",
+    "forAdults": "Para adultos",
+    "heroImgAlt": "Manos coloreando un mandala en un libro para colorear",
+    "heroBadgeLabel": "PDF instantáneo · listo para imprimir",
+    "featureBoldLines": "Líneas gruesas y nítidas",
+    "featureBoldLinesDesc": "Diseñado para colorear, no para desesperarse.",
+    "featureInstantPdf": "PDF instantáneo",
+    "featureInstantPdfDesc": "Descarga e imprime justo después de la compra.",
+    "featureAllAges": "Para todas las edades",
+    "featureAllAgesDesc": "Desde 3 años hasta adultos que buscan relajarse.",
+    "macroBanner": "Un lápiz. Una línea. Tu momento de descanso.",
+    "exploreWorlds": "Explora nuestros mundos",
+    "explore": "Explorar",
+    "uspImgAlt": "Página para colorear recién impresa junto a una impresora",
+    "digitalBuyTitle": "Compra digital, imprime en casa",
+    "digitalBuyText": "Justo después de la compra recibes un PDF listo para imprimir. Imprímelo todas las veces que quieras – para toda la familia, sin esperas ni envíos.",
+    "uspItem1": "Descarga instantánea justo después de la compra",
+    "uspItem2": "PDF en A4 listo para imprimir – imprímelo cuantas veces quieras",
+    "uspItem3": "Líneas gruesas y nítidas para colorear con precisión",
+    "freebieImgAlt": "Tarde acogedora coloreando en el sofá",
     "featured": "Libros para colorear populares",
     "browseCategories": "Explora nuestras categorías",
     "bundleTeaser": "Compra más, ahorra más",
     "bundleTeaserText": "Crea tu propio paquete – cuantos más libros, mayor el descuento (hasta un 40 %).",
     "freebieTitle": "Consigue páginas de muestra gratis",
-    "freebieText": "Regístrate y recibe al instante páginas para colorear gratis en tu correo.",
+    "freebieText": "Regístrate y recibe al instante páginas para colorear gratis por correo electrónico.",
     "trustInstant": "Descarga instantánea",
     "trustQuality": "PDFs de alta calidad",
     "trustSecure": "Pago seguro"
   },
   "categories": {
     "title": "Todas las categorías",
-    "subtitle": "Encuentra tu temática favorita",
+    "subtitle": "Encuentra tu tema favorito",
     "booksIn": "Libros para colorear en",
     "noBooks": "Próximamente – aquí se están creando nuevos libros para colorear."
   },
@@ -64,7 +84,22 @@
     "format": "Formato",
     "formatValue": "PDF (A4, listo para imprimir)",
     "related": "También te puede gustar",
-    "watermarkNote": "Cada PDF se entrega personalizado (con tu correo electrónico). Solo para uso privado."
+    "watermarkNote": "Cada PDF se entrega personalizado (con tu correo electrónico). Solo para uso privado.",
+    "audience": "Público",
+    "printReady": "listo para imprimir",
+    "reviews": "Opiniones",
+    "audienceKids": "Niños",
+    "audienceAdult": "Adultos",
+    "audienceAll": "Todos"
+  },
+  "worlds": {
+    "subtitle": "Mundos temáticos que encajan entre sí – encuentra tu estilo.",
+    "explore": "Explorar"
+  },
+  "search": {
+    "prefix": "Buscar",
+    "allBooks": "Todos los libros para colorear",
+    "noResults": "Sin resultados."
   },
   "cart": {
     "title": "Carrito",
@@ -78,7 +113,7 @@
   },
   "bundleBuilder": {
     "title": "Crea tu propio paquete",
-    "subtitle": "Elige tus libros favoritos – el descuento aumenta automáticamente con cada selección.",
+    "subtitle": "Elige tus libros favoritos – el descuento crece automáticamente con cada elección.",
     "selected": "seleccionados",
     "yourPrice": "Tu precio",
     "nextTier": "¡{n} libro(s) más para obtener un {pct}% de descuento!",
@@ -87,10 +122,10 @@
   },
   "freebie": {
     "title": "Consigue páginas para colorear gratis",
-    "text": "Regístrate con tu correo y recibe al instante páginas de muestra gratis – además de ofertas exclusivas.",
+    "text": "Regístrate con tu correo electrónico y recibe al instante páginas de muestra gratis – además de ofertas exclusivas.",
     "emailPlaceholder": "tu@correo.com",
     "submit": "Obtener páginas gratis",
-    "success": "¡Listo! Revisa tu bandeja de entrada para ver tus páginas gratis.",
+    "success": "¡Listo! Revisa tu bandeja de entrada para ver tus páginas gratuitas.",
     "privacy": "Sin spam. Cancela la suscripción cuando quieras."
   },
   "checkout": {
@@ -98,21 +133,21 @@
     "emailLabel": "Correo electrónico (para tus descargas)",
     "payNow": "Pagar ahora",
     "successTitle": "¡Gracias por tu compra!",
-    "successText": "Tus libros para colorear están listos para descargar. También te hemos enviado los enlaces por correo.",
+    "successText": "Tus libros para colorear están listos para descargar. También te hemos enviado los enlaces por correo electrónico.",
     "failTitle": "Pago no completado",
     "failText": "No ha pasado nada – tu carrito sigue aquí."
   },
   "library": {
     "title": "Mi biblioteca",
     "subtitle": "Todos tus libros para colorear comprados en un solo lugar.",
-    "enterEmail": "Introduce el correo de tu compra para ver tus descargas.",
-    "noPurchases": "Aún no se han encontrado compras."
+    "enterEmail": "Introduce tu correo de compra para ver tus descargas.",
+    "noPurchases": "Aún no se encontraron compras."
   },
   "footer": {
     "rights": "Todos los derechos reservados.",
     "imprint": "Aviso legal",
     "privacy": "Privacidad",
-    "terms": "Términos y condiciones",
+    "terms": "Términos",
     "revocation": "Derecho de desistimiento",
     "contact": "Contacto"
   },
@@ -120,6 +155,17 @@
     "title": "Ayuda y soporte",
     "placeholder": "Pregúntame lo que quieras …",
     "greeting": "¡Hola! Soy tu asistente de libros para colorear. Puedo ayudarte con descargas, pagos o encontrar el libro perfecto para ti. ¿En qué puedo ayudarte?",
-    "send": "Enviar"
-  }
+    "send": "Enviar",
+    "connectionError": "Error de conexión."
+  },
+  "cartToast": {
+    "added": "añadido",
+    "cartLabel": "Carrito"
+  },
+  "account": {
+    "signOut": "Cerrar sesión",
+    "searchLabel": "Buscar",
+    "expired": "caducado"
+  },
+  "orgSlogan": "Colorea tu mundo."
 }

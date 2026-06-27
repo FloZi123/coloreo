@@ -58,7 +58,7 @@ export default async function LibraryPage({ params }: { params: Promise<{ locale
             <h1 className="font-display text-3xl font-bold">{dict.library.title}</h1>
             <p className="text-ink-soft">{email}</p>
           </div>
-          <LogoutButton locale={locale} />
+          <LogoutButton locale={locale} dict={dict} />
         </div>
         {orders.length === 0 ? (
           <div className="card p-10 text-center text-muted">{dict.library.noPurchases}</div>

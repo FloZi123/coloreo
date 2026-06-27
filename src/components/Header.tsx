@@ -33,7 +33,7 @@ export default function Header({
     { href: p("/gratis"), label: dict.nav.freebies },
     { href: p("/bibliothek"), label: dict.nav.library },
   ];
-  const searchLabel = locale === "de" ? "Suche" : "Search";
+  const searchLabel = dict.account.searchLabel;
 
   return (
     <header className="sticky top-0 z-40 border-b bg-paper/90 backdrop-blur">

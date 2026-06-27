@@ -90,6 +90,7 @@ async function materializeBook(admin: Admin, spec: BookSpec): Promise<string> {
       title_en: spec.titleEn,
       description_de: spec.descDe,
       description_en: spec.descEn,
+      i18n: { de: { title: spec.titleDe, description: spec.descDe }, en: { title: spec.titleEn, description: spec.descEn } },
       price_cents: spec.priceCents ?? defaultPriceFor(spec.audience),
       page_count: pages,
       cover_url: coverUrl,

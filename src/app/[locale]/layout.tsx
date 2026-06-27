@@ -51,7 +51,7 @@ export default async function LocaleLayout({
           <main className="flex-1">{children}</main>
           <Footer locale={l} dict={dict} />
           <ChatWidget locale={l} dict={dict} />
-          <CartToast locale={l} />
+          <CartToast locale={l} dict={dict} />
           <FirstOrderPopup locale={l} />
         </CartProvider>
       </body>

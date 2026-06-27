@@ -4,7 +4,7 @@
     "worlds": "Univers",
     "categories": "Catégories",
     "bundles": "Offres groupées",
-    "bundleBuilder": "Créateur de bundle",
+    "bundleBuilder": "Créateur de pack",
     "freebies": "Pages gratuites",
     "library": "Ma bibliothèque",
     "cart": "Panier",
@@ -39,14 +39,34 @@
     "heroSubtitle": "Plus de 20 catégories tendance pour adultes et enfants. Téléchargement PDF en quelques secondes – sans attente, sans livraison.",
     "heroCta": "Explorer maintenant",
     "heroCtaBundles": "Offres groupées & réductions",
+    "heroAgeBadge": "Des livres de coloriage pour tous les âges",
+    "forAdults": "Pour adultes",
+    "heroImgAlt": "Des mains coloriant un mandala dans un livre de coloriage",
+    "heroBadgeLabel": "PDF instantané · prêt à imprimer",
+    "featureBoldLines": "Traits nets et bien définis",
+    "featureBoldLinesDesc": "Conçu pour colorier avec plaisir, pas pour se décourager.",
+    "featureInstantPdf": "PDF instantané",
+    "featureInstantPdfDesc": "Téléchargez et imprimez dès l'achat.",
+    "featureAllAges": "Pour tous les âges",
+    "featureAllAgesDesc": "De 3 ans aux adultes en quête de détente.",
+    "macroBanner": "Un crayon. Un trait. Votre moment à vous.",
+    "exploreWorlds": "Découvrez nos univers",
+    "explore": "Explorer",
+    "uspImgAlt": "Une page de coloriage fraîchement imprimée à côté d'une imprimante",
+    "digitalBuyTitle": "Achetez en numérique, imprimez chez vous",
+    "digitalBuyText": "Dès votre achat, vous recevez un PDF prêt à imprimer. Imprimez-le autant de fois que vous le souhaitez – pour toute la famille, sans attente et sans frais de livraison.",
+    "uspItem1": "Téléchargement instantané dès l'achat",
+    "uspItem2": "PDF A4 prêt à imprimer – à imprimer autant de fois que vous voulez",
+    "uspItem3": "Traits nets et bien définis pour un coloriage soigné",
+    "freebieImgAlt": "Coloriage douillet sur le canapé un soir",
     "featured": "Livres de coloriage populaires",
     "browseCategories": "Parcourir nos catégories",
     "bundleTeaser": "Plus vous achetez, plus vous économisez",
-    "bundleTeaserText": "Créez votre propre bundle – plus vous ajoutez de livres, plus la réduction est grande (jusqu'à 40 %).",
+    "bundleTeaserText": "Créez votre propre pack – plus vous ajoutez de livres, plus la réduction est grande (jusqu'à 40 %).",
     "freebieTitle": "Obtenez des pages d'exemple gratuites",
     "freebieText": "Inscrivez-vous et recevez instantanément des pages de coloriage gratuites par e-mail.",
     "trustInstant": "Téléchargement instantané",
-    "trustQuality": "PDF haute qualité",
+    "trustQuality": "PDF de haute qualité",
     "trustSecure": "Paiement sécurisé"
   },
   "categories": {
@@ -63,13 +83,28 @@
     "pageCount": "Nombre de pages",
     "format": "Format",
     "formatValue": "PDF (A4, prêt à imprimer)",
-    "related": "Vous aimerez aussi",
-    "watermarkNote": "Chaque PDF est livré personnalisé (avec votre adresse e-mail). À usage privé uniquement."
+    "related": "Vous aimerez peut-être aussi",
+    "watermarkNote": "Chaque PDF est livré personnalisé (avec votre adresse e-mail). À usage privé uniquement.",
+    "audience": "Public",
+    "printReady": "prêt à imprimer",
+    "reviews": "Avis",
+    "audienceKids": "Enfants",
+    "audienceAdult": "Adultes",
+    "audienceAll": "Tous"
+  },
+  "worlds": {
+    "subtitle": "Des univers thématiques qui se complètent – trouvez votre style.",
+    "explore": "Explorer"
+  },
+  "search": {
+    "prefix": "Rechercher",
+    "allBooks": "Tous les livres de coloriage",
+    "noResults": "Aucun résultat."
   },
   "cart": {
     "title": "Panier",
     "empty": "Votre panier est vide.",
-    "quantityDiscount": "Remise sur quantité",
+    "quantityDiscount": "Réduction sur la quantité",
     "couponPlaceholder": "Code promo",
     "apply": "Appliquer",
     "youSave": "Vous économisez",
@@ -77,21 +112,21 @@
     "proceed": "Commander en toute sécurité"
   },
   "bundleBuilder": {
-    "title": "Créez votre propre bundle",
+    "title": "Créez votre propre pack",
     "subtitle": "Choisissez vos livres préférés – la réduction augmente automatiquement à chaque ajout.",
     "selected": "sélectionné(s)",
     "yourPrice": "Votre prix",
-    "nextTier": "Encore {n} livre(s) pour {pct} % de réduction !",
+    "nextTier": "{n} livre(s) de plus pour {pct} % de réduction !",
     "maxTier": "Réduction maximale atteinte – {pct} % !",
-    "addBundle": "Ajouter le bundle au panier"
+    "addBundle": "Ajouter le pack au panier"
   },
   "freebie": {
     "title": "Obtenez des pages de coloriage gratuites",
-    "text": "Inscrivez-vous avec votre e-mail et recevez instantanément des pages d'exemple gratuites – ainsi que des offres exclusives.",
+    "text": "Inscrivez-vous avec votre adresse e-mail et recevez instantanément des pages d'exemple gratuites – ainsi que des offres exclusives.",
     "emailPlaceholder": "vous@email.com",
     "submit": "Recevoir mes pages gratuites",
-    "success": "C'est parti ! Consultez votre boîte mail pour retrouver vos pages gratuites.",
-    "privacy": "Pas de spam. Désinscription possible à tout moment."
+    "success": "C'est parti ! Vérifiez votre boîte de réception pour vos pages gratuites.",
+    "privacy": "Pas de spam. Désabonnement à tout moment."
   },
   "checkout": {
     "title": "Commander",
@@ -118,8 +153,19 @@
   },
   "chat": {
     "title": "Aide & Support",
-    "placeholder": "Posez-moi votre question …",
-    "greeting": "Bonjour ! Je suis votre assistant coloriage Coloreo. Je peux vous aider pour les téléchargements, le paiement ou vous aider à trouver le livre idéal. Comment puis-je vous aider ?",
-    "send": "Envoyer"
-  }
+    "placeholder": "Posez-moi n'importe quelle question …",
+    "greeting": "Bonjour ! Je suis votre assistant coloriage. Je peux vous aider avec les téléchargements, le paiement, ou vous aider à trouver le livre idéal. Comment puis-je vous aider ?",
+    "send": "Envoyer",
+    "connectionError": "Erreur de connexion."
+  },
+  "cartToast": {
+    "added": "ajouté",
+    "cartLabel": "Panier"
+  },
+  "account": {
+    "signOut": "Se déconnecter",
+    "searchLabel": "Rechercher",
+    "expired": "expiré"
+  },
+  "orgSlogan": "Colorez votre monde."
 }

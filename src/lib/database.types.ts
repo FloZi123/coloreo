@@ -63,6 +63,7 @@ export type Database = {
           created_at: string
           description_de: string | null
           description_en: string | null
+          i18n: Json
           id: string
           is_featured: boolean
           page_count: number
@@ -85,6 +86,7 @@ export type Database = {
           created_at?: string
           description_de?: string | null
           description_en?: string | null
+          i18n?: Json
           id?: string
           is_featured?: boolean
           page_count?: number
@@ -115,6 +117,7 @@ export type Database = {
           created_at: string
           description_de: string | null
           description_en: string | null
+          i18n: Json
           id: string
           is_active: boolean
           price_cents: number | null
@@ -129,6 +132,7 @@ export type Database = {
           created_at?: string
           description_de?: string | null
           description_en?: string | null
+          i18n?: Json
           id?: string
           is_active?: boolean
           price_cents?: number | null
@@ -142,8 +146,8 @@ export type Database = {
         Relationships: []
       }
       worlds: {
-        Row: { id: string; slug: string; name_de: string; name_en: string; description_de: string | null; description_en: string | null; emoji: string | null; accent: string | null; sort_order: number; is_active: boolean; created_at: string }
-        Insert: { id?: string; slug: string; name_de: string; name_en: string; description_de?: string | null; description_en?: string | null; emoji?: string | null; accent?: string | null; sort_order?: number; is_active?: boolean; created_at?: string }
+        Row: { id: string; slug: string; name_de: string; name_en: string; description_de: string | null; description_en: string | null; i18n: Json; emoji: string | null; accent: string | null; sort_order: number; is_active: boolean; created_at: string }
+        Insert: { id?: string; slug: string; name_de: string; name_en: string; description_de?: string | null; description_en?: string | null; i18n?: Json; emoji?: string | null; accent?: string | null; sort_order?: number; is_active?: boolean; created_at?: string }
         Update: Partial<Database["public"]["Tables"]["worlds"]["Insert"]>
         Relationships: []
       }
@@ -153,6 +157,7 @@ export type Database = {
           created_at: string
           description_de: string | null
           description_en: string | null
+          i18n: Json
           emoji: string | null
           hero_image: string | null
           id: string
@@ -168,6 +173,7 @@ export type Database = {
           created_at?: string
           description_de?: string | null
           description_en?: string | null
+          i18n?: Json
           emoji?: string | null
           hero_image?: string | null
           id?: string

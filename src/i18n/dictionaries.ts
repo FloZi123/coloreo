@@ -42,6 +42,27 @@ const de = {
       "Über 20 Trend-Kategorien für Erwachsene und Kinder. Digitaler PDF-Download in Sekunden – kein Warten, kein Versand.",
     heroCta: "Jetzt entdecken",
     heroCtaBundles: "Bundles & Rabatte",
+    heroAgeBadge: "Malbücher für jedes Alter",
+    forAdults: "Für Erwachsene",
+    heroImgAlt: "Hände malen ein Mandala in einem Malbuch aus",
+    heroBadgeLabel: "Sofort-PDF · druckfertig",
+    featureBoldLines: "Dicke, klare Linien",
+    featureBoldLinesDesc: "Gemacht zum Ausmalen, nicht zum Verzweifeln.",
+    featureInstantPdf: "Sofort als PDF",
+    featureInstantPdfDesc: "Direkt nach dem Kauf herunterladen & drucken.",
+    featureAllAges: "Für jedes Alter",
+    featureAllAgesDesc: "Von ab 3 bis Anti-Stress für Erwachsene.",
+    macroBanner: "Ein Stift. Eine Linie. Deine Auszeit.",
+    exploreWorlds: "Entdecke unsere Welten",
+    explore: "Entdecken",
+    uspImgAlt: "Frisch gedruckte Malbuchseite neben einem Drucker",
+    digitalBuyTitle: "Digital kaufen, zu Hause drucken",
+    digitalBuyText:
+      "Nach dem Kauf bekommst du sofort eine druckfertige PDF. So oft ausdrucken, wie du magst – für die ganze Familie, ganz ohne Warten und Versand.",
+    uspItem1: "Sofort-Download direkt nach dem Kauf",
+    uspItem2: "Druckfertiges PDF in A4 – beliebig oft drucken",
+    uspItem3: "Dicke, klare Linien für sauberes Ausmalen",
+    freebieImgAlt: "Gemütlicher Abend mit Malbuch auf dem Sofa",
     featured: "Beliebte Malbücher",
     browseCategories: "Stöbere in unseren Kategorien",
     bundleTeaser: "Mehr kaufen, mehr sparen",
@@ -70,6 +91,21 @@ const de = {
     related: "Das könnte dir auch gefallen",
     watermarkNote:
       "Jedes PDF wird personalisiert (mit deiner E-Mail) ausgeliefert. Nur für den privaten Gebrauch.",
+    audience: "Zielgruppe",
+    printReady: "druckfertig",
+    reviews: "Bewertungen",
+    audienceKids: "Kinder",
+    audienceAdult: "Erwachsene",
+    audienceAll: "Alle",
+  },
+  worlds: {
+    subtitle: "Themenwelten, die zusammenpassen – finde deinen Stil.",
+    explore: "Entdecken",
+  },
+  search: {
+    prefix: "Suche",
+    allBooks: "Alle Malbücher",
+    noResults: "Keine Treffer.",
   },
   cart: {
     title: "Warenkorb",
@@ -128,7 +164,18 @@ const de = {
     greeting:
       "Hallo! Ich bin dein Malbuch-Assistent. Ich helfe dir bei Fragen zu Downloads, Zahlung oder finde das passende Malbuch für dich. Wie kann ich helfen?",
     send: "Senden",
+    connectionError: "Verbindungsfehler.",
   },
+  cartToast: {
+    added: "hinzugefügt",
+    cartLabel: "Warenkorb",
+  },
+  account: {
+    signOut: "Abmelden",
+    searchLabel: "Suche",
+    expired: "abgelaufen",
+  },
+  orgSlogan: "Mal dir deine Welt.",
 };
 
 type Dict = typeof de;
@@ -175,6 +222,27 @@ const en: Dict = {
       "20+ trending categories for adults and kids. Digital PDF download in seconds – no waiting, no shipping.",
     heroCta: "Explore now",
     heroCtaBundles: "Bundles & discounts",
+    heroAgeBadge: "Coloring books for every age",
+    forAdults: "For adults",
+    heroImgAlt: "Hands coloring a mandala in a coloring book",
+    heroBadgeLabel: "Instant PDF · print-ready",
+    featureBoldLines: "Bold, clear lines",
+    featureBoldLinesDesc: "Made for coloring, not despairing.",
+    featureInstantPdf: "Instant PDF",
+    featureInstantPdfDesc: "Download & print right after purchase.",
+    featureAllAges: "For every age",
+    featureAllAgesDesc: "From age 3 to adult anti-stress.",
+    macroBanner: "One pencil. One line. Your time out.",
+    exploreWorlds: "Explore our worlds",
+    explore: "Explore",
+    uspImgAlt: "Freshly printed coloring page next to a printer",
+    digitalBuyTitle: "Buy digital, print at home",
+    digitalBuyText:
+      "Right after purchase you get a print-ready PDF. Print it as often as you like – for the whole family, with no waiting and no shipping.",
+    uspItem1: "Instant download right after purchase",
+    uspItem2: "Print-ready A4 PDF – print as often as you like",
+    uspItem3: "Bold, clear lines for clean coloring",
+    freebieImgAlt: "Cozy evening coloring on the sofa",
     featured: "Popular coloring books",
     browseCategories: "Browse our categories",
     bundleTeaser: "Buy more, save more",
@@ -203,6 +271,21 @@ const en: Dict = {
     related: "You might also like",
     watermarkNote:
       "Every PDF is delivered personalized (with your email). For private use only.",
+    audience: "Audience",
+    printReady: "print-ready",
+    reviews: "Reviews",
+    audienceKids: "Kids",
+    audienceAdult: "Adults",
+    audienceAll: "All",
+  },
+  worlds: {
+    subtitle: "Themed worlds that fit together – find your style.",
+    explore: "Explore",
+  },
+  search: {
+    prefix: "Search",
+    allBooks: "All coloring books",
+    noResults: "No results.",
   },
   cart: {
     title: "Cart",
@@ -260,7 +343,18 @@ const en: Dict = {
     greeting:
       "Hi! I'm your coloring book assistant. I can help with downloads, payment, or find the right book for you. How can I help?",
     send: "Send",
+    connectionError: "Connection error.",
   },
+  cartToast: {
+    added: "added",
+    cartLabel: "Cart",
+  },
+  account: {
+    signOut: "Sign out",
+    searchLabel: "Search",
+    expired: "expired",
+  },
+  orgSlogan: "Color your world.",
 };
 
 import frRaw from "./messages/fr.json";

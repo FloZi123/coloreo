@@ -53,7 +53,7 @@ export default async function BookPage({
   const related = category ? (await getBooks({ categoryId: category.id, limit: 5 })).filter((b) => b.id !== book.id).slice(0, 4) : [];
   const previews = Array.isArray(book.preview_urls) ? (book.preview_urls as string[]) : [];
   const [rating, reviews] = await Promise.all([getBookRating(book.id), getReviews(book.id)]);
-  const audienceLabel = book.audience === "kids" ? (locale === "de" ? "Kinder" : "Kids") : book.audience === "adult" ? (locale === "de" ? "Erwachsene" : "Adults") : (locale === "de" ? "Alle" : "All");
+  const audienceLabel = book.audience === "kids" ? dict.product.audienceKids : book.audience === "adult" ? dict.product.audienceAdult : dict.product.audienceAll;
 
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const absImage = book.cover_url ? (book.cover_url.startsWith("http") ? book.cover_url : `${site}${book.cover_url}`) : undefined;
@@ -136,11 +136,11 @@ export default async function BookPage({
             </div>
             <div className="rounded-2xl p-4" style={{ background: "var(--color-beige)" }}>
               <div className="font-display text-xl font-bold">{audienceLabel}</div>
-              <div className="text-xs text-muted">{locale === "de" ? "Zielgruppe" : "Audience"}</div>
+              <div className="text-xs text-muted">{dict.product.audience}</div>
             </div>
             <div className="rounded-2xl p-4" style={{ background: "var(--color-beige)" }}>
               <div className="font-display text-xl font-bold">PDF</div>
-              <div className="text-xs text-muted">A4 · {locale === "de" ? "druckfertig" : "print-ready"}</div>
+              <div className="text-xs text-muted">A4 · {dict.product.printReady}</div>
             </div>
           </div>
 
@@ -153,7 +153,7 @@ export default async function BookPage({
 
       {reviews.length > 0 && (
         <section className="mt-16">
-          <h2 className="mb-6 font-display text-2xl font-bold">{locale === "de" ? "Bewertungen" : "Reviews"}</h2>
+          <h2 className="mb-6 font-display text-2xl font-bold">{dict.product.reviews}</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {reviews.map((r, i) => (
               <div key={i} className="card p-5">

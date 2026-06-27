@@ -2,15 +2,21 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { getAnthropic, MODELS } from "@/lib/anthropic";
 import { createPublicClient } from "@/lib/supabase/public";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { Locale } from "@/i18n/config";
+import { localeMeta, type Locale } from "@/i18n/config";
 import { formatPrice } from "@/lib/pricing";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export type ChatMessage = { role: "user" | "assistant"; content: string };
 
+/** Buchtitel in der Nutzersprache (i18n mit DE/EN-Fallback). */
+function pickTitle(b: { i18n?: unknown; title_de: string; title_en: string }, locale: Locale): string {
+  const t = (b.i18n as Record<string, { title?: string }> | undefined)?.[locale]?.title;
+  return t && t.trim() ? t : locale === "de" ? b.title_de : b.title_en;
+}
+
 function systemPrompt(locale: Locale): string {
-  const lang = locale === "de" ? "Deutsch" : "English";
+  const lang = localeMeta[locale].label;
   return `Du bist der freundliche Support- und Verkaufsassistent von "Coloreo", einem Online-Shop für digitale Malbücher (PDF-Sofortdownload) für Erwachsene und Kinder. Antworte IMMER auf ${lang}, kurz und herzlich.
 
 Wissen:
@@ -68,23 +74,23 @@ async function execTool(name: string, input: Record<string, unknown>, locale: Lo
   if (name === "search_products") {
     const q = String(input.query ?? "");
     const sb = createPublicClient();
+    const cols = "slug, title_de, title_en, i18n, price_cents, tags";
     const { data } = await sb
       .from("books")
-      .select("slug, title_de, title_en, price_cents, tags")
+      .select(cols)
       .eq("status", "published")
       .or(`title_de.ilike.%${q}%,title_en.ilike.%${q}%`)
       .limit(5);
     let results = data ?? [];
     if (results.length === 0) {
-      // Fallback: über Tags / Kategorie-Namen
-      const { data: byTag } = await sb.from("books").select("slug, title_de, title_en, price_cents, tags").eq("status", "published").contains("tags", [q.toLowerCase()]).limit(5);
+      const { data: byTag } = await sb.from("books").select(cols).eq("status", "published").contains("tags", [q.toLowerCase()]).limit(5);
       results = byTag ?? [];
     }
     if (results.length === 0) return JSON.stringify({ found: 0, hint: "Keine direkten Treffer – bitte allgemeiner suchen." });
     return JSON.stringify({
       found: results.length,
       products: results.map((b) => ({
-        title: locale === "en" ? b.title_en : b.title_de,
+        title: pickTitle(b, locale),
         price: formatPrice(b.price_cents, locale),
         url: `${SITE}/${locale}/buch/${b.slug}`,
       })),
@@ -102,8 +108,8 @@ async function execTool(name: string, input: Record<string, unknown>, locale: Lo
     if (!orders || orders.length === 0) return JSON.stringify({ found: 0 });
     const orderIds = orders.map((o) => o.id);
     const { data: dls } = await admin.from("downloads").select("order_id, book_id, token").in("order_id", orderIds);
-    const { data: books } = await admin.from("books").select("id, title_de, title_en").in("id", (dls ?? []).map((d) => d.book_id));
-    const titleMap = new Map((books ?? []).map((b) => [b.id, locale === "en" ? b.title_en : b.title_de]));
+    const { data: books } = await admin.from("books").select("id, title_de, title_en, i18n").in("id", (dls ?? []).map((d) => d.book_id));
+    const titleMap = new Map((books ?? []).map((b) => [b.id, pickTitle(b, locale)]));
     return JSON.stringify({
       found: orders.length,
       orders: orders.map((o) => ({

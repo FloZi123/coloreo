@@ -30,12 +30,12 @@ export default async function SearchPage({
   return (
     <div className="container-page py-12">
       <h1 className="mb-6 font-display text-3xl font-bold">
-        {sp.q ? `${locale === "de" ? "Suche" : "Search"}: „${sp.q}"` : locale === "de" ? "Alle Malbücher" : "All coloring books"}
+        {sp.q ? `${dict.search.prefix}: „${sp.q}"` : dict.search.allBooks}
       </h1>
       <SearchControls locale={locale} categories={categories.map((c) => ({ slug: c.slug, name: tName(c, locale) }))} />
 
       {books.length === 0 ? (
-        <div className="card p-10 text-center text-muted">{locale === "de" ? "Keine Treffer." : "No results."}</div>
+        <div className="card p-10 text-center text-muted">{dict.search.noResults}</div>
       ) : (
         <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
           {books.map((b) => (

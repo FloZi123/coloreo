@@ -4,9 +4,9 @@
     "worlds": "Werelden",
     "categories": "Categorieën",
     "bundles": "Bundels",
-    "bundleBuilder": "Bundelsamensteller",
+    "bundleBuilder": "Bundel samenstellen",
     "freebies": "Gratis pagina's",
-    "library": "Mijn Bibliotheek",
+    "library": "Mijn bibliotheek",
     "cart": "Winkelwagen",
     "help": "Help"
   },
@@ -35,36 +35,71 @@
     "newsletter": "Nieuwsbrief"
   },
   "home": {
-    "heroTitle": "Prachtige kleurboeken, direct klaar om af te drukken",
-    "heroSubtitle": "20+ populaire categorieën voor volwassenen en kinderen. Digitale PDF-download in seconden – geen wachten, geen verzending.",
+    "heroTitle": "Prachtige kleurboeken, direct klaar om te printen",
+    "heroSubtitle": "20+ populaire categorieën voor volwassenen en kinderen. Digitale PDF-download in een paar seconden – geen wachten, geen verzending.",
     "heroCta": "Ontdek nu",
     "heroCtaBundles": "Bundels & kortingen",
+    "heroAgeBadge": "Kleurboeken voor elke leeftijd",
+    "forAdults": "Voor volwassenen",
+    "heroImgAlt": "Handen die een mandala inkleuren in een kleurboek",
+    "heroBadgeLabel": "Directe PDF · printklaar",
+    "featureBoldLines": "Vette, duidelijke lijnen",
+    "featureBoldLinesDesc": "Gemaakt om in te kleuren, niet om te wanhopen.",
+    "featureInstantPdf": "Directe PDF",
+    "featureInstantPdfDesc": "Download & print direct na aankoop.",
+    "featureAllAges": "Voor elke leeftijd",
+    "featureAllAgesDesc": "Van 3 jaar tot anti-stress voor volwassenen.",
+    "macroBanner": "Één potlood. Één lijn. Jouw moment van rust.",
+    "exploreWorlds": "Ontdek onze werelden",
+    "explore": "Ontdekken",
+    "uspImgAlt": "Vers geprinte kleurplaat naast een printer",
+    "digitalBuyTitle": "Digitaal kopen, thuis printen",
+    "digitalBuyText": "Direct na aankoop ontvang je een printklare PDF. Print hem zo vaak als je wilt – voor het hele gezin, zonder wachten en zonder verzendkosten.",
+    "uspItem1": "Direct downloaden na aankoop",
+    "uspItem2": "Printklare A4-PDF – print hem zo vaak als je wilt",
+    "uspItem3": "Vette, duidelijke lijnen voor mooi inkleuren",
+    "freebieImgAlt": "Gezellig 's avonds kleuren op de bank",
     "featured": "Populaire kleurboeken",
     "browseCategories": "Bekijk onze categorieën",
     "bundleTeaser": "Meer kopen, meer besparen",
-    "bundleTeaserText": "Stel je eigen bundel samen – hoe meer boeken, hoe groter de korting (tot wel 40%).",
+    "bundleTeaserText": "Stel je eigen bundel samen – hoe meer boeken, hoe groter de korting (tot 40%).",
     "freebieTitle": "Ontvang gratis voorbeeldpagina's",
-    "freebieText": "Meld je aan en ontvang direct gratis kleurpagina's per e-mail.",
+    "freebieText": "Meld je aan en ontvang direct gratis kleurplaten per e-mail.",
     "trustInstant": "Direct downloaden",
-    "trustQuality": "PDF's van hoge kwaliteit",
+    "trustQuality": "Hoogwaardige PDF's",
     "trustSecure": "Veilig betalen"
   },
   "categories": {
     "title": "Alle categorieën",
     "subtitle": "Vind jouw favoriete thema",
     "booksIn": "Kleurboeken in",
-    "noBooks": "Binnenkort beschikbaar – er worden hier nieuwe kleurboeken gemaakt."
+    "noBooks": "Binnenkort beschikbaar – hier worden nieuwe kleurboeken gemaakt."
   },
   "product": {
-    "preview": "Voorbeeld",
-    "description": "Beschrijving",
+    "preview": "Voorvertoning",
+    "description": "Omschrijving",
     "details": "Details",
     "category": "Categorie",
     "pageCount": "Aantal pagina's",
     "format": "Formaat",
-    "formatValue": "PDF (A4, drukklaar)",
-    "related": "Dit vind je misschien ook leuk",
-    "watermarkNote": "Elke PDF wordt gepersonaliseerd geleverd (met jouw e-mailadres). Uitsluitend voor privégebruik."
+    "formatValue": "PDF (A4, printklaar)",
+    "related": "Misschien vind je dit ook leuk",
+    "watermarkNote": "Elke PDF wordt gepersonaliseerd geleverd (met jouw e-mailadres). Alleen voor privégebruik.",
+    "audience": "Doelgroep",
+    "printReady": "printklaar",
+    "reviews": "Beoordelingen",
+    "audienceKids": "Kinderen",
+    "audienceAdult": "Volwassenen",
+    "audienceAll": "Alle"
+  },
+  "worlds": {
+    "subtitle": "Themawerelden die bij elkaar passen – vind jouw stijl.",
+    "explore": "Ontdekken"
+  },
+  "search": {
+    "prefix": "Zoeken",
+    "allBooks": "Alle kleurboeken",
+    "noResults": "Geen resultaten."
   },
   "cart": {
     "title": "Winkelwagen",
@@ -86,10 +121,10 @@
     "addBundle": "Bundel in winkelwagen"
   },
   "freebie": {
-    "title": "Ontvang gratis kleurpagina's",
+    "title": "Ontvang gratis kleurplaten",
     "text": "Meld je aan met je e-mailadres en ontvang direct gratis voorbeeldpagina's – plus exclusieve aanbiedingen.",
     "emailPlaceholder": "jij@email.com",
-    "submit": "Gratis pagina's ontvangen",
+    "submit": "Stuur mij gratis pagina's",
     "success": "Gelukt! Controleer je inbox voor je gratis pagina's.",
     "privacy": "Geen spam. Op elk moment uitschrijven."
   },
@@ -98,28 +133,39 @@
     "emailLabel": "E-mailadres (voor je downloads)",
     "payNow": "Nu betalen",
     "successTitle": "Bedankt voor je aankoop!",
-    "successText": "Je kleurboeken zijn klaar om te downloaden. We hebben je de links ook per e-mail gestuurd.",
+    "successText": "Je kleurboeken zijn klaar om te downloaden. We hebben je ook de links per e-mail gestuurd.",
     "failTitle": "Betaling niet voltooid",
-    "failText": "Er is niets veranderd – je winkelwagen staat nog steeds klaar."
+    "failText": "Er is niets in rekening gebracht – je winkelwagen staat nog klaar."
   },
   "library": {
-    "title": "Mijn Bibliotheek",
+    "title": "Mijn bibliotheek",
     "subtitle": "Al je gekochte kleurboeken op één plek.",
-    "enterEmail": "Voer je aankoop-e-mailadres in om je downloads te bekijken.",
+    "enterEmail": "Voer je aankoope-mailadres in om je downloads te bekijken.",
     "noPurchases": "Nog geen aankopen gevonden."
   },
   "footer": {
     "rights": "Alle rechten voorbehouden.",
-    "imprint": "Colofon",
-    "privacy": "Privacy",
+    "imprint": "Impressum",
+    "privacy": "Privacybeleid",
     "terms": "Algemene voorwaarden",
     "revocation": "Herroepingsrecht",
     "contact": "Contact"
   },
   "chat": {
-    "title": "Help & Ondersteuning",
-    "placeholder": "Stel gerust je vraag …",
-    "greeting": "Hoi! Ik ben jouw kleurboekassistent. Ik help je graag met downloads, betaling of het vinden van het juiste boek. Hoe kan ik je helpen?",
-    "send": "Versturen"
-  }
+    "title": "Help & ondersteuning",
+    "placeholder": "Stel me gerust een vraag …",
+    "greeting": "Hoi! Ik ben jouw kleurboekassistent. Ik help je graag met downloads, betaling of het vinden van het juiste boek. Waar kan ik je mee helpen?",
+    "send": "Versturen",
+    "connectionError": "Verbindingsfout."
+  },
+  "cartToast": {
+    "added": "toegevoegd",
+    "cartLabel": "Winkelwagen"
+  },
+  "account": {
+    "signOut": "Uitloggen",
+    "searchLabel": "Zoeken",
+    "expired": "verlopen"
+  },
+  "orgSlogan": "Kleur jouw wereld."
 }

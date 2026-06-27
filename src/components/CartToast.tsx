@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/cart/store";
 import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries";
 
-export default function CartToast({ locale }: { locale: Locale }) {
+export default function CartToast({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const { lastAdded } = useCart();
   const [show, setShow] = useState(false);
   const [title, setTitle] = useState("");
@@ -24,10 +25,10 @@ export default function CartToast({ locale }: { locale: Locale }) {
       <div className="flex items-center gap-3 rounded-full border bg-surface px-5 py-3 shadow-lg">
         <span className="text-success">✓</span>
         <span className="text-sm font-medium">
-          <span className="font-semibold">{title}</span> {locale === "de" ? "hinzugefügt" : "added"}
+          <span className="font-semibold">{title}</span> {dict.cartToast.added}
         </span>
         <Link href={`/${locale}/warenkorb`} className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-dark">
-          {locale === "de" ? "Warenkorb" : "Cart"} →
+          {dict.cartToast.cartLabel} →
         </Link>
       </div>
     </div>

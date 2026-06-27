@@ -22,7 +22,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const orgLd = {
     "@context": "https://schema.org",
     "@graph": [
-      { "@type": "Organization", name: "Coloreo", url: site, slogan: locale === "de" ? "Mal dir deine Welt." : "Color your world." },
+      { "@type": "Organization", name: "Coloreo", url: site, slogan: dict.orgSlogan },
       { "@type": "WebSite", name: "Coloreo", url: site, inLanguage: locale,
         potentialAction: { "@type": "SearchAction", target: `${site}/${locale}/suche?q={search_term_string}`, "query-input": "required name=search_term_string" } },
     ],
@@ -36,14 +36,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div>
           <span className="inline-flex items-center gap-2 rounded-full border bg-surface px-4 py-1.5 text-xs font-extrabold uppercase tracking-wider text-primary">
             <span className="h-2 w-2 rounded-full bg-primary" />
-            {locale === "de" ? "Malbücher für jedes Alter" : "Coloring books for every age"}
+            {dict.home.heroAgeBadge}
           </span>
           <h1 className="mt-5 font-display text-5xl font-bold leading-[1.02] md:text-6xl">{dict.home.heroTitle}</h1>
           <p className="mt-5 max-w-[46ch] text-lg text-muted">{dict.home.heroSubtitle}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href={p("/welten")} className="btn-primary px-7 py-3.5">{dict.home.heroCta}</Link>
             <Link href={p("/welten/anti-stress")} className="rounded-full border-2 border-ink px-7 py-3.5 font-extrabold text-ink transition hover:bg-ink hover:text-paper">
-              {locale === "de" ? "Für Erwachsene" : "For adults"}
+              {dict.home.forAdults}
             </Link>
           </div>
         </div>
@@ -51,12 +51,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/mood/hero.webp"
-            alt={locale === "de" ? "Hände malen ein Mandala in einem Malbuch aus" : "Hands coloring a mandala in a coloring book"}
+            alt={dict.home.heroImgAlt}
             className="aspect-[16/11] w-full rounded-[1.75rem] object-cover shadow-xl"
           />
           <div className="absolute -bottom-4 -left-4 hidden rounded-2xl bg-paper px-4 py-3 shadow-lg sm:block">
             <div className="font-display text-sm font-bold" style={{ color: "#FFC23C" }}>★★★★★</div>
-            <div className="text-xs text-muted">{locale === "de" ? "Sofort-PDF · druckfertig" : "Instant PDF · print-ready"}</div>
+            <div className="text-xs text-muted">{dict.home.heroBadgeLabel}</div>
           </div>
         </div>
       </section>
@@ -65,9 +65,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <section style={{ background: "var(--color-beige)" }}>
         <div className="container-page grid gap-6 py-10 sm:grid-cols-3">
           {[
-            { c: "#FF5A4D", t: locale === "de" ? "Dicke, klare Linien" : "Bold, clear lines", d: locale === "de" ? "Gemacht zum Ausmalen, nicht zum Verzweifeln." : "Made for coloring, not despairing." },
-            { c: "#3FBF87", t: locale === "de" ? "Sofort als PDF" : "Instant PDF", d: locale === "de" ? "Direkt nach dem Kauf herunterladen & drucken." : "Download & print right after purchase." },
-            { c: "#3B8EEA", t: locale === "de" ? "Für jedes Alter" : "For every age", d: locale === "de" ? "Von ab 3 bis Anti-Stress für Erwachsene." : "From age 3 to adult anti-stress." },
+            { c: "#FF5A4D", t: dict.home.featureBoldLines, d: dict.home.featureBoldLinesDesc },
+            { c: "#3FBF87", t: dict.home.featureInstantPdf, d: dict.home.featureInstantPdfDesc },
+            { c: "#3B8EEA", t: dict.home.featureAllAges, d: dict.home.featureAllAgesDesc },
           ].map((f) => (
             <div key={f.t} className="flex items-start gap-3.5">
               <span className="h-10 w-10 flex-none rounded-xl" style={{ background: f.c }} />
@@ -117,7 +117,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="absolute inset-0 flex items-center" style={{ background: "linear-gradient(90deg, rgba(34,30,27,0.62), rgba(34,30,27,0.05))" }}>
           <div className="container-page">
             <p className="max-w-md font-display text-2xl font-bold text-paper md:text-3xl">
-              {locale === "de" ? "Ein Stift. Eine Linie. Deine Auszeit." : "One pencil. One line. Your time out."}
+              {dict.home.macroBanner}
             </p>
           </div>
         </div>
@@ -125,7 +125,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       {/* WELTEN */}
       <section className="container-page py-8">
-        <h2 className="mb-8 font-display text-2xl font-bold md:text-3xl">{locale === "de" ? "Entdecke unsere Welten" : "Explore our worlds"}</h2>
+        <h2 className="mb-8 font-display text-2xl font-bold md:text-3xl">{dict.home.exploreWorlds}</h2>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {worlds.map((w) => (
             <Link
@@ -137,7 +137,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl text-2xl" style={{ background: (w.accent ?? "#7C4DFF") + "22" }}>{w.emoji}</div>
               <h3 className="mt-4 font-display text-xl font-bold">{tName(w, locale)}</h3>
               <p className="mt-1 text-sm text-ink-soft">{tDesc(w, locale)}</p>
-              <span className="mt-3 inline-block text-sm font-semibold" style={{ color: w.accent ?? "#7C4DFF" }}>{locale === "de" ? "Entdecken" : "Explore"} →</span>
+              <span className="mt-3 inline-block text-sm font-semibold" style={{ color: w.accent ?? "#7C4DFF" }}>{dict.home.explore} →</span>
             </Link>
           ))}
         </div>
@@ -163,21 +163,19 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/mood/usp-print.webp"
-            alt={locale === "de" ? "Frisch gedruckte Malbuchseite neben einem Drucker" : "Freshly printed coloring page next to a printer"}
+            alt={dict.home.uspImgAlt}
             className="aspect-[4/3] w-full rounded-3xl object-cover shadow-lg"
           />
           <div>
-            <h2 className="font-display text-2xl font-bold md:text-3xl">{locale === "de" ? "Digital kaufen, zu Hause drucken" : "Buy digital, print at home"}</h2>
+            <h2 className="font-display text-2xl font-bold md:text-3xl">{dict.home.digitalBuyTitle}</h2>
             <p className="mt-3 max-w-[42ch] text-muted">
-              {locale === "de"
-                ? "Nach dem Kauf bekommst du sofort eine druckfertige PDF. So oft ausdrucken, wie du magst – für die ganze Familie, ganz ohne Warten und Versand."
-                : "Right after purchase you get a print-ready PDF. Print it as often as you like – for the whole family, with no waiting and no shipping."}
+              {dict.home.digitalBuyText}
             </p>
             <ul className="mt-5 space-y-2.5 text-sm font-medium text-ink-soft">
               {[
-                locale === "de" ? "Sofort-Download direkt nach dem Kauf" : "Instant download right after purchase",
-                locale === "de" ? "Druckfertiges PDF in A4 – beliebig oft drucken" : "Print-ready A4 PDF – print as often as you like",
-                locale === "de" ? "Dicke, klare Linien für sauberes Ausmalen" : "Bold, clear lines for clean coloring",
+                dict.home.uspItem1,
+                dict.home.uspItem2,
+                dict.home.uspItem3,
               ].map((t) => (
                 <li key={t} className="flex items-center gap-2.5">
                   <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full text-xs text-white" style={{ background: "var(--color-success)" }}>✓</span>
@@ -195,7 +193,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/mood/cozy-evening.webp"
-            alt={locale === "de" ? "Gemütlicher Abend mit Malbuch auf dem Sofa" : "Cozy evening coloring on the sofa"}
+            alt={dict.home.freebieImgAlt}
             className="h-full min-h-[260px] w-full object-cover"
           />
           <div className="flex flex-col items-center gap-4 p-10 text-center">

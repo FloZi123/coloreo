@@ -92,7 +92,8 @@ export async function POST(req: Request) {
       cancel_url: `${origin}/${locale}/warenkorb`,
       automatic_tax: { enabled: false },
       metadata: { order_id: order.id, order_number: orderNumber, locale },
-      locale: locale === "de" ? "de" : "en",
+      // Stripe Checkout unterstützt de/en/fr/es/it/nl direkt
+      locale: (["de", "en", "fr", "es", "it", "nl"].includes(locale) ? locale : "auto") as "de" | "en" | "fr" | "es" | "it" | "nl" | "auto",
     });
 
     await admin.from("orders").update({ stripe_session_id: session.id }).eq("id", order.id);

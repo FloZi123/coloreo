@@ -8,7 +8,7 @@
     "freebies": "Pagine gratuite",
     "library": "La mia libreria",
     "cart": "Carrello",
-    "help": "Assistenza"
+    "help": "Aiuto"
   },
   "common": {
     "addToCart": "Aggiungi al carrello",
@@ -19,8 +19,8 @@
     "total": "Totale",
     "discount": "Sconto",
     "subtotal": "Subtotale",
-    "checkout": "Vai alla cassa",
-    "continueShopping": "Continua a fare acquisti",
+    "checkout": "Acquista",
+    "continueShopping": "Continua lo shopping",
     "remove": "Rimuovi",
     "all": "Tutti",
     "adults": "Adulti",
@@ -30,22 +30,42 @@
     "book": "Libro da colorare",
     "books": "Libri da colorare",
     "download": "Scarica",
-    "instantDownload": "Download PDF immediato",
+    "instantDownload": "Download PDF istantaneo",
     "securePayment": "Pagamento sicuro",
     "newsletter": "Newsletter"
   },
   "home": {
     "heroTitle": "Bellissimi libri da colorare, pronti da stampare subito",
-    "heroSubtitle": "Oltre 20 categorie di tendenza per adulti e bambini. Download PDF digitale in pochi secondi – senza attese, senza spedizioni.",
-    "heroCta": "Esplora ora",
+    "heroSubtitle": "Oltre 20 categorie di tendenza per adulti e bambini. Download PDF digitale in pochi secondi – nessuna attesa, nessuna spedizione.",
+    "heroCta": "Scopri ora",
     "heroCtaBundles": "Bundle e sconti",
+    "heroAgeBadge": "Libri da colorare per ogni età",
+    "forAdults": "Per adulti",
+    "heroImgAlt": "Mani che colorano un mandala in un libro da colorare",
+    "heroBadgeLabel": "PDF istantaneo · pronto per la stampa",
+    "featureBoldLines": "Linee decise e chiare",
+    "featureBoldLinesDesc": "Pensati per colorare con gioia, non per scoraggiarsi.",
+    "featureInstantPdf": "PDF istantaneo",
+    "featureInstantPdfDesc": "Scarica e stampa subito dopo l'acquisto.",
+    "featureAllAges": "Per ogni età",
+    "featureAllAgesDesc": "Dai 3 anni fino all'antistress per adulti.",
+    "macroBanner": "Una matita. Un tratto. Il tuo momento di relax.",
+    "exploreWorlds": "Esplora i nostri mondi",
+    "explore": "Esplora",
+    "uspImgAlt": "Pagina da colorare appena stampata accanto a una stampante",
+    "digitalBuyTitle": "Acquista digitale, stampa a casa",
+    "digitalBuyText": "Subito dopo l'acquisto ricevi un PDF pronto per la stampa. Stampalo tutte le volte che vuoi – per tutta la famiglia, senza attese e senza spedizione.",
+    "uspItem1": "Download istantaneo subito dopo l'acquisto",
+    "uspItem2": "PDF A4 pronto per la stampa – stampalo quante volte vuoi",
+    "uspItem3": "Linee decise e chiare per una colorazione perfetta",
+    "freebieImgAlt": "Serata accogliente a colorare sul divano",
     "featured": "Libri da colorare più amati",
     "browseCategories": "Sfoglia le nostre categorie",
     "bundleTeaser": "Più acquisti, più risparmi",
-    "bundleTeaserText": "Crea il tuo bundle personalizzato – più libri scegli, più grande sarà lo sconto (fino al 40%).",
+    "bundleTeaserText": "Crea il tuo bundle personalizzato – più libri scegli, maggiore è lo sconto (fino al 40%).",
     "freebieTitle": "Ricevi pagine di esempio gratuite",
     "freebieText": "Iscriviti e ricevi subito pagine da colorare gratuite via email.",
-    "trustInstant": "Download immediato",
+    "trustInstant": "Download istantaneo",
     "trustQuality": "PDF di alta qualità",
     "trustSecure": "Pagamento sicuro"
   },
@@ -64,7 +84,22 @@
     "format": "Formato",
     "formatValue": "PDF (A4, pronto per la stampa)",
     "related": "Potrebbe piacerti anche",
-    "watermarkNote": "Ogni PDF viene consegnato personalizzato (con la tua email). Solo per uso privato."
+    "watermarkNote": "Ogni PDF viene consegnato personalizzato (con la tua email). Solo per uso privato.",
+    "audience": "Destinatari",
+    "printReady": "pronto per la stampa",
+    "reviews": "Recensioni",
+    "audienceKids": "Bambini",
+    "audienceAdult": "Adulti",
+    "audienceAll": "Tutti"
+  },
+  "worlds": {
+    "subtitle": "Mondi tematici che si abbinano perfettamente – trova il tuo stile.",
+    "explore": "Esplora"
+  },
+  "search": {
+    "prefix": "Cerca",
+    "allBooks": "Tutti i libri da colorare",
+    "noResults": "Nessun risultato."
   },
   "cart": {
     "title": "Carrello",
@@ -74,7 +109,7 @@
     "apply": "Applica",
     "youSave": "Risparmi",
     "addMoreSave": "Aggiungi ancora {n} libro/i per uno sconto del {pct}%",
-    "proceed": "Vai alla cassa in sicurezza"
+    "proceed": "Acquisto sicuro"
   },
   "bundleBuilder": {
     "title": "Crea il tuo bundle",
@@ -86,15 +121,15 @@
     "addBundle": "Aggiungi il bundle al carrello"
   },
   "freebie": {
-    "title": "Ottieni pagine da colorare gratuite",
+    "title": "Ricevi pagine da colorare gratuite",
     "text": "Iscriviti con la tua email e ricevi subito pagine di esempio gratuite – più offerte esclusive.",
     "emailPlaceholder": "tu@email.com",
     "submit": "Ricevi le pagine gratuite",
-    "success": "Fatto! Controlla la tua casella email per le pagine gratuite.",
-    "privacy": "Niente spam. Cancellati in qualsiasi momento."
+    "success": "Fatto! Controlla la tua casella di posta per le pagine gratuite.",
+    "privacy": "Niente spam. Cancellati quando vuoi."
   },
   "checkout": {
-    "title": "Cassa",
+    "title": "Acquisto",
     "emailLabel": "Email (per i tuoi download)",
     "payNow": "Paga ora",
     "successTitle": "Grazie per il tuo acquisto!",
@@ -105,7 +140,7 @@
   "library": {
     "title": "La mia libreria",
     "subtitle": "Tutti i tuoi libri da colorare acquistati in un unico posto.",
-    "enterEmail": "Inserisci l'email usata per l'acquisto per visualizzare i tuoi download.",
+    "enterEmail": "Inserisci l'email usata per l'acquisto per vedere i tuoi download.",
     "noPurchases": "Nessun acquisto trovato."
   },
   "footer": {
@@ -118,8 +153,19 @@
   },
   "chat": {
     "title": "Aiuto e supporto",
-    "placeholder": "Chiedimi pure …",
-    "greeting": "Ciao! Sono il tuo assistente Coloreo per i libri da colorare. Posso aiutarti con i download, il pagamento o trovare il libro giusto per te. Come posso aiutarti?",
-    "send": "Invia"
-  }
+    "placeholder": "Chiedimi qualsiasi cosa …",
+    "greeting": "Ciao! Sono il tuo assistente Coloreo. Posso aiutarti con i download, il pagamento o trovare il libro giusto per te. Come posso aiutarti?",
+    "send": "Invia",
+    "connectionError": "Errore di connessione."
+  },
+  "cartToast": {
+    "added": "aggiunto",
+    "cartLabel": "Carrello"
+  },
+  "account": {
+    "signOut": "Esci",
+    "searchLabel": "Cerca",
+    "expired": "scaduto"
+  },
+  "orgSlogan": "Colora il tuo mondo."
 }

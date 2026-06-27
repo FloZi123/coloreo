@@ -61,7 +61,7 @@ export default function LibraryView({ locale, dict }: { locale: Locale; dict: Di
                     <div key={i} className="flex items-center justify-between rounded-xl border px-4 py-3">
                       <span className="font-display text-sm font-semibold">🎨 {locale === "en" ? it.title_en : it.title_de}</span>
                       {it.expired ? (
-                        <span className="text-xs text-muted">{locale === "de" ? "abgelaufen" : "expired"}</span>
+                        <span className="text-xs text-muted">{dict.account.expired}</span>
                       ) : (
                         <a href={it.url} className="btn-primary px-4 py-1.5 text-xs">
                           ⬇ {dict.common.download} ({it.downloadsLeft})

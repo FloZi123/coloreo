@@ -107,8 +107,11 @@ export function computeCart(
   };
 }
 
+const PRICE_LOCALE: Record<Locale, string> = {
+  de: "de-DE", en: "en-IE", fr: "fr-FR", es: "es-ES", it: "it-IT", nl: "nl-NL",
+};
 export function formatPrice(cents: number, locale: Locale = "de"): string {
-  return new Intl.NumberFormat(locale === "de" ? "de-DE" : "en-IE", {
+  return new Intl.NumberFormat(PRICE_LOCALE[locale] ?? "de-DE", {
     style: "currency",
     currency: "EUR",
   }).format(cents / 100);

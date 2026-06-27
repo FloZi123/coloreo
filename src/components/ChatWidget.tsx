@@ -31,7 +31,7 @@ export default function ChatWidget({ locale, dict }: { locale: Locale; dict: Dic
       const data = await res.json();
       setMessages([...next, { role: "assistant", content: data.reply ?? "…" }]);
     } catch {
-      setMessages([...next, { role: "assistant", content: "⚠️ " + (locale === "de" ? "Verbindungsfehler." : "Connection error.") }]);
+      setMessages([...next, { role: "assistant", content: "⚠️ " + dict.chat.connectionError }]);
     } finally {
       setLoading(false);
     }
