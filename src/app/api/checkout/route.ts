@@ -89,7 +89,8 @@ export async function POST(req: Request) {
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      payment_method_types: ["card", "paypal"],
+      // KEIN payment_method_types → Stripe Checkout zeigt automatisch alle im Dashboard
+      // aktivierten Zahlarten (Karte, PayPal, Klarna …). Bricht nicht, wenn PayPal (noch) fehlt.
       line_items: lineItems,
       discounts,
       success_url: `${origin}/${locale}/danke?session_id={CHECKOUT_SESSION_ID}`,
