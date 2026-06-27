@@ -23,6 +23,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: msg }, { status: 400 });
   }
 
+  // Mehrere Apps teilen sich ggf. EIN Stripe-Konto → NUR explizit als coloreo getaggte Sessions verarbeiten.
+  const obj = event.data.object as { object?: string; metadata?: { app?: string } };
+  if (obj.object === "checkout.session" && obj.metadata?.app !== "coloreo") {
+    return NextResponse.json({ received: true, skipped: "not_coloreo" });
+  }
+
   try {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as {

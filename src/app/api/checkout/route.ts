@@ -98,7 +98,8 @@ export async function POST(req: Request) {
       ...(TAX ? { billing_address_collection: "required" as const, customer_creation: "always" as const } : {}),
       // Läuft nach 2 h ab → löst checkout.session.expired (Warenkorbabbruch-Flow) aus
       expires_at: Math.floor(Date.now() / 1000) + 2 * 60 * 60,
-      metadata: { order_id: order.id, order_number: orderNumber, locale },
+      // app-Tag → trennt Coloreo-Events von anderen Apps am selben Stripe-Konto
+      metadata: { order_id: order.id, order_number: orderNumber, locale, app: "coloreo" },
       // Stripe Checkout unterstützt de/en/fr/es/it/nl direkt
       locale: (["de", "en", "fr", "es", "it", "nl"].includes(locale) ? locale : "auto") as "de" | "en" | "fr" | "es" | "it" | "nl" | "auto",
     });
