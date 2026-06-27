@@ -1,149 +1,201 @@
 import sharp from "sharp";
 import { spawnSync } from "node:child_process";
-import { writeFileSync, mkdtempSync, rmSync } from "node:fs";
+import { writeFileSync, mkdtempSync, rmSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import ffmpegPath from "ffmpeg-static";
 import { colorizeWithinLines } from "../generator/thematic";
 import type { Frame } from "./frames";
 
-const W = 1080, H = 1920, FPS = 30;
-const PAPER = { r: 250, g: 247, b: 240 };
+const TW = 1080, TH = 1920, FPS = 30;
+const ZOOM = 0.10; // Ken-Burns-Zoomtiefe
+const SCALE = 1.16; // Render-Headroom für den Zoom
+const SW = Math.round((TW * SCALE) / 2) * 2, SH = Math.round((TH * SCALE) / 2) * 2;
 const DOMAIN = "coloreo.de";
+const MOOD = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "public", "mood");
 
-function wordmarkSvg(cx: number, y: number, size: number, base: string): string {
+function wordmark(cx: number, y: number, size: number, base: string): string {
   return `<text x="${cx}" y="${y}" text-anchor="middle" font-family="'Fredoka','Baloo 2','Segoe UI',Arial,sans-serif" font-size="${size}" font-weight="700" letter-spacing="-1">` +
     `<tspan fill="${base}">c</tspan><tspan fill="#FF5A4D">o</tspan><tspan fill="${base}">l</tspan>` +
     `<tspan fill="#3B8EEA">o</tspan><tspan fill="${base}">re</tspan><tspan fill="#3FBF87">o</tspan></text>`;
 }
 const esc = (s: string) => s.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]!));
 
-/** Eine Folie 1080×1920: zentriertes Bild auf Papier, Kopf-Wortmarke, optional Titel-Band + Fortschritt. */
-async function slide(image: Buffer, opts: { title?: string; subtitle?: string; progress?: number } = {}): Promise<Buffer> {
-  const HEADER = 110;
-  const FOOTER = opts.title ? 210 : 70;
-  const boxW = W - 120, boxH = H - HEADER - FOOTER - 80;
-  const meta = await sharp(image).metadata();
-  const iw = meta.width ?? 1, ih = meta.height ?? 1;
-  const scale = Math.min(boxW / iw, boxH / ih);
-  const rw = Math.round(iw * scale), rh = Math.round(ih * scale);
-  const img = await sharp(image).resize(rw, rh).png().toBuffer();
-  const ix = Math.round((W - rw) / 2), iy = HEADER + 40 + Math.round((boxH - rh) / 2);
-
-  const progress = opts.progress != null
-    ? `<rect x="60" y="${H - FOOTER - 26}" width="${W - 120}" height="12" rx="6" fill="#e3dacb"/>` +
-      `<rect x="60" y="${H - FOOTER - 26}" width="${Math.max(12, Math.round((W - 120) * opts.progress))}" height="12" rx="6" fill="#FF5A4D"/>`
-    : "";
-  const titleBand = opts.title
-    ? `<rect x="0" y="${H - FOOTER}" width="${W}" height="${FOOTER}" fill="#FF5A4D"/>` +
-      `<text x="${W / 2}" y="${H - FOOTER + 86}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="60" font-weight="700" fill="#ffffff">${esc(opts.title)}</text>` +
-      (opts.subtitle ? `<text x="${W / 2}" y="${H - FOOTER + 148}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="34" fill="#ffffffd9">${esc(opts.subtitle)}</text>` : "")
-    : "";
-  const overlay = Buffer.from(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">` +
-    `<rect x="0" y="0" width="${W}" height="${HEADER}" fill="rgba(28,24,21,0.92)"/>${wordmarkSvg(W / 2, 72, 52, "#FAF7F0")}${progress}${titleBand}</svg>`,
-  );
-  return sharp({ create: { width: W, height: H, channels: 3, background: PAPER } })
-    .composite([{ input: img, left: ix, top: iy }, { input: overlay, left: 0, top: 0 }]).png().toBuffer();
+/** Verwischter Schreibtisch-Hintergrund (Mood-Bild) in Szenengröße. */
+let _bg: Buffer | null = null;
+async function deskBg(): Promise<Buffer> {
+  if (_bg) return _bg;
+  const file = ["flatlay", "cozy-evening", "hero"].map((n) => join(MOOD, `${n}.webp`)).find((p) => existsSync(p));
+  if (file) {
+    _bg = await sharp(file).resize(SW, SH, { fit: "cover" }).blur(14).modulate({ brightness: 0.86 }).toColourspace("srgb").png().toBuffer();
+  } else {
+    _bg = await sharp({ create: { width: SW, height: SH, channels: 3, background: { r: 244, g: 238, b: 228 } } }).png().toBuffer();
+  }
+  return _bg;
 }
 
-async function endcard(): Promise<Buffer> {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">` +
-    `<rect width="${W}" height="${H}" fill="#FAF7F0"/>` +
-    wordmarkSvg(W / 2, H / 2 - 60, 150, "#221E1B") +
-    `<text x="${W / 2}" y="${H / 2 + 30}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="46" font-weight="600" fill="#6f675c">${DOMAIN}</text>` +
-    `<rect x="${W / 2 - 290}" y="${H / 2 + 110}" width="580" height="96" rx="48" fill="#FF5A4D"/>` +
-    `<text x="${W / 2}" y="${H / 2 + 172}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="40" font-weight="700" fill="#ffffff">Sofort-Download · druckfertig</text>` +
-    `</svg>`;
-  return sharp(Buffer.from(svg)).png().toBuffer();
+function roundedMask(w: number, h: number, r: number): Buffer {
+  return Buffer.from(`<svg width="${w}" height="${h}"><rect width="${w}" height="${h}" rx="${r}" ry="${r}"/></svg>`);
 }
 
-/** Mischt b mit Deckkraft t über a (Crossfade-Zwischenbild). */
+/** Eine Seite als ausgedrucktes Blatt (weiß, runde Ecken, Schlagschatten) auf dem Schreibtisch. */
+async function pageScene(pageImg: Buffer): Promise<Buffer> {
+  const bg = await deskBg();
+  const meta = await sharp(pageImg).metadata();
+  const ar = (meta.width ?? 1) / (meta.height ?? 1);
+  const sheetW = Math.round(SW * 0.74);
+  const sheetH = Math.round(sheetW / ar);
+  const pad = Math.round(sheetW * 0.045);
+  const inner = await sharp(pageImg).resize(sheetW - pad * 2, sheetH - pad * 2, { fit: "fill" }).flatten({ background: "#ffffff" }).toBuffer();
+  let sheet = await sharp({ create: { width: sheetW, height: sheetH, channels: 3, background: { r: 255, g: 255, b: 255 } } })
+    .composite([{ input: inner, left: pad, top: pad }]).png().toBuffer();
+  sheet = await sharp(sheet).composite([{ input: roundedMask(sheetW, sheetH, 26), blend: "dest-in" }]).png().toBuffer();
+
+  const left = Math.round((SW - sheetW) / 2);
+  const top = Math.round(SH * 0.45 - sheetH / 2);
+  // Schatten
+  const shadow = await sharp(Buffer.from(`<svg width="${sheetW + 80}" height="${sheetH + 80}"><rect x="40" y="46" width="${sheetW}" height="${sheetH}" rx="26" fill="#000" fill-opacity="0.34"/></svg>`)).blur(22).png().toBuffer();
+  return sharp(bg)
+    .composite([{ input: shadow, left: left - 40, top: top - 46 }, { input: sheet, left, top }])
+    .png().toBuffer();
+}
+
+/** Fotorealistische Vollbild-Szene (z. B. Hero-Hände), Cover-gefüllt. */
+async function photoScene(file: string): Promise<Buffer> {
+  return sharp(file).resize(SW, SH, { fit: "cover" }).toColourspace("srgb").png().toBuffer();
+}
+
+async function endcardScene(): Promise<Buffer> {
+  const bg = await deskBg();
+  return sharp(bg).modulate({ brightness: 1.04 }).blur(6).png().toBuffer();
+}
+
+/** Fixes UI-Overlay (1080×1920, transparent): Kopf-Wortmarke, optional Fortschritt + Titel-Band. */
+function overlay(opts: { title?: string; subtitle?: string; progress?: number; scrim?: boolean }): Buffer {
+  const HEADER = 104, FOOTER = opts.title ? 200 : 0;
+  const scrim = opts.scrim ? `<linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0.42"/><stop offset="0.25" stop-color="#000" stop-opacity="0"/><stop offset="0.7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.5"/></linearGradient><rect width="${TW}" height="${TH}" fill="url(#g)"/>` : "";
+  const prog = opts.progress != null
+    ? `<rect x="60" y="${TH - FOOTER - 30}" width="${TW - 120}" height="12" rx="6" fill="#ffffff66"/><rect x="60" y="${TH - FOOTER - 30}" width="${Math.max(12, Math.round((TW - 120) * opts.progress))}" height="12" rx="6" fill="#FF5A4D"/>`
+    : "";
+  const title = opts.title
+    ? `<rect x="0" y="${TH - FOOTER}" width="${TW}" height="${FOOTER}" fill="#FF5A4D"/>` +
+      `<text x="${TW / 2}" y="${TH - FOOTER + 84}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="58" font-weight="700" fill="#fff">${esc(opts.title)}</text>` +
+      (opts.subtitle ? `<text x="${TW / 2}" y="${TH - FOOTER + 144}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="33" fill="#ffffffd9">${esc(opts.subtitle)}</text>` : "")
+    : "";
+  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${TW}" height="${TH}">${scrim}` +
+    `<rect x="0" y="0" width="${TW}" height="${HEADER}" fill="rgba(28,24,21,0.5)"/>${wordmark(TW / 2, 70, 50, "#FAF7F0")}${prog}${title}</svg>`);
+}
+
+function endcardOverlay(): Buffer {
+  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${TW}" height="${TH}">` +
+    `<rect width="${TW}" height="${TH}" fill="#FAF7F0" fill-opacity="0.82"/>` +
+    wordmark(TW / 2, TH / 2 - 50, 150, "#221E1B") +
+    `<text x="${TW / 2}" y="${TH / 2 + 36}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="46" font-weight="600" fill="#6f675c">${DOMAIN}</text>` +
+    `<rect x="${TW / 2 - 300}" y="${TH / 2 + 120}" width="600" height="98" rx="49" fill="#FF5A4D"/>` +
+    `<text x="${TW / 2}" y="${TH / 2 + 184}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="40" font-weight="700" fill="#fff">Sofort-Download · druckfertig</text></svg>`);
+}
+
+/** Ken-Burns-Frame: zoomt langsam in die Szene und legt das Overlay darüber. */
+async function kbFrame(scene: Buffer, f: number, ov: Buffer): Promise<Buffer> {
+  const zoom = 1 + ZOOM * f;
+  const winW = Math.round(TW / zoom), winH = Math.round(TH / zoom);
+  const left = Math.round((SW - winW) / 2), top = Math.round((SH - winH) / 2);
+  const cropped = await sharp(scene).extract({ left, top, width: winW, height: winH }).resize(TW, TH).png().toBuffer();
+  return sharp(cropped).composite([{ input: ov, left: 0, top: 0 }]).png().toBuffer();
+}
+
 async function blend(a: Buffer, b: Buffer, t: number): Promise<Buffer> {
-  const overlay = await sharp(b).ensureAlpha(t).png().toBuffer();
-  return sharp(a).composite([{ input: overlay, left: 0, top: 0 }]).png().toBuffer();
+  return sharp(a).composite([{ input: await sharp(b).ensureAlpha(t).png().toBuffer(), left: 0, top: 0 }]).png().toBuffer();
 }
 
-interface Entry { file: string; dur: number }
-
-function encode(entries: Entry[], out: string) {
-  const lines: string[] = [];
-  for (const e of entries) { lines.push(`file '${e.file.replace(/\\/g, "/")}'`); lines.push(`duration ${e.dur.toFixed(4)}`); }
-  lines.push(`file '${entries[entries.length - 1].file.replace(/\\/g, "/")}'`); // letztes Bild flushen
-  const listPath = out + ".list.txt";
-  writeFileSync(listPath, lines.join("\n"));
-  const r = spawnSync(ffmpegPath as string, [
-    "-y", "-f", "concat", "-safe", "0", "-i", listPath,
-    "-vf", `fps=${FPS},format=yuv420p`, "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
-    "-an", "-movflags", "+faststart", out,
-  ], { encoding: "utf8" });
-  rmSync(listPath, { force: true });
-  if (r.status !== 0) throw new Error("ffmpeg: " + (r.stderr || "").split("\n").slice(-6).join("\n"));
-}
-
-/** Koloriert eine Linienkunst-Seite (flache Markenfüllung) und liefert PNG. */
 async function coloredOf(frame: Frame): Promise<Buffer> {
-  const cw = 700, ch = Math.max(1, Math.round((cw * frame.height) / frame.width));
+  const cw = 760, ch = Math.max(1, Math.round((cw * frame.height) / frame.width));
   const raw = await colorizeWithinLines(frame.png, cw, ch);
   return sharp(raw, { raw: { width: cw, height: ch, channels: 3 } }).png().toBuffer();
 }
 
-/** Flip-Through: Hook (Cover) → ausgemalte Seiten mit Fortschritt → Endcard. */
-export async function renderFlipThrough(book: { title: string; subtitle?: string }, cover: Buffer, frames: Frame[], out: string) {
+function encode(dir: string, out: string) {
+  const r = spawnSync(ffmpegPath as string, [
+    "-y", "-framerate", String(FPS), "-i", join(dir, "f%05d.png"),
+    "-vf", "format=yuv420p", "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
+    "-an", "-movflags", "+faststart", out,
+  ], { encoding: "utf8" });
+  if (r.status !== 0) throw new Error("ffmpeg: " + (r.stderr || "").split("\n").slice(-6).join("\n"));
+}
+
+/** Flip-Through: fotorealistischer Hook → ausgemalte Blätter auf dem Schreibtisch (Ken Burns) → Endcard. */
+export async function renderFlipThrough(book: { title: string; subtitle?: string }, _cover: Buffer, frames: Frame[], out: string) {
   const tmp = mkdtempSync(join(tmpdir(), "flip-"));
+  let n = 0;
+  const put = (b: Buffer) => writeFileSync(join(tmp, `f${String(n++).padStart(5, "0")}.png`), b);
   try {
-    let n = 0;
-    const file = (buf: Buffer) => { const f = join(tmp, `f${String(n++).padStart(4, "0")}.png`); writeFileSync(f, buf); return f; };
-    const entries: Entry[] = [];
-    const XF = 7; // Crossfade-Frames
+    const XF = 9;
+    const heroFile = join(MOOD, "hero.webp");
+    const segs: { scene: Buffer; ov: Buffer; frames: number }[] = [];
 
-    const hook = await slide(cover, { title: book.title, subtitle: book.subtitle ?? "Sofort ausdrucken & losmalen" });
-    let prev = hook;
-    entries.push({ file: file(hook), dur: 1.4 });
-
+    // Hook (fotorealistisch)
+    if (existsSync(heroFile)) {
+      segs.push({ scene: await photoScene(heroFile), ov: overlay({ title: book.title, subtitle: book.subtitle ?? "Sofort ausdrucken & losmalen", scrim: true }), frames: Math.round(FPS * 1.8) });
+    }
+    // Seiten
     const colored = await Promise.all(frames.map(coloredOf));
     for (let i = 0; i < colored.length; i++) {
-      const s = await slide(colored[i], { progress: (i + 1) / colored.length });
-      for (let k = 1; k <= XF; k++) entries.push({ file: file(await blend(prev, s, k / (XF + 1))), dur: 1 / FPS });
-      entries.push({ file: file(s), dur: 0.95 });
-      prev = s;
+      segs.push({ scene: await pageScene(colored[i]), ov: overlay({ progress: (i + 1) / colored.length, scrim: true }), frames: Math.round(FPS * 1.15) });
     }
-    const end = await endcard();
-    for (let k = 1; k <= XF; k++) entries.push({ file: file(await blend(prev, end, k / (XF + 1))), dur: 1 / FPS });
-    entries.push({ file: file(end), dur: 2.0 });
+    // Endcard
+    segs.push({ scene: await endcardScene(), ov: endcardOverlay(), frames: Math.round(FPS * 2.2) });
 
-    encode(entries, out);
+    let prevLast: Buffer | null = null;
+    for (const seg of segs) {
+      const first = await kbFrame(seg.scene, 0, seg.ov);
+      if (prevLast) for (let k = 1; k <= XF; k++) put(await blend(prevLast, first, k / (XF + 1)));
+      for (let i = 0; i < seg.frames; i++) put(await kbFrame(seg.scene, i / (seg.frames - 1), seg.ov));
+      prevLast = await kbFrame(seg.scene, 1, seg.ov);
+    }
+    encode(tmp, out);
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
 }
 
-/** Reveal: eine Seite, kolorierte Version wischt von oben nach unten ein. */
+/** Reveal: ein Blatt auf dem Schreibtisch, kolorierte Version wischt von oben ein. */
 export async function renderReveal(book: { title: string }, frames: Frame[], out: string) {
   const tmp = mkdtempSync(join(tmpdir(), "reveal-"));
+  let n = 0;
+  const put = (b: Buffer) => writeFileSync(join(tmp, `f${String(n++).padStart(5, "0")}.png`), b);
   try {
-    let n = 0;
-    const file = (buf: Buffer) => { const f = join(tmp, `r${String(n++).padStart(4, "0")}.png`); writeFileSync(f, buf); return f; };
-    const entries: Entry[] = [];
     const frame = frames[0];
-    const lineSlide = await slide(frame.png, { title: book.title, subtitle: "Aus Linie wird Farbe" });
-    const colSlide = await slide(await coloredOf(frame), { title: book.title, subtitle: "Aus Linie wird Farbe" });
+    const ov = overlay({ title: book.title, subtitle: "Aus Linie wird Farbe", scrim: true });
+    const lineScene = await pageScene(await sharp(frame.png).flatten({ background: "#ffffff" }).png().toBuffer());
+    const colScene = await pageScene(await coloredOf(frame));
 
-    entries.push({ file: file(lineSlide), dur: 0.7 });
-    const STEPS = 60;
+    const hold = Math.round(FPS * 0.7);
+    for (let i = 0; i < hold; i++) put(await kbFrame(lineScene, i / (hold * 4), ov)); // leichter Zoom
+
+    const STEPS = Math.round(FPS * 2.4);
     for (let s = 1; s <= STEPS; s++) {
-      const revealH = Math.max(1, Math.round((H * s) / STEPS));
-      const topCrop = await sharp(colSlide).extract({ left: 0, top: 0, width: W, height: revealH }).png().toBuffer();
-      const fr = await sharp(lineSlide).composite([{ input: topCrop, left: 0, top: 0 }]).png().toBuffer();
-      entries.push({ file: file(fr), dur: 1 / FPS });
+      const f = (hold + s) / (hold * 4);
+      const lineF = await kbFrame(lineScene, f, ov);
+      const colF = await kbFrame(colScene, f, ov);
+      const revealH = Math.max(1, Math.round((TH * s) / STEPS));
+      const top = await sharp(colF).extract({ left: 0, top: 0, width: TW, height: revealH }).png().toBuffer();
+      put(await sharp(lineF).composite([{ input: top, left: 0, top: 0 }]).png().toBuffer());
     }
-    entries.push({ file: file(colSlide), dur: 1.0 });
-    const end = await endcard();
-    const XF = 7;
-    for (let k = 1; k <= XF; k++) entries.push({ file: file(await blend(colSlide, end, k / (XF + 1))), dur: 1 / FPS });
-    entries.push({ file: file(end), dur: 2.0 });
+    const hold2 = Math.round(FPS * 1.1);
+    for (let i = 0; i < hold2; i++) put(await kbFrame(colScene, 0.6 + (0.4 * i) / hold2, ov));
 
-    encode(entries, out);
+    // Endcard
+    const endScene = await endcardScene();
+    const endOv = endcardOverlay();
+    const prevLast = await kbFrame(colScene, 1, ov);
+    const endFirst = await kbFrame(endScene, 0, endOv);
+    const XF = 9;
+    for (let k = 1; k <= XF; k++) put(await blend(prevLast, endFirst, k / (XF + 1)));
+    const eEnd = Math.round(FPS * 2.0);
+    for (let i = 0; i < eEnd; i++) put(await kbFrame(endScene, i / (eEnd - 1), endOv));
+
+    encode(tmp, out);
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }

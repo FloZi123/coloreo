@@ -22,7 +22,7 @@ const SUPA = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const sb = createClient(SUPA, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } });
 
 const PIN_COUNT = 6;
-const FLIP_PAGES = 8;
+const FLIP_PAGES = 6;
 const DOMAIN = "https://coloreo.de";
 const BUCKET = "social-assets";
 const UPLOAD = process.argv.includes("--upload");
