@@ -138,29 +138,49 @@ function esc(s: string) {
 }
 
 function brandingOverlay(w: number, h: number, title: string, category: string, pages: number): string {
+  const brand = "'Fredoka', 'Baloo 2', 'Segoe UI', Arial, sans-serif";
+  // Coloreo-Wortmarke: c o(coral) l o(blau) re o(grün), helle Grundbuchstaben auf dunklem Balken.
+  const wordmark = `<text x="${w / 2}" y="50" text-anchor="middle" font-family="${brand}" font-size="36" font-weight="700" letter-spacing="-1">` +
+    `<tspan fill="#FBF7F0">c</tspan><tspan fill="#FF5A4D">o</tspan><tspan fill="#FBF7F0">l</tspan>` +
+    `<tspan fill="#3B8EEA">o</tspan><tspan fill="#FBF7F0">re</tspan><tspan fill="#3FBF87">o</tspan></text>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
-    <rect x="0" y="0" width="${w}" height="74" fill="rgba(0,0,0,0.30)"/>
-    <text x="${w / 2}" y="48" text-anchor="middle" font-family="Arial" font-size="30" font-weight="700" fill="#ffffff">&#10022; Coloreo</text>
-    <rect x="0" y="${h - 150}" width="${w}" height="150" fill="rgba(255,255,255,0.84)"/>
-    <text x="${w / 2}" y="${h - 96}" text-anchor="middle" font-family="Arial" font-size="34" font-weight="700" fill="#2b2540">${esc(title)}</text>
-    <text x="${w / 2}" y="${h - 58}" text-anchor="middle" font-family="Arial" font-size="17" fill="#5b5470">${esc(category)}</text>
-    <text x="${w / 2}" y="${h - 30}" text-anchor="middle" font-family="Arial" font-size="15" fill="#8b8499">Malbuch · ${pages} Seiten</text>
+    <rect x="0" y="0" width="${w}" height="74" fill="rgba(34,30,27,0.42)"/>
+    ${wordmark}
+    <rect x="0" y="${h - 150}" width="${w}" height="150" fill="rgba(250,247,240,0.86)"/>
+    <text x="${w / 2}" y="${h - 96}" text-anchor="middle" font-family="${brand}" font-size="34" font-weight="700" fill="#221E1B">${esc(title)}</text>
+    <text x="${w / 2}" y="${h - 58}" text-anchor="middle" font-family="${brand}" font-size="17" fill="#6f675c">${esc(category)}</text>
+    <text x="${w / 2}" y="${h - 30}" text-anchor="middle" font-family="${brand}" font-size="15" fill="#9a9388">Malbuch · ${pages} Seiten</text>
   </svg>`;
 }
 
-/** Helle, harmonische "Filzstift"-Palette zum Ausmalen der Linienkunst-Flächen. */
+const clamp8 = (v: number) => (v < 0 ? 0 : v > 255 ? 255 : Math.round(v));
+
+/** Farbe kräftiger/sättigungsstärker ziehen (Filzstift-Look), sehr dunkle Flächen leicht aufhellen. */
+function vivify(r: number, g: number, b: number): [number, number, number] {
+  const avg = (r + g + b) / 3;
+  const k = 1.5; // Sättigung
+  const lift = avg < 70 ? 70 - avg : 0; // dunkle Flächen anheben
+  return [clamp8(avg + (r - avg) * k + lift), clamp8(avg + (g - avg) * k + lift), clamp8(avg + (b - avg) * k + lift)];
+}
+
+/** Fallback-Palette, falls keine Farbquelle vorliegt oder eine Fläche keine Farbe abbekommt. */
 const COLOR_PALETTE: [number, number, number][] = [
-  [233, 86, 75], [255, 138, 76], [255, 191, 71], [255, 221, 89],
-  [120, 190, 90], [70, 175, 130], [76, 175, 205], [60, 130, 200],
-  [150, 110, 220], [220, 120, 190], [240, 150, 170], [180, 140, 100],
+  [233, 86, 75], [255, 138, 76], [255, 191, 71], [120, 190, 90],
+  [70, 175, 130], [76, 175, 205], [60, 130, 200], [150, 110, 220],
 ];
 
 /**
  * Füllt die weißen Flächen einer Linienzeichnung (schwarze Konturen auf Weiß) FLÄCHENWEISE
- * mit Farben – wie echtes Ausmalen INNERHALB der Linien. Hintergrund (randberührende Fläche)
- * bleibt weiß. Liefert rohe RGB-Bytes (W×H×3).
+ * mit Farben – wie echtes Ausmalen INNERHALB der Linien. Liegt eine Farbquelle (farbig
+ * gerendertes Motiv) vor, bekommt jede Fläche ihren REALISTISCHEN Mittelwert daraus; sonst
+ * eine Palettenfarbe. Hintergrund (randberührende Fläche) bleibt weiß. Liefert RGB-Bytes.
  */
-async function colorizeWithinLines(lineBin: Uint8Array, W: number, H: number): Promise<Buffer> {
+async function colorizeWithinLines(
+  lineBin: Uint8Array,
+  W: number,
+  H: number,
+  colorSrc?: { data: Buffer; ch: number },
+): Promise<Buffer> {
   const { data } = await sharp(lineBin).resize(W, H, { fit: "cover" }).grayscale().raw().toBuffer({ resolveWithObject: true });
   const N = W * H;
   const isLine = (i: number) => data[i] < 110; // dunkle Kontur = Barriere
@@ -174,12 +194,14 @@ async function colorizeWithinLines(lineBin: Uint8Array, W: number, H: number): P
     region++;
     const px: number[] = [];
     let touchesBorder = false;
+    let sr = 0, sg = 0, sb = 0;
     stack.length = 0;
     stack.push(s);
     label[s] = region;
     while (stack.length) {
       const q = stack.pop()!;
       px.push(q);
+      if (colorSrc) { const j = q * colorSrc.ch; sr += colorSrc.data[j]; sg += colorSrc.data[j + 1]; sb += colorSrc.data[j + 2]; }
       const x = q % W, y = (q / W) | 0;
       if (x === 0 || y === 0 || x === W - 1 || y === H - 1) touchesBorder = true;
       if (x > 0) { const n = q - 1; if (label[n] === 0 && !isLine(n)) { label[n] = region; stack.push(n); } }
@@ -188,7 +210,16 @@ async function colorizeWithinLines(lineBin: Uint8Array, W: number, H: number): P
       if (y < H - 1) { const n = q + W; if (label[n] === 0 && !isLine(n)) { label[n] = region; stack.push(n); } }
     }
     if (touchesBorder) continue; // Hintergrund weiß lassen
-    const c = COLOR_PALETTE[(region * 5) % COLOR_PALETTE.length];
+
+    let c: [number, number, number];
+    if (colorSrc) {
+      const m = px.length;
+      const [vr, vg, vb] = vivify(sr / m, sg / m, sb / m);
+      // Fast-weiße Flächen (Motiv-Render hatte dort kaum Farbe) → Palette, sonst realer Mittelwert
+      c = vr > 236 && vg > 236 && vb > 236 ? COLOR_PALETTE[(region * 3) % COLOR_PALETTE.length] : [vr, vg, vb];
+    } else {
+      c = COLOR_PALETTE[(region * 3) % COLOR_PALETTE.length];
+    }
     for (const q of px) { out[q * 3] = c[0]; out[q * 3 + 1] = c[1]; out[q * 3 + 2] = c[2]; }
   }
   // Konturen schwarz nachzeichnen
@@ -203,14 +234,27 @@ export async function generateCoverImage(
 ): Promise<Uint8Array> {
   const W = 600, H = 800, MID = Math.round(W / 2);
 
-  // EIN Bild: echte Linienkunst des Hauptmotivs (weißer Grund per Konstruktion → für JEDES
-  // Motiv saubere Konturen). Beide Hälften stammen daraus → Konturen am Split deckungsgleich.
+  // Linienkunst des Hauptmotivs (weißer Grund per Konstruktion → für JEDES Motiv saubere
+  // Konturen). Beide Hälften stammen daraus → Konturen am Split deckungsgleich.
   const lineRaw = await provider.generate(buildMotifPrompt("all", opts.heroMotif, 0));
   const lineBin = await binarize(lineRaw);
   const lineFull = await sharp(lineBin).resize(W, H, { fit: "cover" }).toColourspace("srgb").png().toBuffer();
 
+  // Farbquelle: dasselbe Motiv FARBIG & REALISTISCH gerendert. Daraus bekommt jede Fläche
+  // ihren echten Farbton (Mittelwert), platziert aber sauber innerhalb der Linien.
+  let colorSrc: { data: Buffer; ch: number } | undefined;
+  try {
+    const colorRaw = await provider.generate(
+      `a colored illustration of ${opts.heroMotif}, natural realistic colors, flat bright colors, simple, centered, white background, no text`,
+    );
+    const { data, info } = await sharp(colorRaw).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).toColourspace("srgb").raw().toBuffer({ resolveWithObject: true });
+    colorSrc = { data, ch: info.channels };
+  } catch {
+    /* ohne Farbquelle → Palette-Fallback */
+  }
+
   // Linke Hälfte: dieselbe Zeichnung, Flächen INNERHALB der Linien ausgemalt (Flood-Fill).
-  const coloredRaw = await colorizeWithinLines(lineBin, W, H);
+  const coloredRaw = await colorizeWithinLines(lineBin, W, H, colorSrc);
   const coloredFull = await sharp(coloredRaw, { raw: { width: W, height: H, channels: 3 } }).png().toBuffer();
 
   const leftColored = await sharp(coloredFull).extract({ left: 0, top: 0, width: MID, height: H }).toBuffer();
