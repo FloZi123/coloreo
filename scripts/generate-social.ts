@@ -9,9 +9,11 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createClient } from "@supabase/supabase-js";
-import { pdfToFrames, pickSpread } from "../src/lib/social/frames";
+import Replicate from "replicate";
+import { pdfToFrames, pickSpread, type Frame } from "../src/lib/social/frames";
 import { makePin } from "../src/lib/social/pins";
 import { renderFlipThrough, renderReveal } from "../src/lib/social/video";
+import { realisticColored, flatColored } from "../src/lib/social/colorize";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 for (const l of readFileSync(join(root, ".env.local"), "utf8").split("\n")) {
@@ -26,6 +28,8 @@ const FLIP_PAGES = 6;
 const DOMAIN = "https://coloreo.de";
 const BUCKET = "social-assets";
 const UPLOAD = process.argv.includes("--upload");
+const FLAT = process.argv.includes("--flat"); // flache Markenfüllung statt realistischer AI-Farben
+const rep = new Replicate({ auth: process.env.REPLICATE_API_TOKEN ?? "" });
 
 const linkFor = (slug: string, channel: string) =>
   `${DOMAIN}/de/buch/${slug}?utm_source=${channel}&utm_medium=organic&utm_campaign=${slug}`;
@@ -49,18 +53,32 @@ async function processBook(slug: string) {
   mkdirSync(dir, { recursive: true });
   const localPaths: string[] = [];
 
+  // Seiten auswählen (Pins + Flip teilen sich dieselben) + Reveal-Seite
+  const pageFrames = pickSpread(frames, Math.max(PIN_COUNT, FLIP_PAGES));
+  const revealFrame = frames[Math.floor(frames.length / 2)];
+  const unique = [...pageFrames];
+  if (!unique.includes(revealFrame)) unique.push(revealFrame);
+
+  // Realistische Kolorierung (wie Cover) – einmal pro Seite, gecacht
+  console.log(`  … koloriere ${unique.length} Seiten (${FLAT ? "flach" : "realistisch/AI"}) …`);
+  const colorMap = new Map<Frame, Buffer>();
+  for (const f of unique) {
+    const cw = 800, ch = Math.max(1, Math.round((cw * f.height) / f.width));
+    colorMap.set(f, FLAT ? await flatColored(f, cw, ch) : await realisticColored(rep, f, cw, ch));
+  }
+
   // Pins
-  const pinFrames = pickSpread(frames, PIN_COUNT);
+  const pinFrames = pageFrames.slice(0, PIN_COUNT);
   const pins: string[] = [];
   for (let i = 0; i < pinFrames.length; i++) {
-    const webp = await makePin(pinFrames[i], { title: book.title_de, category, locale: "de" });
+    const webp = await makePin(pinFrames[i], colorMap.get(pinFrames[i])!, { title: book.title_de, category, locale: "de" });
     const name = `pin-${i + 1}.webp`;
     writeFileSync(join(dir, name), webp);
     pins.push(`public/social/${slug}/${name}`); localPaths.push(join(dir, name));
   }
   console.log(`  ✓ ${pins.length} Pins`);
 
-  // Cover für Hook
+  // Cover für Hook (optional)
   let coverBytes: Buffer | null = null;
   const coverFile = (book.cover_url?.split("/").pop()) || `${slug}.png`;
   const { data: covBlob } = await sb.storage.from("covers").download(coverFile);
@@ -70,12 +88,13 @@ async function processBook(slug: string) {
   const videos: string[] = [];
   console.log(`  … Flip-Through rendern`);
   const flipOut = join(dir, "video-flip.mp4");
-  await renderFlipThrough({ title: book.title_de }, coverBytes ?? frames[0].png, pickSpread(frames, FLIP_PAGES), flipOut);
+  const flipPages = pageFrames.slice(0, FLIP_PAGES).map((f) => ({ frame: f, colored: colorMap.get(f)! }));
+  await renderFlipThrough({ title: book.title_de }, coverBytes ?? frames[0].png, flipPages, flipOut);
   videos.push(`public/social/${slug}/video-flip.mp4`); localPaths.push(flipOut);
 
   console.log(`  … Reveal rendern`);
   const revealOut = join(dir, "video-reveal.mp4");
-  await renderReveal({ title: book.title_de }, [frames[Math.floor(frames.length / 2)]], revealOut);
+  await renderReveal({ title: book.title_de }, { frame: revealFrame, colored: colorMap.get(revealFrame)! }, revealOut);
   videos.push(`public/social/${slug}/video-reveal.mp4`); localPaths.push(revealOut);
   console.log(`  ✓ 2 Videos`);
 

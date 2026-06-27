@@ -1,5 +1,4 @@
 import sharp from "sharp";
-import { colorizeWithinLines } from "../generator/thematic";
 import type { Frame } from "./frames";
 
 // Aktuelle Coloreo-CI
@@ -24,17 +23,12 @@ export interface PinMeta {
 
 /**
  * Erzeugt einen 2:3-Pinterest-Pin (1000×1500): eine Seite, linke Hälfte Linienkunst,
- * rechte Hälfte ausgemalt (Flood-Fill), oben coloreo-Wortmarke, unten Titel-Band.
+ * rechte Hälfte ausgemalt (vorgefertigte kolorierte Version), oben coloreo-Wortmarke, unten Titel-Band.
  */
-export async function makePin(frame: Frame, meta: PinMeta): Promise<Buffer> {
+export async function makePin(frame: Frame, colored: Buffer, meta: PinMeta): Promise<Buffer> {
   const W = 1000, H = 1500;
   const HEADER = 96, FOOTER = 150;
   const boxW = W - 80, boxH = H - HEADER - FOOTER - 40;
-
-  // "Nachher": Flächen innerhalb der Linien füllen (flache Markenfüllung)
-  const cw = 600, ch = Math.max(1, Math.round((cw * frame.height) / frame.width));
-  const coloredRaw = await colorizeWithinLines(frame.png, cw, ch);
-  const colored = await sharp(coloredRaw, { raw: { width: cw, height: ch, channels: 3 } }).png().toBuffer();
 
   // Beide Seiten auf gleiche Breite, dann links Linie / rechts Farbe zusammensetzen
   const pw = 900;

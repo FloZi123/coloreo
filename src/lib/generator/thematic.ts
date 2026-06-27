@@ -155,11 +155,11 @@ function brandingOverlay(w: number, h: number, title: string, category: string, 
 
 const clamp8 = (v: number) => (v < 0 ? 0 : v > 255 ? 255 : Math.round(v));
 
-/** Farbe kräftiger/sättigungsstärker ziehen (Filzstift-Look), sehr dunkle Flächen leicht aufhellen. */
-function vivify(r: number, g: number, b: number): [number, number, number] {
+/** Farbe kräftiger/sättigungsstärker ziehen (Filzstift-Look), dunkle Flächen anheben. */
+function vivify(r: number, g: number, b: number, floor = 70): [number, number, number] {
   const avg = (r + g + b) / 3;
   const k = 1.5; // Sättigung
-  const lift = avg < 70 ? 70 - avg : 0; // dunkle Flächen anheben
+  const lift = avg < floor ? floor - avg : 0; // dunkle Flächen anheben (keine Schwarzflächen)
   return [clamp8(avg + (r - avg) * k + lift), clamp8(avg + (g - avg) * k + lift), clamp8(avg + (b - avg) * k + lift)];
 }
 
@@ -180,6 +180,7 @@ export async function colorizeWithinLines(
   W: number,
   H: number,
   colorSrc?: { data: Buffer; ch: number },
+  floor = 70,
 ): Promise<Buffer> {
   const { data } = await sharp(lineBin).resize(W, H, { fit: "cover" }).grayscale().raw().toBuffer({ resolveWithObject: true });
   const N = W * H;
@@ -214,7 +215,7 @@ export async function colorizeWithinLines(
     let c: [number, number, number];
     if (colorSrc) {
       const m = px.length;
-      const [vr, vg, vb] = vivify(sr / m, sg / m, sb / m);
+      const [vr, vg, vb] = vivify(sr / m, sg / m, sb / m, floor);
       // Fast-weiße Flächen (Motiv-Render hatte dort kaum Farbe) → Palette, sonst realer Mittelwert
       c = vr > 236 && vg > 236 && vb > 236 ? COLOR_PALETTE[(region * 3) % COLOR_PALETTE.length] : [vr, vg, vb];
     } else {

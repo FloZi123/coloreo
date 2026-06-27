@@ -5,8 +5,10 @@ import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import ffmpegPath from "ffmpeg-static";
-import { colorizeWithinLines } from "../generator/thematic";
 import type { Frame } from "./frames";
+
+/** Seite + ihre fertig kolorierte Version. */
+export interface ColoredPage { frame: Frame; colored: Buffer }
 
 const TW = 1080, TH = 1920, FPS = 30;
 const ZOOM = 0.10; // Ken-Burns-Zoomtiefe
@@ -109,12 +111,6 @@ async function blend(a: Buffer, b: Buffer, t: number): Promise<Buffer> {
   return sharp(a).composite([{ input: await sharp(b).ensureAlpha(t).png().toBuffer(), left: 0, top: 0 }]).png().toBuffer();
 }
 
-async function coloredOf(frame: Frame): Promise<Buffer> {
-  const cw = 760, ch = Math.max(1, Math.round((cw * frame.height) / frame.width));
-  const raw = await colorizeWithinLines(frame.png, cw, ch);
-  return sharp(raw, { raw: { width: cw, height: ch, channels: 3 } }).png().toBuffer();
-}
-
 function encode(dir: string, out: string) {
   const r = spawnSync(ffmpegPath as string, [
     "-y", "-framerate", String(FPS), "-i", join(dir, "f%05d.png"),
@@ -125,7 +121,7 @@ function encode(dir: string, out: string) {
 }
 
 /** Flip-Through: fotorealistischer Hook → ausgemalte Blätter auf dem Schreibtisch (Ken Burns) → Endcard. */
-export async function renderFlipThrough(book: { title: string; subtitle?: string }, _cover: Buffer, frames: Frame[], out: string) {
+export async function renderFlipThrough(book: { title: string; subtitle?: string }, _cover: Buffer, pages: ColoredPage[], out: string) {
   const tmp = mkdtempSync(join(tmpdir(), "flip-"));
   let n = 0;
   const put = (b: Buffer) => writeFileSync(join(tmp, `f${String(n++).padStart(5, "0")}.png`), b);
@@ -139,9 +135,8 @@ export async function renderFlipThrough(book: { title: string; subtitle?: string
       segs.push({ scene: await photoScene(heroFile), ov: overlay({ title: book.title, subtitle: book.subtitle ?? "Sofort ausdrucken & losmalen", scrim: true }), frames: Math.round(FPS * 1.8) });
     }
     // Seiten
-    const colored = await Promise.all(frames.map(coloredOf));
-    for (let i = 0; i < colored.length; i++) {
-      segs.push({ scene: await pageScene(colored[i]), ov: overlay({ progress: (i + 1) / colored.length, scrim: true }), frames: Math.round(FPS * 1.15) });
+    for (let i = 0; i < pages.length; i++) {
+      segs.push({ scene: await pageScene(pages[i].colored), ov: overlay({ progress: (i + 1) / pages.length, scrim: true }), frames: Math.round(FPS * 1.15) });
     }
     // Endcard
     segs.push({ scene: await endcardScene(), ov: endcardOverlay(), frames: Math.round(FPS * 2.2) });
@@ -160,15 +155,14 @@ export async function renderFlipThrough(book: { title: string; subtitle?: string
 }
 
 /** Reveal: ein Blatt auf dem Schreibtisch, kolorierte Version wischt von oben ein. */
-export async function renderReveal(book: { title: string }, frames: Frame[], out: string) {
+export async function renderReveal(book: { title: string }, page: ColoredPage, out: string) {
   const tmp = mkdtempSync(join(tmpdir(), "reveal-"));
   let n = 0;
   const put = (b: Buffer) => writeFileSync(join(tmp, `f${String(n++).padStart(5, "0")}.png`), b);
   try {
-    const frame = frames[0];
     const ov = overlay({ title: book.title, subtitle: "Aus Linie wird Farbe", scrim: true });
-    const lineScene = await pageScene(await sharp(frame.png).flatten({ background: "#ffffff" }).png().toBuffer());
-    const colScene = await pageScene(await coloredOf(frame));
+    const lineScene = await pageScene(await sharp(page.frame.png).flatten({ background: "#ffffff" }).png().toBuffer());
+    const colScene = await pageScene(page.colored);
 
     const hold = Math.round(FPS * 0.7);
     for (let i = 0; i < hold; i++) put(await kbFrame(lineScene, i / (hold * 4), ov)); // leichter Zoom
