@@ -27,6 +27,12 @@ interface BookSpec {
   motifs: string[];
   heroMotif: string;
   priceCents?: number;
+  pages?: number;
+}
+
+/** Standard-Preis (Cent) je Zielgruppe – analog Konzept-Anker. */
+function defaultPriceFor(audience: Audience): number {
+  return audience === "kids" ? 499 : audience === "all" ? 599 : 699;
 }
 
 /**
@@ -35,7 +41,7 @@ interface BookSpec {
  */
 async function materializeBook(admin: Admin, spec: BookSpec): Promise<string> {
   const slug = `${slugify(spec.titleDe)}-${Math.floor(Math.random() * 9000 + 1000)}`;
-  const pages = 24;
+  const pages = Math.min(40, Math.max(8, spec.pages ?? 18));
   const useAI = imageProviderConfigured();
 
   // Cover
@@ -84,7 +90,7 @@ async function materializeBook(admin: Admin, spec: BookSpec): Promise<string> {
       title_en: spec.titleEn,
       description_de: spec.descDe,
       description_en: spec.descEn,
-      price_cents: spec.priceCents ?? 599,
+      price_cents: spec.priceCents ?? defaultPriceFor(spec.audience),
       page_count: pages,
       cover_url: coverUrl,
       pdf_path: `${slug}.pdf`,
@@ -247,13 +253,20 @@ Antworte als JSON: {"title_de":"...","title_en":"...","description_de":"<2 Sätz
 }
 
 /**
- * Buch-Generierung aus Admin-Brief: Thema + Stichpunkte (Motive) + Kategorie → vollständiger
- * Buch-Entwurf (Cover Stil B, 24 Seiten aus den Stichpunkten, Schwierigkeit nach Zielgruppe).
+ * Buch-Generierung aus Admin-Brief, in Konzept-Qualität ("visuelle Reise").
+ *
+ * Thema + (optional) Anker-Motive + Kategorie + Zielgruppe + Seitenzahl/Preis →
+ * Claude plant eine narrative Story und eine GEORDNETE Motiv-Liste (Seite 1→n) plus
+ * ein Cover-heroMotif. Danach läuft dieselbe Pipeline wie bei den Konzept-Büchern
+ * (Cover Stil B, Linienkunst je Schwierigkeit, Binarisierung, Wasserzeichen-Vorschauen).
  */
 export async function generateBookFromBrief(input: {
   theme: string;
   bullets: string[];
   categoryId: string;
+  audience?: Audience;
+  pageCount?: number;
+  priceCents?: number;
 }): Promise<{ bookId: string }> {
   const admin = createAdminClient();
   const { data: cat } = await admin
@@ -263,28 +276,52 @@ export async function generateBookFromBrief(input: {
     .maybeSingle();
   if (!cat) throw new Error("category_not_found");
 
-  const audience = (cat.audience ?? "adult") as Audience;
+  // Zielgruppe: explizit gewählt schlägt Kategorie-Default
+  const audience: Audience = input.audience ?? ((cat.audience ?? "adult") as Audience);
+  const pages = Math.min(40, Math.max(8, input.pageCount ?? (audience === "kids" ? 16 : 18)));
   const theme = input.theme.trim();
   const bullets = input.bullets.map((b) => b.trim()).filter(Boolean);
 
+  const diffHint =
+    audience === "kids"
+      ? "Bold & Easy: dicke, einfache Linien, große Flächen, niedlich, für junge Kinder"
+      : audience === "all"
+        ? "mittlerer Detailgrad, familientauglich, freundlich"
+        : "filigran, detailreich, ornamental, Zentangle-Stil, für Erwachsene/Anti-Stress";
+
   let titleDe = theme;
   let titleEn = theme;
-  let descDe = `${theme}: ein liebevoll gestaltetes Malbuch mit ${bullets.length || "vielen"} Motiven. Sofort als PDF herunterladen, ausdrucken und losmalen.`;
-  let descEn = `${theme}: a lovingly designed coloring book. Download instantly as PDF, print and start coloring.`;
+  let story = "";
+  let descDe = `${theme}: ein liebevoll gestaltetes Malbuch mit ${pages} Motiven. Sofort als PDF herunterladen, ausdrucken und losmalen.`;
+  let descEn = `${theme}: a lovingly designed coloring book with ${pages} motifs. Download instantly as PDF, print and start coloring.`;
+  let motifs: string[] = bullets.length ? [...bullets] : [theme];
+  let heroMotif = motifs[0] ?? theme;
 
-  // Optional: Claude verfeinert Titel/Texte und füllt Motive auf 24 auf
-  let motifs = bullets.length ? bullets : [theme];
   if (anthropicConfigured()) {
     try {
       const client = getAnthropic();
       const res = await client.messages.create({
         model: MODELS.content,
-        max_tokens: 900,
+        max_tokens: 1600,
         messages: [
           {
             role: "user",
-            content: `Plane ein digitales Malbuch. Thema: "${theme}". Kategorie: ${cat.name_de}. Zielgruppe: ${audience}. Stichpunkte des Kunden: ${bullets.join("; ") || "(keine)"}.
-Antworte NUR als JSON: {"title_de":"...","title_en":"...","description_de":"<2 knackige Verkaufssätze>","description_en":"<2 sentences>","motifs":["24 unterschiedliche, konkrete Motive auf Englisch für die Malseiten, passend zu Thema und Stichpunkten"]}`,
+            content: `Du bist Produktdesigner für den digitalen Malbuch-Shop "Coloreo". Plane EIN Malbuch als zusammenhängende "visuelle Reise": die Seiten erzählen Schritt für Schritt eine Geschichte (narrativer Bogen) statt loser Einzelmotive. Das ist das Verkaufs- und Kohäsions-Argument.
+
+Thema: "${theme}"
+Kategorie: ${cat.name_de}
+Zielgruppe/Stil: ${audience} → ${diffHint}
+Seitenanzahl: GENAU ${pages}
+${bullets.length ? `Diese Anker-Motive MÜSSEN sinnvoll in der Reise vorkommen: ${bullets.join("; ")}` : "Keine Vorgaben – du wählst die Motive."}
+
+Wichtig für die Motiv-Liste:
+- GENAU ${pages} Einträge, in Story-Reihenfolge (Seite 1 → ${pages}), aufeinander aufbauend.
+- Jeder Eintrag NUR ein kurzer, konkreter englischer Nominalausdruck (z. B. "a cozy thatched cottage with a flower garden").
+- KEIN "coloring book", KEIN "line art", KEIN "black and white" – das wird automatisch ergänzt.
+- Abwechslungsreich (nicht 5x dasselbe Objekt), passend zu Thema, Kategorie und Stil.
+
+Antworte AUSSCHLIESSLICH als JSON:
+{"title_de":"kurzer einprägsamer Titel","title_en":"English title","story":"1-2 Sätze narrative Klammer (Deutsch)","description_de":"2 knackige Verkaufssätze (Deutsch), nenne ${pages} Seiten und Sofort-PDF","description_en":"2 sentences (English)","hero_motif":"EIN attraktives englisches Hauptmotiv fürs Cover (kurzer Nominalausdruck, kein 'coloring book'/'line art')","motifs":["...genau ${pages} Einträge..."]}`,
           },
         ],
       });
@@ -292,13 +329,22 @@ Antworte NUR als JSON: {"title_de":"...","title_en":"...","description_de":"<2 k
       const j = JSON.parse(txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1));
       titleDe = j.title_de ?? titleDe;
       titleEn = j.title_en ?? titleEn;
+      story = typeof j.story === "string" ? j.story : "";
       descDe = j.description_de ?? descDe;
       descEn = j.description_en ?? descEn;
-      if (Array.isArray(j.motifs) && j.motifs.length) motifs = j.motifs;
+      if (typeof j.hero_motif === "string" && j.hero_motif.trim()) heroMotif = j.hero_motif.trim();
+      if (Array.isArray(j.motifs) && j.motifs.length) {
+        motifs = j.motifs.map((m: unknown) => String(m).trim()).filter(Boolean);
+      }
     } catch {
       /* Brief-Daten beibehalten */
     }
   }
+
+  // Auf exakte Seitenzahl bringen (Story-Reihenfolge erhalten, sonst zyklisch auffüllen)
+  if (motifs.length > pages) motifs = motifs.slice(0, pages);
+  const base = motifs.length;
+  for (let i = 0; base > 0 && motifs.length < pages; i++) motifs.push(motifs[i % base]);
 
   const bookId = await materializeBook(admin, {
     titleDe, titleEn, descDe, descEn,
@@ -307,17 +353,19 @@ Antworte NUR als JSON: {"title_de":"...","title_en":"...","description_de":"<2 k
     categorySlug: cat.slug,
     audience,
     motifs,
-    heroMotif: motifs[0] ?? theme,
+    heroMotif,
+    pages,
+    priceCents: input.priceCents,
   });
 
   await admin.from("book_generation_queue").insert({
     suggested_title_de: titleDe,
     suggested_title_en: titleEn,
     category_id: input.categoryId,
-    rationale: `Manuell erzeugt aus Brief: ${theme}`,
+    rationale: story ? `Visuelle Reise: ${story}` : `Manuell erzeugt aus Brief: ${theme}`,
     status: "draft_ready",
     generated_book_id: bookId,
-    trigger_data: { source: "admin_brief", bullets },
+    trigger_data: { source: "admin_brief", theme, bullets, audience, pages, story, heroMotif, motifs },
   });
 
   return { bookId };

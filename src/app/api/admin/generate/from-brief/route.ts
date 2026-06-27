@@ -21,7 +21,11 @@ export async function POST(req: Request) {
     if (!theme || !categoryId) {
       return NextResponse.json({ error: "theme_and_category_required" }, { status: 400 });
     }
-    const result = await generateBookFromBrief({ theme, bullets, categoryId });
+    const audience = ["adult", "kids", "all"].includes(body.audience) ? body.audience : undefined;
+    const pageCount = Number.isFinite(Number(body.pageCount)) && Number(body.pageCount) > 0 ? Number(body.pageCount) : undefined;
+    const euros = parseFloat(String(body.price ?? "").replace(",", "."));
+    const priceCents = Number.isFinite(euros) && euros > 0 ? Math.round(euros * 100) : undefined;
+    const result = await generateBookFromBrief({ theme, bullets, categoryId, audience, pageCount, priceCents });
     return NextResponse.json({ ok: true, bookId: result.bookId });
   } catch (e) {
     console.error("[generate/from-brief]", e);
