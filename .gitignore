@@ -54,3 +54,6 @@ cover-*.png
 
 # generierte Social-Assets (reproduzierbar via npm run social:gen)
 public/social/
+
+.vercel
+.env*
