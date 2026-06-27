@@ -172,33 +172,52 @@ export async function generateCoverImage(
   provider: ImageProvider,
   opts: { title: string; categoryName: string; heroMotif: string; pages: number }
 ): Promise<Uint8Array> {
-  // Forcierte Farb-Prompts: EIN Linienbild, eine Hälfte VON HAND ausgemalt (flache Stift-/
-  // Filzstift-Flächen, Konturen sichtbar, leicht unperfekt), andere Hälfte blanke Linienkunst.
-  // Eskaliert bei zu wenig Farbe.
-  const prompts = [
-    `a single coloring book line drawing of ${opts.heroMotif} with thick bold black outlines, the left half colored in by hand with flat bright marker and colored-pencil fills that stay inside the black outlines and leave the outlines clearly visible, the right half left as blank black-and-white line art, before-and-after coloring page, hand-colored crayon look, flat colors, no realistic shading, no gradients, no 3d render, white background, no text`,
-    `${opts.heroMotif} as a black outline coloring book page, partly filled in with flat vibrant crayon and felt-tip marker colors inside the lines like a hand-colored coloring book, bold black outlines still visible over the colored areas, slightly uneven childlike coloring strokes, the rest left as plain line art, no smooth shading, no gradients, cheerful, white background, no text`,
-    `coloring book illustration of ${opts.heroMotif}, thick black outlines, half of it colored in by hand with flat saturated marker colors staying within the outlines, half plain black-and-white line art, hand-colored coloring book style, visible pencil strokes, flat colors only, no 3d, no realistic rendering, cheerful, white background, no text`,
-  ];
+  const W = 600, H = 800, MID = Math.round(W / 2);
 
+  // (A) Echte Linienkunst des Hauptmotivs (weißer Grund per Konstruktion → für JEDES Motiv,
+  //     auch dunkle, saubere Konturen). Liefert die rechte Hälfte UND die Konturen der linken.
+  const lineRaw = await provider.generate(buildMotifPrompt("all", opts.heroMotif, 0));
+  const lineBin = await binarize(lineRaw);
+  const lineFull = await sharp(lineBin).resize(W, H, { fit: "cover" }).toColourspace("srgb").png().toBuffer();
+
+  // (B) Farbquelle (vollfarbig, flach). Wird nur als weiche, posterisierte Farbfläche genutzt,
+  //     die UNTER die Linien gelegt wird – wirkt wie grob von Hand ausgemalt.
+  const colorPrompts = [
+    `a brightly colored illustration of ${opts.heroMotif}, flat vibrant saturated colors, cheerful, simple shapes, white background, no text`,
+    `${opts.heroMotif}, colorful flat illustration, bright saturated colors, white background, no text`,
+  ];
   let best: Uint8Array | null = null;
   let bestScore = -1;
-  const tries = Math.min(3, prompts.length);
-  for (let i = 0; i < tries; i++) {
-    const img = await provider.generate(prompts[i]);
+  for (let i = 0; i < colorPrompts.length; i++) {
+    const img = await provider.generate(colorPrompts[i]);
     const score = await colorfulness(img);
     if (score > bestScore) { bestScore = score; best = img; }
-    if (score >= COVER_COLOR_MIN) break; // bunt genug → fertig
+    if (score >= COVER_COLOR_MIN) break;
   }
-  if (!best) best = await provider.generate(prompts[0]);
+  if (!best) best = await provider.generate(colorPrompts[0]);
 
-  // Posterisieren: glatte Render-Verläufe → flache Farbflächen (Filzstift-/Buntstift-Look),
-  // damit das Ausgemalte nicht "zu perfekt" wirkt, sondern wie von Hand koloriert.
-  const flat = await sharp(best)
-    .resize(600, 800, { fit: "cover" })
-    .modulate({ saturation: 1.12 })
-    .png({ palette: true, colours: 20, dither: 0 })
+  const colorField = await sharp(best)
+    .resize(W, H, { fit: "cover" })
+    .modulate({ saturation: 1.3 })
+    .blur(10)
+    .png({ palette: true, colours: 14, dither: 0 }) // flache Farbzonen statt glattem Verlauf
     .toBuffer();
-  const overlay = Buffer.from(brandingOverlay(600, 800, opts.title, opts.categoryName, opts.pages));
-  return new Uint8Array(await sharp(flat).composite([{ input: overlay, top: 0, left: 0 }]).png().toBuffer());
+
+  // Linke Hälfte: Farbe UNTER die Linien (multiply) – Linien bleiben schwarz, Flächen werden bunt.
+  const leftColoredFull = await sharp(lineFull).composite([{ input: colorField, blend: "multiply" }]).png().toBuffer();
+
+  const leftColored = await sharp(leftColoredFull).extract({ left: 0, top: 0, width: MID, height: H }).toBuffer();
+  const rightLines = await sharp(lineFull).extract({ left: MID, top: 0, width: W - MID, height: H }).toBuffer();
+  const divider = Buffer.from(`<svg width="${W}" height="${H}"><rect x="${MID - 1}" y="0" width="2" height="${H}" fill="#1a1a1a"/></svg>`);
+  const overlay = Buffer.from(brandingOverlay(W, H, opts.title, opts.categoryName, opts.pages));
+
+  return new Uint8Array(await sharp({ create: { width: W, height: H, channels: 3, background: { r: 255, g: 255, b: 255 } } })
+    .composite([
+      { input: leftColored, left: 0, top: 0 },
+      { input: rightLines, left: MID, top: 0 },
+      { input: divider, left: 0, top: 0 },
+      { input: overlay, left: 0, top: 0 },
+    ])
+    .png()
+    .toBuffer());
 }
