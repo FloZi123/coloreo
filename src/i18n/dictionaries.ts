@@ -82,6 +82,7 @@ const de = {
   },
   product: {
     preview: "Vorschau",
+    videoTitle: "Das Buch im Video",
     description: "Beschreibung",
     details: "Details",
     category: "Kategorie",
@@ -262,6 +263,7 @@ const en: Dict = {
   },
   product: {
     preview: "Preview",
+    videoTitle: "See the book in action",
     description: "Description",
     details: "Details",
     category: "Category",

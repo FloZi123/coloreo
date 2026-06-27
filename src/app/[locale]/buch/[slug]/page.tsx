@@ -105,6 +105,21 @@ export default async function BookPage({
               </div>
             )}
           </div>
+          {book.social_video_url && (
+            <div className="mt-6">
+              <h2 className="mb-2 font-display text-sm font-bold uppercase tracking-wide text-muted">{dict.product.videoTitle}</h2>
+              <video
+                src={book.social_video_url}
+                poster={book.cover_url ?? undefined}
+                controls
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                className="w-full max-w-md rounded-2xl border bg-black"
+              />
+            </div>
+          )}
           {previews.length > 0 && (
             <div className="mt-8">
               <BookPreviewViewer images={previews} totalPages={book.page_count} locale={locale} dict={dict} />

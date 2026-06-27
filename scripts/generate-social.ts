@@ -131,6 +131,14 @@ async function processBook(slug: string) {
     }
     console.log(`  ✓ ${loc}: ${pins.length} Pins + 2 Videos${UPLOAD ? " (hochgeladen)" : ""}`);
   }
+
+  // Flip-Through-Video am Produkt verlinken (Shop-Produktseite zeigt es automatisch)
+  if (UPLOAD) {
+    const primary = LOCALES.includes("de") ? "de" : LOCALES[0];
+    const flipUrl = `${SUPA}/storage/v1/object/public/${BUCKET}/${slug}/${primary}/video-flip.mp4`;
+    await sb.from("books").update({ social_video_url: flipUrl }).eq("slug", slug);
+    console.log(`  ✓ social_video_url gesetzt (${primary})`);
+  }
 }
 
 async function main() {

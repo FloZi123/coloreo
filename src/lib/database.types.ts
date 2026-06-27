@@ -71,6 +71,7 @@ export type Database = {
           page_count: number
           pdf_path: string | null
           preview_urls: Json
+          social_video_url: string | null
           price_cents: number
           sales_count: number
           slug: string
@@ -96,6 +97,7 @@ export type Database = {
           page_count?: number
           pdf_path?: string | null
           preview_urls?: Json
+          social_video_url?: string | null
           price_cents?: number
           sales_count?: number
           slug: string
