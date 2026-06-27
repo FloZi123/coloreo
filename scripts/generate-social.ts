@@ -11,11 +11,10 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createClient } from "@supabase/supabase-js";
-import Replicate from "replicate";
+import sharp from "sharp";
 import { pdfToFrames, pickSpread, type Frame } from "../src/lib/social/frames";
 import { makePin } from "../src/lib/social/pins";
-import { renderFlipThrough, renderReveal } from "../src/lib/social/video";
-import { realisticColored, flatColored } from "../src/lib/social/colorize";
+import { renderFlipThrough } from "../src/lib/social/video";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 for (const l of readFileSync(join(root, ".env.local"), "utf8").split("\n")) {
@@ -32,7 +31,6 @@ const BUCKET = "social-assets";
 const UPLOAD = process.argv.includes("--upload");
 const FLAT = process.argv.includes("--flat"); // flache Markenfüllung statt realistischer AI-Farben
 const FORCE = process.argv.includes("--force"); // Vorhandenes neu erzeugen
-const rep = new Replicate({ auth: process.env.REPLICATE_API_TOKEN ?? "" });
 
 // --locale de,en  → Sprachen für die Assets (Default: de). Die KI-Kolorierung läuft trotzdem nur EINMAL.
 const li = process.argv.indexOf("--locale");
@@ -70,17 +68,10 @@ async function processBook(slug: string) {
   console.log(`▶ ${slug} – Frames extrahieren …`);
   const frames = await pdfToFrames(pdfBytes, { scale: 2 });
 
-  // Seiten auswählen + EINMALIGE Kolorierung (sprach-neutral, von allen Locales geteilt)
+  // Option A: Linienkunst-Durchblättern – KEINE KI-Kolorierung (flux trifft reale Farben nicht
+  // zuverlässig; zeigt stattdessen die echten Seiten, die der Kunde bekommt).
   const pageFrames = pickSpread(frames, Math.max(PIN_COUNT, FLIP_PAGES));
-  const revealFrame = frames[Math.floor(frames.length / 2)];
-  const unique = [...pageFrames];
-  if (!unique.includes(revealFrame)) unique.push(revealFrame);
-  console.log(`  … koloriere ${unique.length} Seiten (${FLAT ? "flach" : "realistisch/AI"}) – einmal für ${LOCALES.join("/")} …`);
-  const colorMap = new Map<Frame, Buffer>();
-  for (const f of unique) {
-    const cw = 800, ch = Math.max(1, Math.round((cw * f.height) / f.width));
-    colorMap.set(f, FLAT ? await flatColored(f, cw, ch) : await realisticColored(rep, f, cw, ch));
-  }
+  const lineBuf = (f: Frame) => sharp(f.png).flatten({ background: "#ffffff" }).png().toBuffer();
 
   // Cover für Hook (optional)
   let coverBytes: Buffer | null = null;
@@ -89,7 +80,7 @@ async function processBook(slug: string) {
   if (covBlob) coverBytes = Buffer.from(await covBlob.arrayBuffer());
 
   const pinFrames = pageFrames.slice(0, PIN_COUNT);
-  const flipPages = pageFrames.slice(0, FLIP_PAGES).map((f) => ({ frame: f, colored: colorMap.get(f)! }));
+  const flipPages = await Promise.all(pageFrames.slice(0, FLIP_PAGES).map(async (f) => ({ frame: f, colored: await lineBuf(f) })));
 
   // Pro Sprache: nur die (billigen) Text-Overlays neu rendern
   for (const loc of LOCALES) {
@@ -102,21 +93,18 @@ async function processBook(slug: string) {
 
     const pins: string[] = [];
     for (let i = 0; i < pinFrames.length; i++) {
-      const webp = await makePin(pinFrames[i], colorMap.get(pinFrames[i])!, { title, category, locale: loc as Loc });
+      const webp = await makePin(pinFrames[i], await lineBuf(pinFrames[i]), { title, category, locale: loc as Loc });
       const fp = join(lDir, `pin-${i + 1}.webp`); writeFileSync(fp, webp);
       pins.push(`public/social/${slug}/${loc}/pin-${i + 1}.webp`); localPaths.push(fp);
     }
     const flipOut = join(lDir, "video-flip.mp4");
     await renderFlipThrough({ title }, coverBytes ?? frames[0].png, flipPages, flipOut, loc as Loc);
     localPaths.push(flipOut);
-    const revealOut = join(lDir, "video-reveal.mp4");
-    await renderReveal({ title }, { frame: revealFrame, colored: colorMap.get(revealFrame)! }, revealOut, loc as Loc);
-    localPaths.push(revealOut);
 
     const manifest = {
       slug, locale: loc, title, category,
       links: { tiktok: linkFor(slug, "tiktok", loc), instagram: linkFor(slug, "instagram", loc), pinterest: linkFor(slug, "pinterest", loc) },
-      pins, videos: [`public/social/${slug}/${loc}/video-flip.mp4`, `public/social/${slug}/${loc}/video-reveal.mp4`],
+      pins, videos: [`public/social/${slug}/${loc}/video-flip.mp4`],
       bucket: UPLOAD ? BUCKET : null,
     };
     const mPath = join(lDir, "social.json"); writeFileSync(mPath, JSON.stringify(manifest, null, 2)); localPaths.push(mPath);
@@ -129,7 +117,7 @@ async function processBook(slug: string) {
         await sb.storage.from(BUCKET).upload(rel, readFileSync(fp), { contentType: ct, upsert: true });
       }
     }
-    console.log(`  ✓ ${loc}: ${pins.length} Pins + 2 Videos${UPLOAD ? " (hochgeladen)" : ""}`);
+    console.log(`  ✓ ${loc}: ${pins.length} Pins + 1 Video${UPLOAD ? " (hochgeladen)" : ""}`);
   }
 
   // Flip-Through-Video am Produkt verlinken (Shop-Produktseite zeigt es automatisch)
