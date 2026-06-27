@@ -47,7 +47,7 @@ npm run social:gen <slug> --upload   # + Upload nach Supabase-Bucket "social-ass
 npm run social:gen:all -- --upload   # alle veröffentlichten Bücher
 ```
 
-Flags: `--upload` (Supabase-Bucket), `--flat` (flache Markenfüllung statt realistischer
+Flags: `--locale de,en` (Sprachen der Assets; KI-Kolorierung laeuft nur einmal), `--upload` (Supabase-Bucket), `--flat` (flache Markenfüllung statt realistischer
 AI-Farben, spart Replicate-Kosten), `--force` (Vorhandenes neu erzeugen statt überspringen).
 
 Output liegt in `public/social/<slug>/` (`pin-1..6.webp`, `video-flip.mp4`, `video-reveal.mp4`,

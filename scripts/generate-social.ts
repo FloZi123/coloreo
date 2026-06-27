@@ -140,7 +140,8 @@ async function main() {
     const { data } = await sb.from("books").select("slug").eq("status", "published");
     slugs = (data ?? []).map((b) => b.slug);
   } else {
-    slugs = args.filter((a) => !a.startsWith("--"));
+    // Wert direkt nach --locale ist kein Slug
+    slugs = args.filter((a, i) => !a.startsWith("--") && args[i - 1] !== "--locale");
   }
   if (!slugs.length) { console.error("Kein Slug. Nutzung: generate-social.ts <slug> | --all"); process.exit(1); }
   console.log(`Social-Assets für ${slugs.length} Buch/Bücher${FLAT ? " [flach]" : ""}${UPLOAD ? " [upload]" : ""}${FORCE ? " [force]" : ""}:`);
