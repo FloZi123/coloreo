@@ -71,13 +71,18 @@ async function main() {
   const dir = join(root, "public", "mood");
   mkdirSync(dir, { recursive: true });
 
-  console.log(`Generiere ${targets.length} Mood-Bilder (flux-dev):`);
+  const variants = Number(process.env.VARIANTS || 0); // >0 → mehrere Varianten als <name>-N.webp
+  console.log(`Generiere ${targets.length} Mood-Bilder (flux-dev)${variants ? `, ${variants} Varianten` : ""}:`);
   for (const t of targets) {
     if (!t.prompt) { console.warn(`  ⚠ ${t.name}: kein Prompt geparst`); continue; }
-    console.log(`▶ ${t.name} (${t.ratio}) …`);
-    const bytes = await run(rep, t.prompt, t.ratio);
-    writeFileSync(join(dir, `${t.name}.webp`), bytes);
-    console.log(`  ✓ public/mood/${t.name}.webp (${Math.round(bytes.length / 1024)} KB)`);
+    const n = variants > 0 ? variants : 1;
+    for (let i = 1; i <= n; i++) {
+      const file = variants > 0 ? `${t.name}-${i}.webp` : `${t.name}.webp`;
+      console.log(`▶ ${file} (${t.ratio}) …`);
+      const bytes = await run(rep, t.prompt, t.ratio);
+      writeFileSync(join(dir, file), bytes);
+      console.log(`  ✓ public/mood/${file} (${Math.round(bytes.length / 1024)} KB)`);
+    }
   }
   console.log("FERTIG");
 }
