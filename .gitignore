@@ -51,3 +51,6 @@ shot-*.png
 show-*.png
 cov-*.png
 cover-*.png
+
+# generierte Social-Assets (reproduzierbar via npm run social:gen)
+public/social/

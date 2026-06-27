@@ -175,7 +175,7 @@ const COLOR_PALETTE: [number, number, number][] = [
  * gerendertes Motiv) vor, bekommt jede Fläche ihren REALISTISCHEN Mittelwert daraus; sonst
  * eine Palettenfarbe. Hintergrund (randberührende Fläche) bleibt weiß. Liefert RGB-Bytes.
  */
-async function colorizeWithinLines(
+export async function colorizeWithinLines(
   lineBin: Uint8Array,
   W: number,
   H: number,
