@@ -1,5 +1,7 @@
 import sharp from "sharp";
 import type { Frame } from "./frames";
+import { SOCIAL_I18N } from "./strings";
+import type { Locale } from "../../i18n/config";
 
 // Aktuelle Coloreo-CI
 const PAPER = { r: 250, g: 247, b: 240 };
@@ -18,7 +20,7 @@ function esc(s: string): string {
 export interface PinMeta {
   title: string;
   category: string;
-  locale?: "de" | "en";
+  locale?: Locale;
 }
 
 /**
@@ -53,7 +55,7 @@ export async function makePin(frame: Frame, colored: Buffer, meta: PinMeta): Pro
   // Overlays (Kopf + Fuß) als ein SVG
   const cat = esc(meta.category.toUpperCase());
   const title = esc(meta.title);
-  const sub = meta.locale === "en" ? "Before &amp; after" : "Vorlage &amp; ausgemalt";
+  const sub = esc(SOCIAL_I18N[meta.locale ?? "de"].pinSub);
   const overlay = Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
       <rect x="0" y="0" width="${W}" height="${HEADER}" fill="rgba(28,24,21,0.92)"/>

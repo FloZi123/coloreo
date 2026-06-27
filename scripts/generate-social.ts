@@ -34,19 +34,31 @@ const FLAT = process.argv.includes("--flat"); // flache Markenfüllung statt rea
 const FORCE = process.argv.includes("--force"); // Vorhandenes neu erzeugen
 const rep = new Replicate({ auth: process.env.REPLICATE_API_TOKEN ?? "" });
 
-const linkFor = (slug: string, channel: string) =>
-  `${DOMAIN}/de/buch/${slug}?utm_source=${channel}&utm_medium=organic&utm_campaign=${slug}`;
+// --locale de,en  → Sprachen für die Assets (Default: de). Die KI-Kolorierung läuft trotzdem nur EINMAL.
+const li = process.argv.indexOf("--locale");
+const LOCALES = (li >= 0 && process.argv[li + 1] ? process.argv[li + 1].split(",") : ["de"]).map((s) => s.trim());
+
+type Loc = "de" | "en" | "fr" | "es" | "it" | "nl";
+const pick = (row: Record<string, unknown>, field: "title" | "name", locale: string): string => {
+  const t = (row.i18n as Record<string, { title?: string; name?: string }> | undefined)?.[locale]?.[field];
+  if (t && String(t).trim()) return String(t);
+  return String(row[`${field}_${locale === "de" ? "de" : "en"}`] ?? row[`${field}_de`] ?? "");
+};
+
+const linkFor = (slug: string, channel: string, locale: string) =>
+  `${DOMAIN}/${locale}/buch/${slug}?utm_source=${channel}&utm_medium=organic&utm_campaign=${slug}`;
 
 async function processBook(slug: string) {
-  const { data: book } = await sb.from("books").select("slug, title_de, cover_url, pdf_path, category_id").eq("slug", slug).maybeSingle();
+  const { data: book } = await sb.from("books").select("slug, title_de, title_en, i18n, cover_url, pdf_path, category_id").eq("slug", slug).maybeSingle();
   if (!book) { console.warn(`  ⚠ ${slug}: Buch nicht gefunden`); return; }
-  let category = "";
+  let cat: Record<string, unknown> = {};
   if (book.category_id) {
-    const { data: c } = await sb.from("categories").select("name_de").eq("id", book.category_id).maybeSingle();
-    category = c?.name_de ?? "";
+    const { data: c } = await sb.from("categories").select("name_de, name_en, i18n").eq("id", book.category_id).maybeSingle();
+    cat = (c as Record<string, unknown>) ?? {};
   }
   const dir = join(root, "public", "social", slug);
-  if (!FORCE && existsSync(join(dir, "social.json")) && existsSync(join(dir, "video-flip.mp4")) && existsSync(join(dir, "video-reveal.mp4"))) {
+  const done = (l: string) => existsSync(join(dir, l, "social.json")) && existsSync(join(dir, l, "video-flip.mp4"));
+  if (!FORCE && LOCALES.every(done)) {
     console.log(`⏭  ${slug}: bereits vorhanden (--force zum Neu-Erzeugen)`);
     return;
   }
@@ -57,33 +69,18 @@ async function processBook(slug: string) {
 
   console.log(`▶ ${slug} – Frames extrahieren …`);
   const frames = await pdfToFrames(pdfBytes, { scale: 2 });
-  mkdirSync(dir, { recursive: true });
-  const localPaths: string[] = [];
 
-  // Seiten auswählen (Pins + Flip teilen sich dieselben) + Reveal-Seite
+  // Seiten auswählen + EINMALIGE Kolorierung (sprach-neutral, von allen Locales geteilt)
   const pageFrames = pickSpread(frames, Math.max(PIN_COUNT, FLIP_PAGES));
   const revealFrame = frames[Math.floor(frames.length / 2)];
   const unique = [...pageFrames];
   if (!unique.includes(revealFrame)) unique.push(revealFrame);
-
-  // Realistische Kolorierung (wie Cover) – einmal pro Seite, gecacht
-  console.log(`  … koloriere ${unique.length} Seiten (${FLAT ? "flach" : "realistisch/AI"}) …`);
+  console.log(`  … koloriere ${unique.length} Seiten (${FLAT ? "flach" : "realistisch/AI"}) – einmal für ${LOCALES.join("/")} …`);
   const colorMap = new Map<Frame, Buffer>();
   for (const f of unique) {
     const cw = 800, ch = Math.max(1, Math.round((cw * f.height) / f.width));
     colorMap.set(f, FLAT ? await flatColored(f, cw, ch) : await realisticColored(rep, f, cw, ch));
   }
-
-  // Pins
-  const pinFrames = pageFrames.slice(0, PIN_COUNT);
-  const pins: string[] = [];
-  for (let i = 0; i < pinFrames.length; i++) {
-    const webp = await makePin(pinFrames[i], colorMap.get(pinFrames[i])!, { title: book.title_de, category, locale: "de" });
-    const name = `pin-${i + 1}.webp`;
-    writeFileSync(join(dir, name), webp);
-    pins.push(`public/social/${slug}/${name}`); localPaths.push(join(dir, name));
-  }
-  console.log(`  ✓ ${pins.length} Pins`);
 
   // Cover für Hook (optional)
   let coverBytes: Buffer | null = null;
@@ -91,37 +88,48 @@ async function processBook(slug: string) {
   const { data: covBlob } = await sb.storage.from("covers").download(coverFile);
   if (covBlob) coverBytes = Buffer.from(await covBlob.arrayBuffer());
 
-  // Videos
-  const videos: string[] = [];
-  console.log(`  … Flip-Through rendern`);
-  const flipOut = join(dir, "video-flip.mp4");
+  const pinFrames = pageFrames.slice(0, PIN_COUNT);
   const flipPages = pageFrames.slice(0, FLIP_PAGES).map((f) => ({ frame: f, colored: colorMap.get(f)! }));
-  await renderFlipThrough({ title: book.title_de }, coverBytes ?? frames[0].png, flipPages, flipOut);
-  videos.push(`public/social/${slug}/video-flip.mp4`); localPaths.push(flipOut);
 
-  console.log(`  … Reveal rendern`);
-  const revealOut = join(dir, "video-reveal.mp4");
-  await renderReveal({ title: book.title_de }, { frame: revealFrame, colored: colorMap.get(revealFrame)! }, revealOut);
-  videos.push(`public/social/${slug}/video-reveal.mp4`); localPaths.push(revealOut);
-  console.log(`  ✓ 2 Videos`);
+  // Pro Sprache: nur die (billigen) Text-Overlays neu rendern
+  for (const loc of LOCALES) {
+    const title = pick(book as Record<string, unknown>, "title", loc);
+    const category = pick(cat, "name", loc);
+    const lDir = join(dir, loc);
+    mkdirSync(lDir, { recursive: true });
+    const localPaths: string[] = [];
+    console.log(`  ▸ ${loc}: Pins + Videos …`);
 
-  const manifest = {
-    slug, title: book.title_de, category,
-    links: { tiktok: linkFor(slug, "tiktok"), instagram: linkFor(slug, "instagram"), pinterest: linkFor(slug, "pinterest") },
-    pins, videos,
-    bucket: UPLOAD ? BUCKET : null,
-  };
-  writeFileSync(join(dir, "social.json"), JSON.stringify(manifest, null, 2));
-  localPaths.push(join(dir, "social.json"));
-
-  if (UPLOAD) {
-    await sb.storage.createBucket(BUCKET, { public: true }).catch(() => {});
-    for (const fp of localPaths) {
-      const rel = `${slug}/${fp.split(/[\\/]/).pop()}`;
-      const ct = fp.endsWith(".mp4") ? "video/mp4" : fp.endsWith(".webp") ? "image/webp" : "application/json";
-      await sb.storage.from(BUCKET).upload(rel, readFileSync(fp), { contentType: ct, upsert: true });
+    const pins: string[] = [];
+    for (let i = 0; i < pinFrames.length; i++) {
+      const webp = await makePin(pinFrames[i], colorMap.get(pinFrames[i])!, { title, category, locale: loc as Loc });
+      const fp = join(lDir, `pin-${i + 1}.webp`); writeFileSync(fp, webp);
+      pins.push(`public/social/${slug}/${loc}/pin-${i + 1}.webp`); localPaths.push(fp);
     }
-    console.log(`  ✓ ${localPaths.length} Dateien → Bucket ${BUCKET}`);
+    const flipOut = join(lDir, "video-flip.mp4");
+    await renderFlipThrough({ title }, coverBytes ?? frames[0].png, flipPages, flipOut, loc as Loc);
+    localPaths.push(flipOut);
+    const revealOut = join(lDir, "video-reveal.mp4");
+    await renderReveal({ title }, { frame: revealFrame, colored: colorMap.get(revealFrame)! }, revealOut, loc as Loc);
+    localPaths.push(revealOut);
+
+    const manifest = {
+      slug, locale: loc, title, category,
+      links: { tiktok: linkFor(slug, "tiktok", loc), instagram: linkFor(slug, "instagram", loc), pinterest: linkFor(slug, "pinterest", loc) },
+      pins, videos: [`public/social/${slug}/${loc}/video-flip.mp4`, `public/social/${slug}/${loc}/video-reveal.mp4`],
+      bucket: UPLOAD ? BUCKET : null,
+    };
+    const mPath = join(lDir, "social.json"); writeFileSync(mPath, JSON.stringify(manifest, null, 2)); localPaths.push(mPath);
+
+    if (UPLOAD) {
+      await sb.storage.createBucket(BUCKET, { public: true }).catch(() => {});
+      for (const fp of localPaths) {
+        const rel = `${slug}/${loc}/${fp.split(/[\\/]/).pop()}`;
+        const ct = fp.endsWith(".mp4") ? "video/mp4" : fp.endsWith(".webp") ? "image/webp" : "application/json";
+        await sb.storage.from(BUCKET).upload(rel, readFileSync(fp), { contentType: ct, upsert: true });
+      }
+    }
+    console.log(`  ✓ ${loc}: ${pins.length} Pins + 2 Videos${UPLOAD ? " (hochgeladen)" : ""}`);
   }
 }
 

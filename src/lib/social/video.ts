@@ -6,6 +6,8 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import ffmpegPath from "ffmpeg-static";
 import type { Frame } from "./frames";
+import { SOCIAL_I18N } from "./strings";
+import type { Locale } from "../../i18n/config";
 
 /** Seite + ihre fertig kolorierte Version. */
 export interface ColoredPage { frame: Frame; colored: Buffer }
@@ -89,13 +91,13 @@ function overlay(opts: { title?: string; subtitle?: string; progress?: number; s
     `<rect x="0" y="0" width="${TW}" height="${HEADER}" fill="rgba(28,24,21,0.5)"/>${wordmark(TW / 2, 70, 50, "#FAF7F0")}${prog}${title}</svg>`);
 }
 
-function endcardOverlay(): Buffer {
+function endcardOverlay(cta: string): Buffer {
   return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${TW}" height="${TH}">` +
     `<rect width="${TW}" height="${TH}" fill="#FAF7F0" fill-opacity="0.82"/>` +
     wordmark(TW / 2, TH / 2 - 50, 150, "#221E1B") +
     `<text x="${TW / 2}" y="${TH / 2 + 36}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="46" font-weight="600" fill="#6f675c">${DOMAIN}</text>` +
-    `<rect x="${TW / 2 - 300}" y="${TH / 2 + 120}" width="600" height="98" rx="49" fill="#FF5A4D"/>` +
-    `<text x="${TW / 2}" y="${TH / 2 + 184}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="40" font-weight="700" fill="#fff">Sofort-Download · druckfertig</text></svg>`);
+    `<rect x="${TW / 2 - 320}" y="${TH / 2 + 120}" width="640" height="98" rx="49" fill="#FF5A4D"/>` +
+    `<text x="${TW / 2}" y="${TH / 2 + 184}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="38" font-weight="700" fill="#fff">${cta}</text></svg>`);
 }
 
 /** Ken-Burns-Frame: zoomt langsam in die Szene und legt das Overlay darüber. */
@@ -121,7 +123,8 @@ function encode(dir: string, out: string) {
 }
 
 /** Flip-Through: fotorealistischer Hook → ausgemalte Blätter auf dem Schreibtisch (Ken Burns) → Endcard. */
-export async function renderFlipThrough(book: { title: string; subtitle?: string }, _cover: Buffer, pages: ColoredPage[], out: string) {
+export async function renderFlipThrough(book: { title: string; subtitle?: string }, _cover: Buffer, pages: ColoredPage[], out: string, locale: Locale = "de") {
+  const S = SOCIAL_I18N[locale];
   const tmp = mkdtempSync(join(tmpdir(), "flip-"));
   let n = 0;
   const put = (b: Buffer) => writeFileSync(join(tmp, `f${String(n++).padStart(5, "0")}.png`), b);
@@ -132,14 +135,14 @@ export async function renderFlipThrough(book: { title: string; subtitle?: string
 
     // Hook (fotorealistisch)
     if (existsSync(heroFile)) {
-      segs.push({ scene: await photoScene(heroFile), ov: overlay({ title: book.title, subtitle: book.subtitle ?? "Sofort ausdrucken & losmalen", scrim: true }), frames: Math.round(FPS * 1.8) });
+      segs.push({ scene: await photoScene(heroFile), ov: overlay({ title: book.title, subtitle: book.subtitle ?? S.hookSub, scrim: true }), frames: Math.round(FPS * 1.8) });
     }
     // Seiten
     for (let i = 0; i < pages.length; i++) {
       segs.push({ scene: await pageScene(pages[i].colored), ov: overlay({ progress: (i + 1) / pages.length, scrim: true }), frames: Math.round(FPS * 1.15) });
     }
     // Endcard
-    segs.push({ scene: await endcardScene(), ov: endcardOverlay(), frames: Math.round(FPS * 2.2) });
+    segs.push({ scene: await endcardScene(), ov: endcardOverlay(S.ctaEndcard), frames: Math.round(FPS * 2.2) });
 
     let prevLast: Buffer | null = null;
     for (const seg of segs) {
@@ -155,12 +158,13 @@ export async function renderFlipThrough(book: { title: string; subtitle?: string
 }
 
 /** Reveal: ein Blatt auf dem Schreibtisch, kolorierte Version wischt von oben ein. */
-export async function renderReveal(book: { title: string }, page: ColoredPage, out: string) {
+export async function renderReveal(book: { title: string }, page: ColoredPage, out: string, locale: Locale = "de") {
+  const S = SOCIAL_I18N[locale];
   const tmp = mkdtempSync(join(tmpdir(), "reveal-"));
   let n = 0;
   const put = (b: Buffer) => writeFileSync(join(tmp, `f${String(n++).padStart(5, "0")}.png`), b);
   try {
-    const ov = overlay({ title: book.title, subtitle: "Aus Linie wird Farbe", scrim: true });
+    const ov = overlay({ title: book.title, subtitle: S.revealSub, scrim: true });
     const lineScene = await pageScene(await sharp(page.frame.png).flatten({ background: "#ffffff" }).png().toBuffer());
     const colScene = await pageScene(page.colored);
 
@@ -181,7 +185,7 @@ export async function renderReveal(book: { title: string }, page: ColoredPage, o
 
     // Endcard
     const endScene = await endcardScene();
-    const endOv = endcardOverlay();
+    const endOv = endcardOverlay(S.ctaEndcard);
     const prevLast = await kbFrame(colScene, 1, ov);
     const endFirst = await kbFrame(endScene, 0, endOv);
     const XF = 9;
