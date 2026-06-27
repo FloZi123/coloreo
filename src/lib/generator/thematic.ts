@@ -148,65 +148,72 @@ function brandingOverlay(w: number, h: number, title: string, category: string, 
   </svg>`;
 }
 
+/** Helle, harmonische "Filzstift"-Palette zum Ausmalen der Linienkunst-Flächen. */
+const COLOR_PALETTE: [number, number, number][] = [
+  [233, 86, 75], [255, 138, 76], [255, 191, 71], [255, 221, 89],
+  [120, 190, 90], [70, 175, 130], [76, 175, 205], [60, 130, 200],
+  [150, 110, 220], [220, 120, 190], [240, 150, 170], [180, 140, 100],
+];
+
 /**
- * Misst die "Buntheit" eines Bildes (mittlere Kanal-Spreizung max-min über RGB, 0–255).
- * Reine Linienkunst (graustufig) → ~0; teilkoloriertes Cover → deutlich höher.
+ * Füllt die weißen Flächen einer Linienzeichnung (schwarze Konturen auf Weiß) FLÄCHENWEISE
+ * mit Farben – wie echtes Ausmalen INNERHALB der Linien. Hintergrund (randberührende Fläche)
+ * bleibt weiß. Liefert rohe RGB-Bytes (W×H×3).
  */
-async function colorfulness(img: Uint8Array): Promise<number> {
-  const { data, info } = await sharp(img).resize(72, 72, { fit: "inside" }).raw().toBuffer({ resolveWithObject: true });
-  const ch = info.channels;
-  let sum = 0, n = 0;
-  for (let i = 0; i + 2 < data.length; i += ch) {
-    const r = data[i], g = data[i + 1], b = data[i + 2];
-    sum += Math.max(r, g, b) - Math.min(r, g, b);
-    n++;
+async function colorizeWithinLines(lineBin: Uint8Array, W: number, H: number): Promise<Buffer> {
+  const { data } = await sharp(lineBin).resize(W, H, { fit: "cover" }).grayscale().raw().toBuffer({ resolveWithObject: true });
+  const N = W * H;
+  const isLine = (i: number) => data[i] < 110; // dunkle Kontur = Barriere
+  const out = Buffer.alloc(N * 3, 255); // alles weiß
+  const label = new Int32Array(N); // 0 = unbesucht
+  const stack: number[] = [];
+  let region = 0;
+
+  for (let s = 0; s < N; s++) {
+    if (label[s] !== 0 || isLine(s)) continue;
+    region++;
+    const px: number[] = [];
+    let touchesBorder = false;
+    stack.length = 0;
+    stack.push(s);
+    label[s] = region;
+    while (stack.length) {
+      const q = stack.pop()!;
+      px.push(q);
+      const x = q % W, y = (q / W) | 0;
+      if (x === 0 || y === 0 || x === W - 1 || y === H - 1) touchesBorder = true;
+      if (x > 0) { const n = q - 1; if (label[n] === 0 && !isLine(n)) { label[n] = region; stack.push(n); } }
+      if (x < W - 1) { const n = q + 1; if (label[n] === 0 && !isLine(n)) { label[n] = region; stack.push(n); } }
+      if (y > 0) { const n = q - W; if (label[n] === 0 && !isLine(n)) { label[n] = region; stack.push(n); } }
+      if (y < H - 1) { const n = q + W; if (label[n] === 0 && !isLine(n)) { label[n] = region; stack.push(n); } }
+    }
+    if (touchesBorder) continue; // Hintergrund weiß lassen
+    const c = COLOR_PALETTE[(region * 5) % COLOR_PALETTE.length];
+    for (const q of px) { out[q * 3] = c[0]; out[q * 3 + 1] = c[1]; out[q * 3 + 2] = c[2]; }
   }
-  return n ? sum / n : 0;
+  // Konturen schwarz nachzeichnen
+  for (let p = 0; p < N; p++) if (isLine(p)) { out[p * 3] = 26; out[p * 3 + 1] = 26; out[p * 3 + 2] = 26; }
+  return out;
 }
 
-/** Mindest-Buntheit, ab der ein Cover den Vorher/Nachher-Effekt klar zeigt. */
-const COVER_COLOR_MIN = 16;
-
-/** Cover (Stil B – teilkoloriert) + Coloreo-Branding-Overlay, als PNG-Bytes (600×800). */
+/** Cover (Stil B – linke Hälfte ausgemalt, rechte Linienkunst) + Branding-Overlay (600×800). */
 export async function generateCoverImage(
   provider: ImageProvider,
   opts: { title: string; categoryName: string; heroMotif: string; pages: number }
 ): Promise<Uint8Array> {
   const W = 600, H = 800, MID = Math.round(W / 2);
 
-  // (A) Echte Linienkunst des Hauptmotivs (weißer Grund per Konstruktion → für JEDES Motiv,
-  //     auch dunkle, saubere Konturen). Liefert die rechte Hälfte UND die Konturen der linken.
+  // EIN Bild: echte Linienkunst des Hauptmotivs (weißer Grund per Konstruktion → für JEDES
+  // Motiv saubere Konturen). Beide Hälften stammen daraus → Konturen am Split deckungsgleich.
   const lineRaw = await provider.generate(buildMotifPrompt("all", opts.heroMotif, 0));
   const lineBin = await binarize(lineRaw);
   const lineFull = await sharp(lineBin).resize(W, H, { fit: "cover" }).toColourspace("srgb").png().toBuffer();
 
-  // (B) Farbquelle (vollfarbig, flach). Wird nur als weiche, posterisierte Farbfläche genutzt,
-  //     die UNTER die Linien gelegt wird – wirkt wie grob von Hand ausgemalt.
-  const colorPrompts = [
-    `a brightly colored illustration of ${opts.heroMotif}, flat vibrant saturated colors, cheerful, simple shapes, white background, no text`,
-    `${opts.heroMotif}, colorful flat illustration, bright saturated colors, white background, no text`,
-  ];
-  let best: Uint8Array | null = null;
-  let bestScore = -1;
-  for (let i = 0; i < colorPrompts.length; i++) {
-    const img = await provider.generate(colorPrompts[i]);
-    const score = await colorfulness(img);
-    if (score > bestScore) { bestScore = score; best = img; }
-    if (score >= COVER_COLOR_MIN) break;
-  }
-  if (!best) best = await provider.generate(colorPrompts[0]);
+  // Linke Hälfte: dieselbe Zeichnung, Flächen INNERHALB der Linien ausgemalt (Flood-Fill).
+  const coloredRaw = await colorizeWithinLines(lineBin, W, H);
+  const coloredFull = await sharp(coloredRaw, { raw: { width: W, height: H, channels: 3 } }).png().toBuffer();
 
-  const colorField = await sharp(best)
-    .resize(W, H, { fit: "cover" })
-    .modulate({ saturation: 1.3 })
-    .blur(10)
-    .png({ palette: true, colours: 14, dither: 0 }) // flache Farbzonen statt glattem Verlauf
-    .toBuffer();
-
-  // Linke Hälfte: Farbe UNTER die Linien (multiply) – Linien bleiben schwarz, Flächen werden bunt.
-  const leftColoredFull = await sharp(lineFull).composite([{ input: colorField, blend: "multiply" }]).png().toBuffer();
-
-  const leftColored = await sharp(leftColoredFull).extract({ left: 0, top: 0, width: MID, height: H }).toBuffer();
+  const leftColored = await sharp(coloredFull).extract({ left: 0, top: 0, width: MID, height: H }).toBuffer();
   const rightLines = await sharp(lineFull).extract({ left: MID, top: 0, width: W - MID, height: H }).toBuffer();
   const divider = Buffer.from(`<svg width="${W}" height="${H}"><rect x="${MID - 1}" y="0" width="2" height="${H}" fill="#1a1a1a"/></svg>`);
   const overlay = Buffer.from(brandingOverlay(W, H, opts.title, opts.categoryName, opts.pages));
