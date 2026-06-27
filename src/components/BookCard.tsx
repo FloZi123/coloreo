@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCart } from "@/lib/cart/store";
 import { formatPrice } from "@/lib/pricing";
+import { showRating } from "@/lib/reviews";
 import Stars from "@/components/Stars";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
@@ -64,7 +65,7 @@ export default function BookCard({
           </Link>
           <span className="whitespace-nowrap font-display text-lg font-bold">{formatPrice(book.priceCents, locale)}</span>
         </div>
-        {book.rating && book.rating.count > 0 && (
+        {book.rating && showRating(book.rating.count) && (
           <div className="mt-1 flex items-center gap-1 text-xs text-muted">
             <Stars value={book.rating.avg} size={13} />
             <span>({book.rating.count})</span>

@@ -6,6 +6,7 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { getBookBySlug, getBooks, getCategoryBySlug, getBookRating, getReviews, tTitle, tDesc, tName } from "@/lib/data";
 import { createPublicClient } from "@/lib/supabase/public";
 import { formatPrice } from "@/lib/pricing";
+import { showRating } from "@/lib/reviews";
 import ProductBuyBox from "@/components/ProductBuyBox";
 import BookCard from "@/components/BookCard";
 import BookPreviewViewer from "@/components/BookPreviewViewer";
@@ -72,7 +73,7 @@ export default async function BookPage({
       availability: "https://schema.org/InStock",
       url: `${site}/${locale}/buch/${book.slug}`,
     },
-    ...(rating && rating.count > 0
+    ...(rating && showRating(rating.count)
       ? { aggregateRating: { "@type": "AggregateRating", ratingValue: rating.avg, reviewCount: rating.count } }
       : {}),
   };
@@ -119,7 +120,7 @@ export default async function BookPage({
             </span>
           )}
           <h1 className="mt-4 font-display text-4xl font-bold leading-tight">{tTitle(book, locale)}</h1>
-          {rating && rating.count > 0 && (
+          {rating && showRating(rating.count) && (
             <div className="mt-2 flex items-center gap-2 text-sm">
               <Stars value={rating.avg} />
               <span className="font-semibold">{rating.avg.toFixed(1)}</span>
