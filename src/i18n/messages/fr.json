@@ -1,0 +1,125 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "worlds": "Univers",
+    "categories": "Catégories",
+    "bundles": "Offres groupées",
+    "bundleBuilder": "Créateur de bundle",
+    "freebies": "Pages gratuites",
+    "library": "Ma bibliothèque",
+    "cart": "Panier",
+    "help": "Aide"
+  },
+  "common": {
+    "addToCart": "Ajouter au panier",
+    "inCart": "Dans le panier",
+    "from": "à partir de",
+    "pages": "pages",
+    "price": "Prix",
+    "total": "Total",
+    "discount": "Réduction",
+    "subtotal": "Sous-total",
+    "checkout": "Commander",
+    "continueShopping": "Continuer mes achats",
+    "remove": "Supprimer",
+    "all": "Tous",
+    "adults": "Adultes",
+    "kids": "Enfants",
+    "loading": "Chargement …",
+    "empty": "Vide",
+    "book": "Livre de coloriage",
+    "books": "Livres de coloriage",
+    "download": "Télécharger",
+    "instantDownload": "Téléchargement PDF instantané",
+    "securePayment": "Paiement sécurisé",
+    "newsletter": "Newsletter"
+  },
+  "home": {
+    "heroTitle": "De magnifiques livres de coloriage, prêts à imprimer instantanément",
+    "heroSubtitle": "Plus de 20 catégories tendance pour adultes et enfants. Téléchargement PDF en quelques secondes – sans attente, sans livraison.",
+    "heroCta": "Explorer maintenant",
+    "heroCtaBundles": "Offres groupées & réductions",
+    "featured": "Livres de coloriage populaires",
+    "browseCategories": "Parcourir nos catégories",
+    "bundleTeaser": "Plus vous achetez, plus vous économisez",
+    "bundleTeaserText": "Créez votre propre bundle – plus vous ajoutez de livres, plus la réduction est grande (jusqu'à 40 %).",
+    "freebieTitle": "Obtenez des pages d'exemple gratuites",
+    "freebieText": "Inscrivez-vous et recevez instantanément des pages de coloriage gratuites par e-mail.",
+    "trustInstant": "Téléchargement instantané",
+    "trustQuality": "PDF haute qualité",
+    "trustSecure": "Paiement sécurisé"
+  },
+  "categories": {
+    "title": "Toutes les catégories",
+    "subtitle": "Trouvez votre thème préféré",
+    "booksIn": "Livres de coloriage dans",
+    "noBooks": "Bientôt disponible – de nouveaux livres de coloriage sont en cours de création."
+  },
+  "product": {
+    "preview": "Aperçu",
+    "description": "Description",
+    "details": "Détails",
+    "category": "Catégorie",
+    "pageCount": "Nombre de pages",
+    "format": "Format",
+    "formatValue": "PDF (A4, prêt à imprimer)",
+    "related": "Vous aimerez aussi",
+    "watermarkNote": "Chaque PDF est livré personnalisé (avec votre adresse e-mail). À usage privé uniquement."
+  },
+  "cart": {
+    "title": "Panier",
+    "empty": "Votre panier est vide.",
+    "quantityDiscount": "Remise sur quantité",
+    "couponPlaceholder": "Code promo",
+    "apply": "Appliquer",
+    "youSave": "Vous économisez",
+    "addMoreSave": "Ajoutez {n} livre(s) de plus pour {pct} % de réduction",
+    "proceed": "Commander en toute sécurité"
+  },
+  "bundleBuilder": {
+    "title": "Créez votre propre bundle",
+    "subtitle": "Choisissez vos livres préférés – la réduction augmente automatiquement à chaque ajout.",
+    "selected": "sélectionné(s)",
+    "yourPrice": "Votre prix",
+    "nextTier": "Encore {n} livre(s) pour {pct} % de réduction !",
+    "maxTier": "Réduction maximale atteinte – {pct} % !",
+    "addBundle": "Ajouter le bundle au panier"
+  },
+  "freebie": {
+    "title": "Obtenez des pages de coloriage gratuites",
+    "text": "Inscrivez-vous avec votre e-mail et recevez instantanément des pages d'exemple gratuites – ainsi que des offres exclusives.",
+    "emailPlaceholder": "vous@email.com",
+    "submit": "Recevoir mes pages gratuites",
+    "success": "C'est parti ! Consultez votre boîte mail pour retrouver vos pages gratuites.",
+    "privacy": "Pas de spam. Désinscription possible à tout moment."
+  },
+  "checkout": {
+    "title": "Commander",
+    "emailLabel": "E-mail (pour vos téléchargements)",
+    "payNow": "Payer maintenant",
+    "successTitle": "Merci pour votre achat !",
+    "successText": "Vos livres de coloriage sont prêts à être téléchargés. Nous vous avons également envoyé les liens par e-mail.",
+    "failTitle": "Paiement non finalisé",
+    "failText": "Rien n'a été débité – votre panier est toujours là."
+  },
+  "library": {
+    "title": "Ma bibliothèque",
+    "subtitle": "Tous vos livres de coloriage achetés au même endroit.",
+    "enterEmail": "Saisissez l'e-mail utilisé lors de votre achat pour accéder à vos téléchargements.",
+    "noPurchases": "Aucun achat trouvé pour le moment."
+  },
+  "footer": {
+    "rights": "Tous droits réservés.",
+    "imprint": "Mentions légales",
+    "privacy": "Confidentialité",
+    "terms": "Conditions générales",
+    "revocation": "Droit de rétractation",
+    "contact": "Contact"
+  },
+  "chat": {
+    "title": "Aide & Support",
+    "placeholder": "Posez-moi votre question …",
+    "greeting": "Bonjour ! Je suis votre assistant coloriage Coloreo. Je peux vous aider pour les téléchargements, le paiement ou vous aider à trouver le livre idéal. Comment puis-je vous aider ?",
+    "send": "Envoyer"
+  }
+}

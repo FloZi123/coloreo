@@ -1,0 +1,125 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "worlds": "Mundos",
+    "categories": "Categorías",
+    "bundles": "Paquetes",
+    "bundleBuilder": "Crea tu paquete",
+    "freebies": "Páginas gratis",
+    "library": "Mi biblioteca",
+    "cart": "Carrito",
+    "help": "Ayuda"
+  },
+  "common": {
+    "addToCart": "Añadir al carrito",
+    "inCart": "En el carrito",
+    "from": "desde",
+    "pages": "páginas",
+    "price": "Precio",
+    "total": "Total",
+    "discount": "Descuento",
+    "subtotal": "Subtotal",
+    "checkout": "Finalizar compra",
+    "continueShopping": "Seguir comprando",
+    "remove": "Eliminar",
+    "all": "Todos",
+    "adults": "Adultos",
+    "kids": "Niños",
+    "loading": "Cargando …",
+    "empty": "Vacío",
+    "book": "Libro para colorear",
+    "books": "Libros para colorear",
+    "download": "Descargar",
+    "instantDownload": "Descarga instantánea en PDF",
+    "securePayment": "Pago seguro",
+    "newsletter": "Boletín"
+  },
+  "home": {
+    "heroTitle": "Preciosos libros para colorear, listos para imprimir al instante",
+    "heroSubtitle": "Más de 20 categorías de tendencia para adultos y niños. Descarga tu PDF en segundos – sin esperas ni envíos.",
+    "heroCta": "Explorar ahora",
+    "heroCtaBundles": "Paquetes y descuentos",
+    "featured": "Libros para colorear populares",
+    "browseCategories": "Explora nuestras categorías",
+    "bundleTeaser": "Compra más, ahorra más",
+    "bundleTeaserText": "Crea tu propio paquete – cuantos más libros, mayor el descuento (hasta un 40 %).",
+    "freebieTitle": "Consigue páginas de muestra gratis",
+    "freebieText": "Regístrate y recibe al instante páginas para colorear gratis en tu correo.",
+    "trustInstant": "Descarga instantánea",
+    "trustQuality": "PDFs de alta calidad",
+    "trustSecure": "Pago seguro"
+  },
+  "categories": {
+    "title": "Todas las categorías",
+    "subtitle": "Encuentra tu temática favorita",
+    "booksIn": "Libros para colorear en",
+    "noBooks": "Próximamente – aquí se están creando nuevos libros para colorear."
+  },
+  "product": {
+    "preview": "Vista previa",
+    "description": "Descripción",
+    "details": "Detalles",
+    "category": "Categoría",
+    "pageCount": "Número de páginas",
+    "format": "Formato",
+    "formatValue": "PDF (A4, listo para imprimir)",
+    "related": "También te puede gustar",
+    "watermarkNote": "Cada PDF se entrega personalizado (con tu correo electrónico). Solo para uso privado."
+  },
+  "cart": {
+    "title": "Carrito",
+    "empty": "Tu carrito está vacío.",
+    "quantityDiscount": "Descuento por cantidad",
+    "couponPlaceholder": "Código de cupón",
+    "apply": "Aplicar",
+    "youSave": "Ahorras",
+    "addMoreSave": "Añade {n} libro(s) más y obtén un {pct}% de descuento",
+    "proceed": "Pago seguro"
+  },
+  "bundleBuilder": {
+    "title": "Crea tu propio paquete",
+    "subtitle": "Elige tus libros favoritos – el descuento aumenta automáticamente con cada selección.",
+    "selected": "seleccionados",
+    "yourPrice": "Tu precio",
+    "nextTier": "¡{n} libro(s) más para obtener un {pct}% de descuento!",
+    "maxTier": "¡Descuento máximo alcanzado – {pct}%!",
+    "addBundle": "Añadir paquete al carrito"
+  },
+  "freebie": {
+    "title": "Consigue páginas para colorear gratis",
+    "text": "Regístrate con tu correo y recibe al instante páginas de muestra gratis – además de ofertas exclusivas.",
+    "emailPlaceholder": "tu@correo.com",
+    "submit": "Obtener páginas gratis",
+    "success": "¡Listo! Revisa tu bandeja de entrada para ver tus páginas gratis.",
+    "privacy": "Sin spam. Cancela la suscripción cuando quieras."
+  },
+  "checkout": {
+    "title": "Finalizar compra",
+    "emailLabel": "Correo electrónico (para tus descargas)",
+    "payNow": "Pagar ahora",
+    "successTitle": "¡Gracias por tu compra!",
+    "successText": "Tus libros para colorear están listos para descargar. También te hemos enviado los enlaces por correo.",
+    "failTitle": "Pago no completado",
+    "failText": "No ha pasado nada – tu carrito sigue aquí."
+  },
+  "library": {
+    "title": "Mi biblioteca",
+    "subtitle": "Todos tus libros para colorear comprados en un solo lugar.",
+    "enterEmail": "Introduce el correo de tu compra para ver tus descargas.",
+    "noPurchases": "Aún no se han encontrado compras."
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados.",
+    "imprint": "Aviso legal",
+    "privacy": "Privacidad",
+    "terms": "Términos y condiciones",
+    "revocation": "Derecho de desistimiento",
+    "contact": "Contacto"
+  },
+  "chat": {
+    "title": "Ayuda y soporte",
+    "placeholder": "Pregúntame lo que quieras …",
+    "greeting": "¡Hola! Soy tu asistente de libros para colorear. Puedo ayudarte con descargas, pagos o encontrar el libro perfecto para ti. ¿En qué puedo ayudarte?",
+    "send": "Enviar"
+  }
+}

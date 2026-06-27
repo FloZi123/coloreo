@@ -4,7 +4,7 @@ type LegalKey = "impressum" | "datenschutz" | "agb" | "widerruf" | "kontakt";
 
 const PH = "【 PLATZHALTER – vor Go-Live durch echte Angaben ersetzen 】";
 
-const content: Record<LegalKey, Record<Locale, { title: string; html: string }>> = {
+const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: string }>>> = {
   impressum: {
     de: {
       title: "Impressum",
@@ -89,6 +89,7 @@ const content: Record<LegalKey, Record<Locale, { title: string; html: string }>>
 };
 
 export function getLegal(key: LegalKey, locale: Locale) {
-  return content[key][locale];
+  // Rechtstexte gibt es vorerst nur DE/EN → Fallback auf EN, dann DE.
+  return content[key][locale] ?? content[key].en ?? content[key].de!;
 }
 export type { LegalKey };

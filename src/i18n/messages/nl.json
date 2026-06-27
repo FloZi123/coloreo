@@ -1,0 +1,125 @@
+{
+  "nav": {
+    "home": "Home",
+    "worlds": "Werelden",
+    "categories": "Categorieën",
+    "bundles": "Bundels",
+    "bundleBuilder": "Bundelsamensteller",
+    "freebies": "Gratis pagina's",
+    "library": "Mijn Bibliotheek",
+    "cart": "Winkelwagen",
+    "help": "Help"
+  },
+  "common": {
+    "addToCart": "In winkelwagen",
+    "inCart": "In winkelwagen",
+    "from": "vanaf",
+    "pages": "pagina's",
+    "price": "Prijs",
+    "total": "Totaal",
+    "discount": "Korting",
+    "subtotal": "Subtotaal",
+    "checkout": "Afrekenen",
+    "continueShopping": "Verder winkelen",
+    "remove": "Verwijderen",
+    "all": "Alle",
+    "adults": "Volwassenen",
+    "kids": "Kinderen",
+    "loading": "Laden …",
+    "empty": "Leeg",
+    "book": "Kleurboek",
+    "books": "Kleurboeken",
+    "download": "Downloaden",
+    "instantDownload": "Direct PDF downloaden",
+    "securePayment": "Veilig betalen",
+    "newsletter": "Nieuwsbrief"
+  },
+  "home": {
+    "heroTitle": "Prachtige kleurboeken, direct klaar om af te drukken",
+    "heroSubtitle": "20+ populaire categorieën voor volwassenen en kinderen. Digitale PDF-download in seconden – geen wachten, geen verzending.",
+    "heroCta": "Ontdek nu",
+    "heroCtaBundles": "Bundels & kortingen",
+    "featured": "Populaire kleurboeken",
+    "browseCategories": "Bekijk onze categorieën",
+    "bundleTeaser": "Meer kopen, meer besparen",
+    "bundleTeaserText": "Stel je eigen bundel samen – hoe meer boeken, hoe groter de korting (tot wel 40%).",
+    "freebieTitle": "Ontvang gratis voorbeeldpagina's",
+    "freebieText": "Meld je aan en ontvang direct gratis kleurpagina's per e-mail.",
+    "trustInstant": "Direct downloaden",
+    "trustQuality": "PDF's van hoge kwaliteit",
+    "trustSecure": "Veilig betalen"
+  },
+  "categories": {
+    "title": "Alle categorieën",
+    "subtitle": "Vind jouw favoriete thema",
+    "booksIn": "Kleurboeken in",
+    "noBooks": "Binnenkort beschikbaar – er worden hier nieuwe kleurboeken gemaakt."
+  },
+  "product": {
+    "preview": "Voorbeeld",
+    "description": "Beschrijving",
+    "details": "Details",
+    "category": "Categorie",
+    "pageCount": "Aantal pagina's",
+    "format": "Formaat",
+    "formatValue": "PDF (A4, drukklaar)",
+    "related": "Dit vind je misschien ook leuk",
+    "watermarkNote": "Elke PDF wordt gepersonaliseerd geleverd (met jouw e-mailadres). Uitsluitend voor privégebruik."
+  },
+  "cart": {
+    "title": "Winkelwagen",
+    "empty": "Je winkelwagen is leeg.",
+    "quantityDiscount": "Volumekorting",
+    "couponPlaceholder": "Kortingscode",
+    "apply": "Toepassen",
+    "youSave": "Je bespaart",
+    "addMoreSave": "Voeg nog {n} boek(en) toe voor {pct}% korting",
+    "proceed": "Veilig afrekenen"
+  },
+  "bundleBuilder": {
+    "title": "Stel je eigen bundel samen",
+    "subtitle": "Kies je favoriete boeken – de korting loopt automatisch op met elke keuze.",
+    "selected": "geselecteerd",
+    "yourPrice": "Jouw prijs",
+    "nextTier": "Nog {n} boek(en) voor {pct}% korting!",
+    "maxTier": "Maximale korting bereikt – {pct}%!",
+    "addBundle": "Bundel in winkelwagen"
+  },
+  "freebie": {
+    "title": "Ontvang gratis kleurpagina's",
+    "text": "Meld je aan met je e-mailadres en ontvang direct gratis voorbeeldpagina's – plus exclusieve aanbiedingen.",
+    "emailPlaceholder": "jij@email.com",
+    "submit": "Gratis pagina's ontvangen",
+    "success": "Gelukt! Controleer je inbox voor je gratis pagina's.",
+    "privacy": "Geen spam. Op elk moment uitschrijven."
+  },
+  "checkout": {
+    "title": "Afrekenen",
+    "emailLabel": "E-mailadres (voor je downloads)",
+    "payNow": "Nu betalen",
+    "successTitle": "Bedankt voor je aankoop!",
+    "successText": "Je kleurboeken zijn klaar om te downloaden. We hebben je de links ook per e-mail gestuurd.",
+    "failTitle": "Betaling niet voltooid",
+    "failText": "Er is niets veranderd – je winkelwagen staat nog steeds klaar."
+  },
+  "library": {
+    "title": "Mijn Bibliotheek",
+    "subtitle": "Al je gekochte kleurboeken op één plek.",
+    "enterEmail": "Voer je aankoop-e-mailadres in om je downloads te bekijken.",
+    "noPurchases": "Nog geen aankopen gevonden."
+  },
+  "footer": {
+    "rights": "Alle rechten voorbehouden.",
+    "imprint": "Colofon",
+    "privacy": "Privacy",
+    "terms": "Algemene voorwaarden",
+    "revocation": "Herroepingsrecht",
+    "contact": "Contact"
+  },
+  "chat": {
+    "title": "Help & Ondersteuning",
+    "placeholder": "Stel gerust je vraag …",
+    "greeting": "Hoi! Ik ben jouw kleurboekassistent. Ik help je graag met downloads, betaling of het vinden van het juiste boek. Hoe kan ik je helpen?",
+    "send": "Versturen"
+  }
+}

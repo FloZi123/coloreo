@@ -7,14 +7,21 @@ export type Category = Tables<"categories">;
 export type Book = Tables<"books">;
 export type Bundle = Tables<"bundles">;
 
-export function tName<T extends { name_de: string; name_en: string }>(o: T, l: Locale) {
-  return l === "en" ? o.name_en : o.name_de;
+/** i18n-JSONB: { "<locale>": { title?, name?, description? } }. */
+type I18n = Record<string, { title?: string; name?: string; description?: string } | undefined>;
+function i18nVal(o: { i18n?: unknown }, l: Locale, key: "title" | "name" | "description"): string | undefined {
+  const v = (o.i18n as I18n | undefined)?.[l]?.[key];
+  return v && v.trim() ? v : undefined;
 }
-export function tTitle<T extends { title_de: string; title_en: string }>(o: T, l: Locale) {
-  return l === "en" ? o.title_en : o.title_de;
+
+export function tName<T extends { name_de: string; name_en: string; i18n?: unknown }>(o: T, l: Locale) {
+  return i18nVal(o, l, "name") ?? (l === "de" ? o.name_de : o.name_en);
 }
-export function tDesc<T extends { description_de: string | null; description_en: string | null }>(o: T, l: Locale) {
-  return (l === "en" ? o.description_en : o.description_de) ?? "";
+export function tTitle<T extends { title_de: string; title_en: string; i18n?: unknown }>(o: T, l: Locale) {
+  return i18nVal(o, l, "title") ?? (l === "de" ? o.title_de : o.title_en);
+}
+export function tDesc<T extends { description_de: string | null; description_en: string | null; i18n?: unknown }>(o: T, l: Locale) {
+  return i18nVal(o, l, "description") ?? (l === "de" ? o.description_de : o.description_en) ?? "";
 }
 
 export async function getBrand(): Promise<{ name: string; tagline_de: string; tagline_en: string }> {

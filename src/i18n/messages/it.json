@@ -1,0 +1,125 @@
+{
+  "nav": {
+    "home": "Home",
+    "worlds": "Mondi",
+    "categories": "Categorie",
+    "bundles": "Bundle",
+    "bundleBuilder": "Crea il tuo bundle",
+    "freebies": "Pagine gratuite",
+    "library": "La mia libreria",
+    "cart": "Carrello",
+    "help": "Assistenza"
+  },
+  "common": {
+    "addToCart": "Aggiungi al carrello",
+    "inCart": "Nel carrello",
+    "from": "da",
+    "pages": "pagine",
+    "price": "Prezzo",
+    "total": "Totale",
+    "discount": "Sconto",
+    "subtotal": "Subtotale",
+    "checkout": "Vai alla cassa",
+    "continueShopping": "Continua a fare acquisti",
+    "remove": "Rimuovi",
+    "all": "Tutti",
+    "adults": "Adulti",
+    "kids": "Bambini",
+    "loading": "Caricamento …",
+    "empty": "Vuoto",
+    "book": "Libro da colorare",
+    "books": "Libri da colorare",
+    "download": "Scarica",
+    "instantDownload": "Download PDF immediato",
+    "securePayment": "Pagamento sicuro",
+    "newsletter": "Newsletter"
+  },
+  "home": {
+    "heroTitle": "Bellissimi libri da colorare, pronti da stampare subito",
+    "heroSubtitle": "Oltre 20 categorie di tendenza per adulti e bambini. Download PDF digitale in pochi secondi – senza attese, senza spedizioni.",
+    "heroCta": "Esplora ora",
+    "heroCtaBundles": "Bundle e sconti",
+    "featured": "Libri da colorare più amati",
+    "browseCategories": "Sfoglia le nostre categorie",
+    "bundleTeaser": "Più acquisti, più risparmi",
+    "bundleTeaserText": "Crea il tuo bundle personalizzato – più libri scegli, più grande sarà lo sconto (fino al 40%).",
+    "freebieTitle": "Ricevi pagine di esempio gratuite",
+    "freebieText": "Iscriviti e ricevi subito pagine da colorare gratuite via email.",
+    "trustInstant": "Download immediato",
+    "trustQuality": "PDF di alta qualità",
+    "trustSecure": "Pagamento sicuro"
+  },
+  "categories": {
+    "title": "Tutte le categorie",
+    "subtitle": "Trova il tuo tema preferito",
+    "booksIn": "Libri da colorare in",
+    "noBooks": "Prossimamente – nuovi libri da colorare sono in arrivo."
+  },
+  "product": {
+    "preview": "Anteprima",
+    "description": "Descrizione",
+    "details": "Dettagli",
+    "category": "Categoria",
+    "pageCount": "Numero di pagine",
+    "format": "Formato",
+    "formatValue": "PDF (A4, pronto per la stampa)",
+    "related": "Potrebbe piacerti anche",
+    "watermarkNote": "Ogni PDF viene consegnato personalizzato (con la tua email). Solo per uso privato."
+  },
+  "cart": {
+    "title": "Carrello",
+    "empty": "Il tuo carrello è vuoto.",
+    "quantityDiscount": "Sconto quantità",
+    "couponPlaceholder": "Codice coupon",
+    "apply": "Applica",
+    "youSave": "Risparmi",
+    "addMoreSave": "Aggiungi ancora {n} libro/i per uno sconto del {pct}%",
+    "proceed": "Vai alla cassa in sicurezza"
+  },
+  "bundleBuilder": {
+    "title": "Crea il tuo bundle",
+    "subtitle": "Scegli i tuoi libri preferiti – lo sconto cresce automaticamente ad ogni aggiunta.",
+    "selected": "selezionati",
+    "yourPrice": "Il tuo prezzo",
+    "nextTier": "Ancora {n} libro/i per uno sconto del {pct}%!",
+    "maxTier": "Sconto massimo raggiunto – {pct}%!",
+    "addBundle": "Aggiungi il bundle al carrello"
+  },
+  "freebie": {
+    "title": "Ottieni pagine da colorare gratuite",
+    "text": "Iscriviti con la tua email e ricevi subito pagine di esempio gratuite – più offerte esclusive.",
+    "emailPlaceholder": "tu@email.com",
+    "submit": "Ricevi le pagine gratuite",
+    "success": "Fatto! Controlla la tua casella email per le pagine gratuite.",
+    "privacy": "Niente spam. Cancellati in qualsiasi momento."
+  },
+  "checkout": {
+    "title": "Cassa",
+    "emailLabel": "Email (per i tuoi download)",
+    "payNow": "Paga ora",
+    "successTitle": "Grazie per il tuo acquisto!",
+    "successText": "I tuoi libri da colorare sono pronti per il download. Ti abbiamo inviato anche i link via email.",
+    "failTitle": "Pagamento non completato",
+    "failText": "Non è successo nulla – il tuo carrello è ancora qui."
+  },
+  "library": {
+    "title": "La mia libreria",
+    "subtitle": "Tutti i tuoi libri da colorare acquistati in un unico posto.",
+    "enterEmail": "Inserisci l'email usata per l'acquisto per visualizzare i tuoi download.",
+    "noPurchases": "Nessun acquisto trovato."
+  },
+  "footer": {
+    "rights": "Tutti i diritti riservati.",
+    "imprint": "Note legali",
+    "privacy": "Privacy",
+    "terms": "Termini e condizioni",
+    "revocation": "Diritto di recesso",
+    "contact": "Contatti"
+  },
+  "chat": {
+    "title": "Aiuto e supporto",
+    "placeholder": "Chiedimi pure …",
+    "greeting": "Ciao! Sono il tuo assistente Coloreo per i libri da colorare. Posso aiutarti con i download, il pagamento o trovare il libro giusto per te. Come posso aiutarti?",
+    "send": "Invia"
+  }
+}

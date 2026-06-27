@@ -263,10 +263,34 @@ const en: Dict = {
   },
 };
 
-const dictionaries: Record<Locale, Dict> = { de, en };
+import frRaw from "./messages/fr.json";
+import esRaw from "./messages/es.json";
+import itRaw from "./messages/it.json";
+import nlRaw from "./messages/nl.json";
+
+/** Tiefes Mergen: Übersetzung über die EN-Basis legen; fehlende Keys fallen auf EN zurück. */
+function deepMerge<T>(base: T, over: unknown): T {
+  if (over == null || typeof over !== "object" || Array.isArray(over)) return base;
+  const out: Record<string, unknown> = Array.isArray(base) ? [...(base as unknown[])] as never : { ...(base as Record<string, unknown>) };
+  for (const [k, v] of Object.entries(over as Record<string, unknown>)) {
+    const b = (base as Record<string, unknown>)[k];
+    out[k] = b && typeof b === "object" && !Array.isArray(b) ? deepMerge(b, v) : (v as unknown);
+  }
+  return out as T;
+}
+
+// Neue Sprachen erben fehlende Strings von EN (bis vollständig übersetzt).
+const dictionaries: Record<Locale, Dict> = {
+  de,
+  en,
+  fr: deepMerge(en, frRaw),
+  es: deepMerge(en, esRaw),
+  it: deepMerge(en, itRaw),
+  nl: deepMerge(en, nlRaw),
+};
 
 export function getDictionary(locale: Locale): Dict {
-  return dictionaries[locale] ?? de;
+  return dictionaries[locale] ?? en;
 }
 
 export type Dictionary = Dict;

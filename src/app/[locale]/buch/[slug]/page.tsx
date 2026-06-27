@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { isLocale, type Locale } from "@/i18n/config";
+import { isLocale, locales, defaultLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getBookBySlug, getBooks, getCategoryBySlug, getBookRating, getReviews, tTitle, tDesc, tName } from "@/lib/data";
 import { createPublicClient } from "@/lib/supabase/public";
@@ -23,9 +23,11 @@ export async function generateMetadata({
   if (!book) return {};
   const title = tTitle(book, locale);
   const description = tDesc(book, locale).slice(0, 160);
+  const languages = Object.fromEntries(locales.map((l) => [l, `/${l}/buch/${slug}`]));
   return {
     title,
     description,
+    alternates: { canonical: `/${locale}/buch/${slug}`, languages: { ...languages, "x-default": `/${defaultLocale}/buch/${slug}` } },
     openGraph: { title, description, images: book.cover_url ? [book.cover_url] : [], type: "website" },
   };
 }
