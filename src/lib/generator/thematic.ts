@@ -144,7 +144,7 @@ function brandingOverlay(w: number, h: number, title: string, category: string, 
     `<tspan fill="#FBF7F0">c</tspan><tspan fill="#FF5A4D">o</tspan><tspan fill="#FBF7F0">l</tspan>` +
     `<tspan fill="#3B8EEA">o</tspan><tspan fill="#FBF7F0">re</tspan><tspan fill="#3FBF87">o</tspan></text>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
-    <rect x="0" y="0" width="${w}" height="74" fill="rgba(34,30,27,0.42)"/>
+    <rect x="0" y="0" width="${w}" height="76" fill="rgba(28,24,21,0.78)"/>
     ${wordmark}
     <rect x="0" y="${h - 150}" width="${w}" height="150" fill="rgba(250,247,240,0.86)"/>
     <text x="${w / 2}" y="${h - 96}" text-anchor="middle" font-family="${brand}" font-size="34" font-weight="700" fill="#221E1B">${esc(title)}</text>
