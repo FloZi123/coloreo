@@ -48,3 +48,4 @@ next-env.d.ts
 
 # lokale QA-Screenshots
 shot-*.png
+show-*.png
