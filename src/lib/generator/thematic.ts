@@ -172,11 +172,13 @@ export async function generateCoverImage(
   provider: ImageProvider,
   opts: { title: string; categoryName: string; heroMotif: string; pages: number }
 ): Promise<Uint8Array> {
-  // Forcierte Farb-Prompts: klarer "before & after"-Split. Eskaliert bei zu wenig Farbe.
+  // Forcierte Farb-Prompts: EIN Linienbild, eine Hälfte VON HAND ausgemalt (flache Stift-/
+  // Filzstift-Flächen, Konturen sichtbar, leicht unperfekt), andere Hälfte blanke Linienkunst.
+  // Eskaliert bei zu wenig Farbe.
   const prompts = [
-    `a coloring book cover of ${opts.heroMotif}, before-and-after coloring effect: the left portion fully painted in bright bold vibrant saturated colors, the right portion clean black-and-white outline line art, thick black outlines, cheerful, playful, white background, no text`,
-    `vibrant colorful coloring book cover illustration of ${opts.heroMotif}, richly partially colored with bright saturated rainbow colors on one side and crisp black-and-white line art on the other, strong before and after contrast, bold outlines, cheerful, white background, no text`,
-    `${opts.heroMotif}, brightly colored illustration, vivid saturated colors filling most shapes, a few areas left as black-and-white line art, coloring book before-and-after style, bold black outlines, cheerful, white background, no text`,
+    `a single coloring book line drawing of ${opts.heroMotif} with thick bold black outlines, the left half colored in by hand with flat bright marker and colored-pencil fills that stay inside the black outlines and leave the outlines clearly visible, the right half left as blank black-and-white line art, before-and-after coloring page, hand-colored crayon look, flat colors, no realistic shading, no gradients, no 3d render, white background, no text`,
+    `${opts.heroMotif} as a black outline coloring book page, partly filled in with flat vibrant crayon and felt-tip marker colors inside the lines like a hand-colored coloring book, bold black outlines still visible over the colored areas, slightly uneven childlike coloring strokes, the rest left as plain line art, no smooth shading, no gradients, cheerful, white background, no text`,
+    `coloring book illustration of ${opts.heroMotif}, thick black outlines, half of it colored in by hand with flat saturated marker colors staying within the outlines, half plain black-and-white line art, hand-colored coloring book style, visible pencil strokes, flat colors only, no 3d, no realistic rendering, cheerful, white background, no text`,
   ];
 
   let best: Uint8Array | null = null;
@@ -190,7 +192,13 @@ export async function generateCoverImage(
   }
   if (!best) best = await provider.generate(prompts[0]);
 
-  const base = await sharp(best).resize(600, 800, { fit: "cover" }).png().toBuffer();
+  // Posterisieren: glatte Render-Verläufe → flache Farbflächen (Filzstift-/Buntstift-Look),
+  // damit das Ausgemalte nicht "zu perfekt" wirkt, sondern wie von Hand koloriert.
+  const flat = await sharp(best)
+    .resize(600, 800, { fit: "cover" })
+    .modulate({ saturation: 1.12 })
+    .png({ palette: true, colours: 20, dither: 0 })
+    .toBuffer();
   const overlay = Buffer.from(brandingOverlay(600, 800, opts.title, opts.categoryName, opts.pages));
-  return new Uint8Array(await sharp(base).composite([{ input: overlay, top: 0, left: 0 }]).png().toBuffer());
+  return new Uint8Array(await sharp(flat).composite([{ input: overlay, top: 0, left: 0 }]).png().toBuffer());
 }
