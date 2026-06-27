@@ -148,15 +148,49 @@ function brandingOverlay(w: number, h: number, title: string, category: string, 
   </svg>`;
 }
 
+/**
+ * Misst die "Buntheit" eines Bildes (mittlere Kanal-Spreizung max-min über RGB, 0–255).
+ * Reine Linienkunst (graustufig) → ~0; teilkoloriertes Cover → deutlich höher.
+ */
+async function colorfulness(img: Uint8Array): Promise<number> {
+  const { data, info } = await sharp(img).resize(72, 72, { fit: "inside" }).raw().toBuffer({ resolveWithObject: true });
+  const ch = info.channels;
+  let sum = 0, n = 0;
+  for (let i = 0; i + 2 < data.length; i += ch) {
+    const r = data[i], g = data[i + 1], b = data[i + 2];
+    sum += Math.max(r, g, b) - Math.min(r, g, b);
+    n++;
+  }
+  return n ? sum / n : 0;
+}
+
+/** Mindest-Buntheit, ab der ein Cover den Vorher/Nachher-Effekt klar zeigt. */
+const COVER_COLOR_MIN = 16;
+
 /** Cover (Stil B – teilkoloriert) + Coloreo-Branding-Overlay, als PNG-Bytes (600×800). */
 export async function generateCoverImage(
   provider: ImageProvider,
   opts: { title: string; categoryName: string; heroMotif: string; pages: number }
 ): Promise<Uint8Array> {
-  const prompt =
-    `coloring book style illustration of ${opts.heroMotif}, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`;
-  const illus = await provider.generate(prompt);
-  const base = await sharp(illus).resize(600, 800, { fit: "cover" }).png().toBuffer();
+  // Forcierte Farb-Prompts: klarer "before & after"-Split. Eskaliert bei zu wenig Farbe.
+  const prompts = [
+    `a coloring book cover of ${opts.heroMotif}, before-and-after coloring effect: the left portion fully painted in bright bold vibrant saturated colors, the right portion clean black-and-white outline line art, thick black outlines, cheerful, playful, white background, no text`,
+    `vibrant colorful coloring book cover illustration of ${opts.heroMotif}, richly partially colored with bright saturated rainbow colors on one side and crisp black-and-white line art on the other, strong before and after contrast, bold outlines, cheerful, white background, no text`,
+    `${opts.heroMotif}, brightly colored illustration, vivid saturated colors filling most shapes, a few areas left as black-and-white line art, coloring book before-and-after style, bold black outlines, cheerful, white background, no text`,
+  ];
+
+  let best: Uint8Array | null = null;
+  let bestScore = -1;
+  const tries = Math.min(3, prompts.length);
+  for (let i = 0; i < tries; i++) {
+    const img = await provider.generate(prompts[i]);
+    const score = await colorfulness(img);
+    if (score > bestScore) { bestScore = score; best = img; }
+    if (score >= COVER_COLOR_MIN) break; // bunt genug → fertig
+  }
+  if (!best) best = await provider.generate(prompts[0]);
+
+  const base = await sharp(best).resize(600, 800, { fit: "cover" }).png().toBuffer();
   const overlay = Buffer.from(brandingOverlay(600, 800, opts.title, opts.categoryName, opts.pages));
   return new Uint8Array(await sharp(base).composite([{ input: overlay, top: 0, left: 0 }]).png().toBuffer());
 }
