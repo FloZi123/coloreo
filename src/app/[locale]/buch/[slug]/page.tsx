@@ -158,10 +158,15 @@ export default async function BookPage({
           <div className="grid gap-4 md:grid-cols-2">
             {reviews.map((r, i) => (
               <div key={i} className="card p-5">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-wrap gap-2">
                   <span className="font-display font-semibold">{r.author_name}</span>
                   <Stars value={r.rating} size={14} />
                 </div>
+                {r.source === "review_copy" && (
+                  <span className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+                    {locale === "de" ? "Rezensionsexemplar" : "Review copy"}
+                  </span>
+                )}
                 {r.body && <p className="mt-2 text-sm text-ink-soft">{r.body}</p>}
               </div>
             ))}

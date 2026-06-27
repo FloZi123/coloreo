@@ -143,7 +143,7 @@ export async function getReviews(bookId: string, limit = 8) {
   const sb = createPublicClient();
   const { data } = await sb
     .from("reviews")
-    .select("rating, author_name, body, created_at")
+    .select("rating, author_name, body, created_at, source")
     .eq("book_id", bookId)
     .eq("is_approved", true)
     .order("created_at", { ascending: false })

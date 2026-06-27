@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 import type { CartLine } from "@/lib/pricing";
+import { capture } from "@/lib/analytics";
 
 const STORAGE_KEY = "malbuch_cart_v1";
 
@@ -47,6 +48,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addBook = useCallback((line: Omit<CartLine, "kind" | "quantity">) => {
     setLastAdded({ title: line.title, at: Date.now() });
+    capture("add_to_cart", { slug: line.slug, price: line.unitPriceCents / 100 });
     setLines((prev) => {
       const existing = prev.find((l) => l.id === line.id);
       if (existing) {

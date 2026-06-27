@@ -366,6 +366,7 @@ export type Database = {
           stripe_session_id: string | null
           subtotal_cents: number
           total_cents: number
+          tax_cents: number | null
         }
         Insert: {
           coupon_code?: string | null
@@ -383,6 +384,7 @@ export type Database = {
           stripe_session_id?: string | null
           subtotal_cents?: number
           total_cents?: number
+          tax_cents?: number | null
         }
         Update: Partial<Database["public"]["Tables"]["orders"]["Insert"]>
         Relationships: []
@@ -422,9 +424,21 @@ export type Database = {
         Relationships: []
       }
       reviews: {
-        Row: { id: string; book_id: string; rating: number; author_name: string; body: string | null; is_approved: boolean; created_at: string }
-        Insert: { id?: string; book_id: string; rating: number; author_name: string; body?: string | null; is_approved?: boolean; created_at?: string }
+        Row: { id: string; book_id: string; rating: number; author_name: string; body: string | null; is_approved: boolean; source: string; created_at: string }
+        Insert: { id?: string; book_id: string; rating: number; author_name: string; body?: string | null; is_approved?: boolean; source?: string; created_at?: string }
         Update: Partial<Database["public"]["Tables"]["reviews"]["Insert"]>
+        Relationships: []
+      }
+      review_invites: {
+        Row: { id: string; token: string; email: string; book_id: string | null; source: string; used_at: string | null; created_at: string }
+        Insert: { id?: string; token: string; email: string; book_id?: string | null; source?: string; used_at?: string | null; created_at?: string }
+        Update: Partial<Database["public"]["Tables"]["review_invites"]["Insert"]>
+        Relationships: []
+      }
+      download_events: {
+        Row: { id: string; kind: string; book_id: string | null; email: string | null; created_at: string }
+        Insert: { id?: string; kind: string; book_id?: string | null; email?: string | null; created_at?: string }
+        Update: Partial<Database["public"]["Tables"]["download_events"]["Insert"]>
         Relationships: []
       }
     }
@@ -451,6 +465,10 @@ export type Database = {
       redeem_coupon: {
         Args: { p_code: string }
         Returns: undefined
+      }
+      download_count: {
+        Args: Record<string, never>
+        Returns: number
       }
     }
     Enums: {

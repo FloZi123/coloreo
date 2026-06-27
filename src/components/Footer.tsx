@@ -2,6 +2,7 @@ import Link from "next/link";
 import Logo from "@/components/Logo";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
+import TrustBadges from "@/components/TrustBadges";
 
 export default function Footer({
   locale,
@@ -45,8 +46,13 @@ export default function Footer({
           </ul>
         </div>
       </div>
-      <div className="border-t py-5 text-center text-xs" style={{ borderColor: "#3a352f", color: "#7a7268" }}>
-        © {year} coloreo. {dict.footer.rights}
+      <div className="border-t py-6" style={{ borderColor: "#3a352f" }}>
+        <div className="container-page mb-4">
+          <TrustBadges locale={locale} variant="grid" />
+        </div>
+        <div className="text-center text-xs" style={{ color: "#7a7268" }}>
+          © {year} coloreo. {dict.footer.rights}
+        </div>
       </div>
     </footer>
   );

@@ -89,6 +89,6 @@ export async function fulfillOrder(orderId: string, email: string): Promise<void
   // Lifecycle-Flows einreihen (Modul C)
   await cancelPendingEmails("abandoned_cart", email); // hat gekauft → kein Abbruch-Mail
   await enqueueEmail({ type: "cross_sell", recipient: email, locale, runAfterMinutes: 2 * 24 * 60, dedupe: `cross_sell:${orderId}` });
-  const reviewBooks = (books ?? []).map((b) => ({ title: locale === "en" ? b.title_en : b.title_de, url: `${SITE}/${locale}/buch/${b.slug}` }));
+  const reviewBooks = (books ?? []).map((b) => ({ title: locale === "en" ? b.title_en : b.title_de, url: `${SITE}/${locale}/bewerten/${b.slug}` }));
   await enqueueEmail({ type: "review_request", recipient: email, locale, runAfterMinutes: 5 * 24 * 60, dedupe: `review_request:${orderId}`, payload: { books: reviewBooks } });
 }

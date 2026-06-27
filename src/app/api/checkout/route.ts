@@ -61,11 +61,15 @@ export async function POST(req: Request) {
 
     const stripe = getStripe();
     const origin = process.env.NEXT_PUBLIC_SITE_URL ?? new URL(req.url).origin;
+    const TAX = process.env.STRIPE_TAX_ENABLED === "true"; // erst aktivieren, wenn OSS/Stripe-Tax eingerichtet
 
     const lineItems = lines.map((l) => ({
       price_data: {
         currency: "eur",
-        product_data: { name: l.title },
+        // Bruttopreise (EU-B2C): Steuer ist im Preis enthalten, Stripe weist sie aus
+        ...(TAX ? { tax_behavior: "inclusive" as const } : {}),
+        // Tax-Code für E-Books/digitale Güter
+        product_data: { name: l.title, ...(TAX ? { tax_code: "txcd_10302000" } : {}) },
         unit_amount: l.unitPriceCents,
       },
       quantity: l.quantity,
@@ -90,7 +94,8 @@ export async function POST(req: Request) {
       discounts,
       success_url: `${origin}/${locale}/danke?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/${locale}/warenkorb`,
-      automatic_tax: { enabled: false },
+      automatic_tax: { enabled: TAX },
+      ...(TAX ? { billing_address_collection: "required" as const, customer_creation: "always" as const } : {}),
       // Läuft nach 2 h ab → löst checkout.session.expired (Warenkorbabbruch-Flow) aus
       expires_at: Math.floor(Date.now() / 1000) + 2 * 60 * 60,
       metadata: { order_id: order.id, order_number: orderNumber, locale },

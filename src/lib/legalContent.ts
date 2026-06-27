@@ -32,7 +32,8 @@ const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: st
 <h3>2. Erhobene Daten</h3><p>Beim Kauf: E-Mail-Adresse, Zahlungsdaten (über Stripe), Bestelldaten. Beim Newsletter: E-Mail-Adresse.</p>
 <h3>3. Zahlungsabwicklung</h3><p>Die Zahlung erfolgt über Stripe Payments Europe Ltd. Es gelten deren Datenschutzbestimmungen.</p>
 <h3>4. Hosting &amp; Speicherung</h3><p>Hosting über Vercel; Datenbank/Storage über Supabase (EU-Region).</p>
-<h3>5. Ihre Rechte</h3><p>Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch, Datenübertragbarkeit. Kontakt: ${PH}</p>`,
+<h3>5. Reichweitenmessung</h3><p>Nur mit Ihrer Einwilligung (Cookie-Banner) nutzen wir PostHog (EU-Hosting) zur anonymen Statistik. Ohne Zustimmung findet keine Analyse statt; Sie können die Einwilligung jederzeit widerrufen. Keine Session-Recordings.</p>
+<h3>6. Ihre Rechte</h3><p>Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch, Datenübertragbarkeit. Kontakt: ${PH}</p>`,
     },
     en: {
       title: "Privacy Policy",
@@ -41,7 +42,8 @@ const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: st
 <h3>2. Data collected</h3><p>On purchase: email, payment data (via Stripe), order data. Newsletter: email.</p>
 <h3>3. Payments</h3><p>Processed via Stripe Payments Europe Ltd.</p>
 <h3>4. Hosting</h3><p>Vercel (hosting) and Supabase (database/storage, EU region).</p>
-<h3>5. Your rights</h3><p>Access, rectification, erasure, restriction, objection, portability. Contact: ${PH}</p>`,
+<h3>5. Analytics</h3><p>Only with your consent (cookie banner) we use PostHog (EU hosting) for anonymous analytics. No tracking without consent; you can withdraw anytime. No session recordings.</p>
+<h3>6. Your rights</h3><p>Access, rectification, erasure, restriction, objection, portability. Contact: ${PH}</p>`,
     },
   },
   agb: {

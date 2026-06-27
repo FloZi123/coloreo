@@ -10,6 +10,8 @@ import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
 import CartToast from "@/components/CartToast";
 import FirstOrderPopup from "@/components/FirstOrderPopup";
+import PostHogProvider from "@/components/PostHogProvider";
+import ConsentBanner from "@/components/ConsentBanner";
 
 const body = Nunito({ subsets: ["latin"], weight: ["400", "600", "700", "800"], variable: "--font-body", display: "swap" });
 const display = Fredoka({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-display", display: "swap" });
@@ -46,6 +48,7 @@ export default async function LocaleLayout({
   return (
     <html lang={l} className={`${body.variable} ${display.variable} h-full`}>
       <body className="min-h-full flex flex-col">
+        <PostHogProvider />
         <CartProvider>
           <Header locale={l} dict={dict} brand={brand.name} />
           <main className="flex-1">{children}</main>
@@ -54,6 +57,7 @@ export default async function LocaleLayout({
           <CartToast locale={l} dict={dict} />
           <FirstOrderPopup locale={l} />
         </CartProvider>
+        <ConsentBanner locale={l} />
       </body>
     </html>
   );

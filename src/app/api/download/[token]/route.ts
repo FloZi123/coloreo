@@ -9,7 +9,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ token: 
 
   const { data: dl } = await admin
     .from("downloads")
-    .select("id, book_id, watermarked_path, download_count, max_downloads, expires_at")
+    .select("id, book_id, watermarked_path, download_count, max_downloads, expires_at, customer_email")
     .eq("token", token)
     .maybeSingle();
 
@@ -29,6 +29,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ token: 
   }
 
   await admin.from("downloads").update({ download_count: dl.download_count + 1 }).eq("id", dl.id);
+
+  // Track download event (fire-and-forget, non-critical)
+  void admin.from("download_events").insert({
+    kind: "purchase",
+    book_id: dl.book_id,
+    email: dl.customer_email ?? null,
+  });
 
   const { data: book } = await admin.from("books").select("slug").eq("id", dl.book_id).maybeSingle();
   const filename = `coloreo-${book?.slug ?? "malbuch"}.pdf`;

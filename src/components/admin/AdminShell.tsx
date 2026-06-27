@@ -13,6 +13,7 @@ const NAV = [
   { href: "/admin/leads", label: "Leads & Newsletter", icon: "✉️" },
   { href: "/admin/support", label: "Support", icon: "💬" },
   { href: "/admin/generator", label: "Auto-Generator", icon: "🤖" },
+  { href: "/admin/reviews", label: "Bewertungen", icon: "⭐" },
 ];
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {

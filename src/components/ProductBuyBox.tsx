@@ -37,6 +37,9 @@ export default function ProductBuyBox({
       <Link href={`/${locale}/warenkorb`} className="mt-2 block text-center text-sm font-extrabold text-ink hover:text-primary">
         {dict.cart.proceed} →
       </Link>
+      {process.env.NEXT_PUBLIC_PRICES_INCLUSIVE_TAX === "true" && (
+        <p className="mt-2 text-center text-xs text-muted">{locale === "de" ? "inkl. gesetzl. USt." : "incl. VAT"}</p>
+      )}
       <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-muted">
         <span>✓ {dict.home.trustInstant}</span>
         <span>✓ {dict.product.formatValue}</span>

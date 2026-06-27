@@ -190,3 +190,16 @@ export async function toggleCategory(id: string, current: boolean) {
   await createAdminClient().from("categories").update({ is_active: !current }).eq("id", id);
   revalidatePath("/admin/kategorien");
 }
+
+// ============ Reviews ============
+export async function approveReview(id: string) {
+  await requireAdmin();
+  await createAdminClient().from("reviews").update({ is_approved: true }).eq("id", id);
+  revalidatePath("/admin/reviews");
+}
+
+export async function rejectReview(id: string) {
+  await requireAdmin();
+  await createAdminClient().from("reviews").delete().eq("id", id);
+  revalidatePath("/admin/reviews");
+}

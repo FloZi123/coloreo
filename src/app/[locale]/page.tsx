@@ -5,6 +5,8 @@ import { getWorlds, getBooks, getRatingsForBooks, tName, tDesc, tTitle } from "@
 import BookCard from "@/components/BookCard";
 import FreebieForm from "@/components/FreebieForm";
 import JsonLd from "@/components/JsonLd";
+import TrustBadges from "@/components/TrustBadges";
+import DownloadCounter from "@/components/DownloadCounter";
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
@@ -58,6 +60,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <div className="font-display text-sm font-bold" style={{ color: "#FFC23C" }}>★★★★★</div>
             <div className="text-xs text-muted">{dict.home.heroBadgeLabel}</div>
           </div>
+        </div>
+      </section>
+
+      {/* TRUST BADGES */}
+      <section className="container-page py-6">
+        <TrustBadges locale={locale} variant="row" />
+        <div className="mt-4 flex justify-center">
+          <DownloadCounter locale={locale} />
         </div>
       </section>
 

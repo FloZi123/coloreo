@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/cart/store";
+import { capture } from "@/lib/analytics";
 import { computeCart, formatPrice, type CouponInput, type PricingTier } from "@/lib/pricing";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
@@ -45,6 +46,7 @@ export default function CartView({
 
   async function checkout() {
     setCheckingOut(true);
+    capture("checkout_started", { value: breakdown.totalCents / 100, items: lines.length });
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",

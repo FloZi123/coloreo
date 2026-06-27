@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { capture } from "@/lib/analytics";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 
@@ -26,6 +27,7 @@ export default function FreebieForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, locale, source: "freebie" }),
       });
+      if (res.ok) capture("freebie_signup");
       setState(res.ok ? "done" : "error");
     } catch {
       setState("error");

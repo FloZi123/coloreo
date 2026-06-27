@@ -168,7 +168,7 @@ Antworte NUR als JSON: {"de":"...","en":"..."}` }],
     console.log(`  ✓ ${b.pages} Seiten`);
 
     // Vorschauen
-    let previewUrls: string[] = [];
+    const previewUrls: string[] = [];
     try {
       const pv = await makeWatermarkedPreviews(pdf, 5);
       for (let i = 0; i < pv.length; i++) {
