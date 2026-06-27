@@ -294,6 +294,7 @@ export type Database = {
           id: string
           locale: string
           opt_in_confirmed: boolean
+          unsubscribed_at: string | null
           source: Database["public"]["Enums"]["lead_source"]
         }
         Insert: {
@@ -304,9 +305,24 @@ export type Database = {
           id?: string
           locale?: string
           opt_in_confirmed?: boolean
+          unsubscribed_at?: string | null
           source?: Database["public"]["Enums"]["lead_source"]
         }
         Update: Partial<Database["public"]["Tables"]["leads"]["Insert"]>
+        Relationships: []
+      }
+      email_jobs: {
+        Row: {
+          id: string; type: string; recipient: string; locale: string; payload: Json
+          run_after: string; status: string; attempts: number; error: string | null
+          dedupe: string | null; created_at: string; sent_at: string | null
+        }
+        Insert: {
+          id?: string; type: string; recipient: string; locale?: string; payload?: Json
+          run_after?: string; status?: string; attempts?: number; error?: string | null
+          dedupe?: string | null; created_at?: string; sent_at?: string | null
+        }
+        Update: Partial<Database["public"]["Tables"]["email_jobs"]["Insert"]>
         Relationships: []
       }
       order_items: {

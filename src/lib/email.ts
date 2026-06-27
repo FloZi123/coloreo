@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import type { Locale } from "@/i18n/config";
+import { unsubToken } from "@/lib/emailJobs";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -112,4 +113,53 @@ export async function sendFreebieEmail(opts: { email: string; locale: Locale; do
       : `<p>${t.freebieOnWay}</p>`;
   const html = layout(t.freebieTitle, `${cta}<p style="color:#9a9388;font-size:13px">${t.freebieNote}</p>`);
   await send(opts.email, t.freebieSubject, html);
+}
+
+// ── Lifecycle-Flows (Modul C) ──────────────────────────────────────────────
+function marketingLayout(title: string, inner: string, email: string, locale: string): string {
+  const unsub = `${SITE}/api/newsletter/unsubscribe?e=${encodeURIComponent(email)}&t=${unsubToken(email)}`;
+  const label = locale === "de" ? "Vom Newsletter abmelden" : "Unsubscribe";
+  return layout(title, inner + `<p style="text-align:center;color:#b8b1a6;font-size:11px;margin-top:18px"><a href="${unsub}" style="color:#b8b1a6">${label}</a></p>`);
+}
+
+interface MkMsg {
+  cartSubj: string; cartTitle: string; cartBody: string; cartCta: string;
+  crossSubj: string; crossTitle: string; crossBody: string; crossCta: string;
+  revSubj: string; revTitle: string; revBody: string; revCta: string;
+  winSubj: string; winTitle: string; winBody: string; winCoupon: (c: string) => string; winCta: string;
+}
+const MK: Partial<Record<Locale, MkMsg>> = {
+  de: {
+    cartSubj: "Du hast etwas vergessen 🎨", cartTitle: "Deine Malbücher warten 🎨", cartBody: "In deinem Warenkorb liegen noch Malbücher – Sofort-Download, druckfertig in A4.", cartCta: "Zum Warenkorb",
+    crossSubj: "Passend zu deinem Kauf 🎁", crossTitle: "Das könnte dir auch gefallen", crossBody: "Danke für deinen Kauf! Mit einem Bundle sparst du bis zu 40 % auf weitere Malbücher.", crossCta: "Bundles entdecken",
+    revSubj: "Wie gefallen dir deine Malbücher?", revTitle: "Deine Meinung zählt ⭐", revBody: "Du hast deine Malbücher jetzt ein paar Tage – eine ehrliche Bewertung hilft anderen sehr.", revCta: "Jetzt bewerten",
+    winSubj: "Wir vermissen dich 🎨", winTitle: "Schön, dich wiederzusehen!", winBody: "Lange nichts ausgemalt? Es warten viele neue Motive auf dich.", winCoupon: (c) => `Mit dem Code <strong>${c}</strong> gibt's einen Willkommens-Rabatt.`, winCta: "Zurück zum Shop",
+  },
+  en: {
+    cartSubj: "You left something behind 🎨", cartTitle: "Your coloring books are waiting 🎨", cartBody: "There are still coloring books in your cart – instant download, print-ready A4.", cartCta: "Go to cart",
+    crossSubj: "Goes well with your purchase 🎁", crossTitle: "You might also like", crossBody: "Thanks for your purchase! With a bundle you save up to 40% on more coloring books.", crossCta: "Explore bundles",
+    revSubj: "How do you like your coloring books?", revTitle: "Your opinion matters ⭐", revBody: "You've had your coloring books for a few days – an honest review helps others a lot.", revCta: "Leave a review",
+    winSubj: "We miss you 🎨", winTitle: "Great to see you again!", winBody: "Haven't colored in a while? Lots of new designs are waiting for you.", winCoupon: (c) => `Use code <strong>${c}</strong> for a welcome-back discount.`, winCta: "Back to the shop",
+  },
+};
+const mk = (l: string) => MK[l as Locale] ?? MK.en!;
+const btn = (href: string, label: string) => `<p style="margin-top:18px"><a href="${href}" style="${BTN}">${label}</a></p>`;
+
+export async function sendAbandonedCart(o: { email: string; locale: string }): Promise<void> {
+  const t = mk(o.locale);
+  await send(o.email, t.cartSubj, marketingLayout(t.cartTitle, `<p>${t.cartBody}</p>${btn(`${SITE}/${o.locale}/warenkorb`, t.cartCta)}`, o.email, o.locale));
+}
+export async function sendCrossSell(o: { email: string; locale: string }): Promise<void> {
+  const t = mk(o.locale);
+  await send(o.email, t.crossSubj, marketingLayout(t.crossTitle, `<p>${t.crossBody}</p>${btn(`${SITE}/${o.locale}/bundles`, t.crossCta)}`, o.email, o.locale));
+}
+export async function sendReviewRequest(o: { email: string; locale: string; books: { title: string; url: string }[] }): Promise<void> {
+  const t = mk(o.locale);
+  const list = o.books.map((b) => `<li style="margin:6px 0"><a href="${b.url}" style="color:#FF5A4D;font-weight:bold">${b.title}</a></li>`).join("");
+  await send(o.email, t.revSubj, marketingLayout(t.revTitle, `<p>${t.revBody}</p><ul>${list}</ul>`, o.email, o.locale));
+}
+export async function sendWinBack(o: { email: string; locale: string; coupon?: string }): Promise<void> {
+  const t = mk(o.locale);
+  const coupon = o.coupon ? `<p>${t.winCoupon(o.coupon)}</p>` : "";
+  await send(o.email, t.winSubj, marketingLayout(t.winTitle, `<p>${t.winBody}</p>${coupon}${btn(`${SITE}/${o.locale}/welten`, t.winCta)}`, o.email, o.locale));
 }

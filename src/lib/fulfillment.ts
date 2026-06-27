@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { produceWatermarkedDownload } from "@/lib/pdf";
 import { sendOrderConfirmation } from "@/lib/email";
+import { enqueueEmail, cancelPendingEmails } from "@/lib/emailJobs";
 import { isLocale } from "@/i18n/config";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -44,7 +45,7 @@ export async function fulfillOrder(orderId: string, email: string): Promise<void
 
   const { data: books } = await admin
     .from("books")
-    .select("id, title_de, title_en, pdf_path, page_count")
+    .select("id, slug, title_de, title_en, pdf_path, page_count")
     .in("id", bookIds);
 
   // Kunde upsert
@@ -84,4 +85,10 @@ export async function fulfillOrder(orderId: string, email: string): Promise<void
   }
 
   await sendOrderConfirmation({ email, orderNumber: order.order_number, locale, downloads });
+
+  // Lifecycle-Flows einreihen (Modul C)
+  await cancelPendingEmails("abandoned_cart", email); // hat gekauft → kein Abbruch-Mail
+  await enqueueEmail({ type: "cross_sell", recipient: email, locale, runAfterMinutes: 2 * 24 * 60, dedupe: `cross_sell:${orderId}` });
+  const reviewBooks = (books ?? []).map((b) => ({ title: locale === "en" ? b.title_en : b.title_de, url: `${SITE}/${locale}/buch/${b.slug}` }));
+  await enqueueEmail({ type: "review_request", recipient: email, locale, runAfterMinutes: 5 * 24 * 60, dedupe: `review_request:${orderId}`, payload: { books: reviewBooks } });
 }

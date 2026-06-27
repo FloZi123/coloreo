@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { fulfillOrder } from "@/lib/fulfillment";
+import { enqueueEmail } from "@/lib/emailJobs";
 
 export const runtime = "nodejs";
 
@@ -31,6 +32,18 @@ export async function POST(req: Request) {
       const email = session.customer_details?.email ?? session.customer_email ?? "";
       if (orderId && email) {
         await fulfillOrder(orderId, email);
+      }
+    } else if (event.type === "checkout.session.expired") {
+      // Warenkorbabbruch: nur wenn E-Mail vorliegt; DOI wird beim Versand geprüft
+      const session = event.data.object as {
+        id: string;
+        metadata?: { locale?: string };
+        customer_details?: { email?: string } | null;
+        customer_email?: string | null;
+      };
+      const email = session.customer_details?.email ?? session.customer_email ?? "";
+      if (email) {
+        await enqueueEmail({ type: "abandoned_cart", recipient: email, locale: session.metadata?.locale ?? "de", runAfterMinutes: 60, dedupe: `abandoned_cart:${session.id}` });
       }
     }
   } catch (e) {

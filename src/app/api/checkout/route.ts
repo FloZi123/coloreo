@@ -91,6 +91,8 @@ export async function POST(req: Request) {
       success_url: `${origin}/${locale}/danke?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/${locale}/warenkorb`,
       automatic_tax: { enabled: false },
+      // Läuft nach 2 h ab → löst checkout.session.expired (Warenkorbabbruch-Flow) aus
+      expires_at: Math.floor(Date.now() / 1000) + 2 * 60 * 60,
       metadata: { order_id: order.id, order_number: orderNumber, locale },
       // Stripe Checkout unterstützt de/en/fr/es/it/nl direkt
       locale: (["de", "en", "fr", "es", "it", "nl"].includes(locale) ? locale : "auto") as "de" | "en" | "fr" | "es" | "it" | "nl" | "auto",
