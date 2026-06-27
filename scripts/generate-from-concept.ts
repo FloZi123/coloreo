@@ -8,6 +8,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createClient } from "@supabase/supabase-js";
+import Anthropic from "@anthropic-ai/sdk";
 import { getImageProvider } from "../src/lib/generator/imageProvider";
 import { generateMasterFromMotifs, generateCoverImage } from "../src/lib/generator/thematic";
 import { makeWatermarkedPreviews } from "../src/lib/generator/previews";
@@ -92,11 +93,39 @@ async function main() {
     const m = l.match(/^([A-Z0-9_]+)=(.*)$/);
     if (m) env[m[1]] = m[2].trim().replace(/^"|"$/g, "");
   }
-  for (const k of ["REPLICATE_API_TOKEN", "REPLICATE_MODEL", "NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"]) {
+  for (const k of ["REPLICATE_API_TOKEN", "REPLICATE_MODEL", "NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY", "ANTHROPIC_API_KEY"]) {
     if (env[k] && !process.env[k]) process.env[k] = env[k];
   }
   const SUPA = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const sb = createClient(SUPA, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } });
+  const anthropic = process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_API_KEY.includes("PLACEHOLDER")
+    ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : null;
+
+  // DE + EN Verkaufsbeschreibung via Claude, gegründet auf die Konzept-Fakten.
+  async function genDescriptions(b: Book): Promise<{ de: string; en: string }> {
+    if (!anthropic) return { de: b.descDe, en: b.titleEn };
+    const aud = b.audience === "kids" ? "Kinder" : b.audience === "all" ? "Familie/alle" : "Erwachsene";
+    try {
+      const res = await anthropic.messages.create({
+        model: "claude-sonnet-4-6", max_tokens: 600,
+        messages: [{ role: "user", content: `Produktbeschreibungen für ein digitales Malbuch (PDF-Download) im Shop "Coloreo".
+
+Titel DE: "${b.titleDe}" · Titel EN: "${b.titleEn}"
+Kategorie: ${b.catName} · Zielgruppe: ${aud} · Seiten: ${b.pages}
+Inhalt/Fakten (Grundlage, nicht wörtlich): "${b.descDe}"
+Einige Motive: ${b.motifs.slice(0, 6).join(", ")}
+
+Schreibe je eine Beschreibung DE und EN: jeweils GENAU 2 Sätze, warm und verkaufsstark, natürliche Sprache (EN keine wörtliche Übersetzung), nenne die ${b.pages} Seiten und den Sofort-PDF-Download, Tonfall passend zur Zielgruppe.
+Antworte NUR als JSON: {"de":"...","en":"..."}` }],
+      });
+      const txt = res.content.filter((c) => c.type === "text").map((c) => (c as { text: string }).text).join("");
+      const j = JSON.parse(txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1));
+      return { de: (j.de || b.descDe).trim(), en: (j.en || b.titleEn).trim() };
+    } catch (e) {
+      console.warn("  ⚠ Beschreibung (Fallback):", e instanceof Error ? e.message : e);
+      return { de: b.descDe, en: b.titleEn };
+    }
+  }
 
   const books = parseConcept(readFileSync(join(root, "MALBUCH-KONZEPT.md"), "utf8"));
   const argSlugs = process.argv.slice(2);
@@ -123,6 +152,10 @@ async function main() {
       .upsert({ slug: b.catSlug, name_de: b.catName, name_en: b.catNameEn, emoji: CAT_EMOJI[b.catSlug] ?? "🎨", audience: b.audience, is_active: true }, { onConflict: "slug" })
       .select("id").single();
 
+    // Beschreibungen (DE+EN) via Claude
+    const desc = await genDescriptions(b);
+    console.log("  ✓ Beschreibungen");
+
     // Cover
     const cover = await generateCoverImage(provider, { title: b.titleDe, categoryName: b.catName, heroMotif: b.heroMotif, pages: b.pages });
     await sb.storage.from("covers").upload(`${b.slug}.png`, cover, { contentType: "image/png", upsert: true });
@@ -148,7 +181,7 @@ async function main() {
     await sb.from("books").upsert({
       slug: b.slug, category_id: cat?.id ?? null,
       title_de: b.titleDe, title_en: b.titleEn,
-      description_de: b.descDe, description_en: b.titleEn,
+      description_de: desc.de, description_en: desc.en,
       audience: b.audience, price_cents: b.priceCents, page_count: b.pages,
       cover_url: coverUrl, pdf_path: `${b.slug}.pdf`, preview_urls: previewUrls,
       status: "draft", source: "ai_generated", tags: [b.catSlug, "konzept", "pdf"],
