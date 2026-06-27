@@ -181,6 +181,7 @@ export async function colorizeWithinLines(
   H: number,
   colorSrc?: { data: Buffer; ch: number },
   floor = 70,
+  grayFallback = false,
 ): Promise<Buffer> {
   const { data } = await sharp(lineBin).resize(W, H, { fit: "cover" }).grayscale().raw().toBuffer({ resolveWithObject: true });
   const N = W * H;
@@ -215,9 +216,13 @@ export async function colorizeWithinLines(
     let c: [number, number, number];
     if (colorSrc) {
       const m = px.length;
-      const [vr, vg, vb] = vivify(sr / m, sg / m, sb / m, floor);
-      // Fast-weiße Flächen (Motiv-Render hatte dort kaum Farbe) → Palette, sonst realer Mittelwert
-      c = vr > 236 && vg > 236 && vb > 236 ? COLOR_PALETTE[(region * 3) % COLOR_PALETTE.length] : [vr, vg, vb];
+      const mr = sr / m, mg = sg / m, mb = sb / m;
+      const chroma = Math.max(mr, mg, mb) - Math.min(mr, mg, mb);
+      const [vr, vg, vb] = vivify(mr, mg, mb, floor);
+      // Graue/fast-weiße Flächen (KI-Render hatte dort kaum echte Farbe) → kräftige Palette,
+      // sonst der realistische Mittelwert. Verhindert blass/ungemalt wirkende Flächen.
+      const washedOut = (grayFallback && chroma < 24) || (vr > 236 && vg > 236 && vb > 236);
+      c = washedOut ? COLOR_PALETTE[(region * 3) % COLOR_PALETTE.length] : [vr, vg, vb];
     } else {
       c = COLOR_PALETTE[(region * 3) % COLOR_PALETTE.length];
     }

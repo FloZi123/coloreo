@@ -40,7 +40,7 @@ export async function realisticColored(rep: Replicate, frame: Frame, W: number, 
     // Farbquelle aufhellen/sättigen, damit dunkle Renderbereiche nicht zu schwarzen Füllungen werden
     const { data, info } = await sharp(colBytes).resize(W, H, { fit: "fill" }).flatten({ background: "#ffffff" })
       .modulate({ brightness: 1.16, saturation: 1.28 }).toColourspace("srgb").raw().toBuffer({ resolveWithObject: true });
-    const raw = await colorizeWithinLines(frame.png, W, H, { data, ch: info.channels }, 108);
+    const raw = await colorizeWithinLines(frame.png, W, H, { data, ch: info.channels }, 108, true);
     return sharp(raw, { raw: { width: W, height: H, channels: 3 } }).png().toBuffer();
   } catch (e) {
     console.warn(`    ⚠ AI-Kolorierung fehlgeschlagen, flache Füllung: ${e instanceof Error ? e.message : e}`);
