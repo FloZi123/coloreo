@@ -31,6 +31,9 @@ Mood-Fotos** ist das zu flach. Empfehlung:
   nicht prominent im Fokus.
 - **Wasserzeichen-Hinweis:** Diese Bilder zeigen *fertig ausgemalte* Seiten als Sympathieträger —
   sie sind **Marketing-Mood**, nicht die wasserzeichengeschützten Produkt-Previews.
+- **PRODUKT = LOSE DRUCKSEITEN (wichtig):** Coloreo verkauft digitale PDFs zum **Selbstausdrucken**.
+  In JEDEM Bild **lose, frisch ausgedruckte A4-Blätter** zeigen — **NIE** ein gebundenes, spiral- oder
+  hardcovergebundenes Buch. Formulierung: "loose printed coloring sheets/pages … loose sheets not a bound book".
 
 ---
 
@@ -40,7 +43,7 @@ Mood-Fotos** ist das zu flach. Empfehlung:
 - **Einsatz:** Startseiten-Hero, große Bühne hinter Headline & CTAs.
 - **Seitenverhältnis:** `16:9` (`aspect_ratio: "16:9"`)
 - **Prompt:**
-  `photorealistic high-end lifestyle photography, a woman's hands holding a colored pencil, coloring an intricate half-finished mandala in an open coloring book on a light wooden desk, a cup of coffee and a small potted plant beside it, soft morning sunlight through a window, shot on a 50mm lens, shallow depth of field, warm cozy color palette, soft violet and coral accents, warm gold highlights, cream paper-white background tones, calm inviting wholesome hygge atmosphere, no text, no watermark, no logos`
+  `photorealistic high-end lifestyle photography, a woman's hands holding a colored pencil, coloring an intricate half-finished mandala on a single loose printed sheet of paper on a light wooden desk, a few more freshly printed coloring pages loosely stacked beside it, a cup of coffee and a small potted plant nearby, soft morning sunlight through a window, shot on a 50mm lens, shallow depth of field, warm cozy color palette, soft violet and coral accents, warm gold highlights, cream paper-white background tones, calm inviting wholesome hygge atmosphere, loose sheets not a bound book, no text, no watermark, no logos`
 - **Vermeiden (QA):** abgeschnittene/verformte Finger, sichtbarer Text auf der Seite, grelles Licht,
   unruhiger Hintergrund.
 
@@ -48,49 +51,49 @@ Mood-Fotos** ist das zu flach. Empfehlung:
 - **Einsatz:** Sektion "beliebte Bücher" / Über-uns / Trust-Bar-Hintergrund.
 - **Seitenverhältnis:** `4:5` (`aspect_ratio: "4:5"`)
 - **Prompt:**
-  `photorealistic top-down flat lay photography, an open coloring book showing a beautifully colored floral mandala page, a neat row of colored pencils fanned out, a few loose pencil shavings, a small ceramic mug, arranged on a cream paper-white desk surface, soft even natural light, shot from directly above, warm cozy color palette, soft violet coral and gold accents, calm wholesome aesthetic, clean uncluttered composition, no text, no watermark, no logos`
+  `photorealistic top-down flat lay photography, a few loose printed coloring sheets fanned out on a cream paper-white desk, the top printed page showing a beautifully colored floral mandala, a neat row of colored pencils, a few loose pencil shavings, a small ceramic mug, soft even natural light, shot from directly above, warm cozy color palette, soft violet coral and gold accents, calm wholesome aesthetic, clean uncluttered composition, loose printed sheets not a bound book, no text, no watermark, no logos`
 - **Vermeiden (QA):** Text/Schrift, schiefe Perspektive (muss exakt top-down sein), zu viele Objekte.
 
 ### Bild 3 — Cozy Abend (Entspannung)
 - **Einsatz:** Freebie-/Newsletter-Sektion, "Anti-Stress"-Story, Bundles-Teaser.
 - **Seitenverhältnis:** `3:2` (`aspect_ratio: "3:2"`)
 - **Prompt:**
-  `photorealistic cozy lifestyle photography, a person relaxing on a soft sofa under a knitted blanket, a coloring book and colored pencils on their lap, a steaming cup of tea on a side table, a warm glowing table lamp, a candle and houseplants in the softly blurred background, evening hygge mood, shot on a 50mm lens, shallow depth of field, warm cozy color palette, soft violet and gold tones, calm intimate wholesome atmosphere, face out of focus, no text, no watermark, no logos`
+  `photorealistic cozy lifestyle photography, a person relaxing on a soft sofa under a knitted blanket, a loose printed coloring page on a clipboard and colored pencils on their lap, a small stack of printed coloring sheets on the side table next to a steaming cup of tea, a warm glowing table lamp, a candle and houseplants in the softly blurred background, evening hygge mood, shot on a 50mm lens, shallow depth of field, warm cozy color palette, soft violet and gold tones, calm intimate wholesome atmosphere, face out of focus, loose printed sheets not a bound book, no text, no watermark, no logos`
 - **Vermeiden (QA):** scharfes/verzerrtes Gesicht im Fokus, kühles Licht, Unordnung.
 
 ### Bild 4 — Familie & Kinder (helle Säule)
 - **Einsatz:** Kinder-/Familien-Kategorie-Banner, Welt "Kleine Entdecker".
 - **Seitenverhältnis:** `3:2` (`aspect_ratio: "3:2"`)
 - **Prompt:**
-  `photorealistic candid family lifestyle photography, a young child coloring a bright cute animal page in a coloring book at a kitchen table, scattered chunky crayons and colored pencils in vibrant colors, a parent's hands gently helping in the frame, bright cheerful daylight, shot on a 35mm lens, shallow depth of field, fresh playful color palette with coral mint and gold accents, warm joyful wholesome atmosphere, child seen from the side or above, no text, no watermark, no logos`
+  `photorealistic candid family lifestyle photography, a young child coloring a bright cute animal on a loose printed coloring sheet at a kitchen table, more loose printed coloring pages scattered around, chunky crayons and colored pencils in vibrant colors, a parent's hands gently helping in the frame, bright cheerful daylight, shot on a 35mm lens, shallow depth of field, fresh playful color palette with coral mint and gold accents, warm joyful wholesome atmosphere, child seen from the side or above, loose printed sheets not a bound book, no text, no watermark, no logos`
 - **Vermeiden (QA):** verzerrte Kindergesichter (eher von oben/seitlich/Hände), düsteres Licht.
 
 ### Bild 5 — Makro / Detail (Textur-Banner)
 - **Einsatz:** schmaler Trennbanner zwischen Sektionen, Kategorie-Header-Hintergrund.
 - **Seitenverhältnis:** `16:9` (`aspect_ratio: "16:9"`)
 - **Prompt:**
-  `photorealistic extreme close-up macro photography, the sharp tip of a violet colored pencil mid-stroke filling a section of a black-and-white line-art coloring page, fine paper texture visible, a soft blur of colorful pencils in the background, dramatic shallow depth of field, natural soft light, warm cozy color palette with violet coral and gold, calm tactile premium feel, no text, no watermark, no logos`
+  `photorealistic extreme close-up macro photography, the sharp tip of a violet colored pencil mid-stroke filling a section of a single loose printed black-and-white line-art coloring sheet, fine printed paper texture visible, a soft blur of colorful pencils in the background, dramatic shallow depth of field, natural soft light, warm cozy color palette with violet coral and gold, calm tactile premium feel, a loose printed sheet not a bound book, no text, no watermark, no logos`
 - **Vermeiden (QA):** lesbarer Text auf der Seite, flaches Licht, kein erkennbarer Schärfepunkt.
 
 ### Bild 6 — USP "Digital → druckfertig"
 - **Einsatz:** Trust-/USP-Sektion ("Sofort-Download · druckfertig"), Erklär-Block.
 - **Seitenverhältnis:** `4:3` (`aspect_ratio: "4:3"`)
 - **Prompt:**
-  `photorealistic lifestyle photography, a freshly printed coloring book page with crisp black line art resting on a desk next to a home inkjet printer and an open laptop, a tidy stack of blank paper, a few colored pencils ready beside it, bright clean home-office light, shot on a 50mm lens, shallow depth of field, warm cozy color palette with subtle violet accents, modern wholesome reassuring mood, screens and paper showing no readable text, no watermark, no logos`
+  `photorealistic lifestyle photography, a freshly printed loose coloring page with crisp black line art coming out of a home inkjet printer and resting on a desk next to an open laptop, a tidy stack of blank paper, a few colored pencils ready beside it, bright clean home-office light, shot on a 50mm lens, shallow depth of field, warm cozy color palette with subtle violet accents, modern wholesome reassuring mood, loose printed sheets not a bound book, screens and paper showing no readable text, no watermark, no logos`
 - **Vermeiden (QA):** lesbare UI-Texte/Marken auf Laptop/Drucker, chaotischer Schreibtisch.
 
 ### Bild 7 — Outdoor / Café (Lifestyle, Fernweh)
 - **Einsatz:** Lifestyle-/Story-Sektion, Social-Header, "überall dabei".
 - **Seitenverhältnis:** `3:2` (`aspect_ratio: "3:2"`)
 - **Prompt:**
-  `photorealistic outdoor lifestyle photography, a coloring book and a small tin of colored pencils on a rustic café table next to a latte, dappled sunlight through green leaves, a softly blurred summer garden background, relaxed weekend mood, shot on a 50mm lens, shallow depth of field, warm cozy color palette with coral gold and mint, airy wholesome inviting atmosphere, no text, no watermark, no logos`
+  `photorealistic outdoor lifestyle photography, a few loose printed coloring pages and a small tin of colored pencils on a rustic café table next to a latte, dappled sunlight through green leaves, a softly blurred summer garden background, relaxed weekend mood, shot on a 50mm lens, shallow depth of field, warm cozy color palette with coral gold and mint, airy wholesome inviting atmosphere, loose printed sheets not a bound book, no text, no watermark, no logos`
 - **Vermeiden (QA):** harte Mittagsschatten, Text auf Tassen/Schildern, überladener Hintergrund.
 
 ### Bild 8 — Geschenk / Hygge (Saison & Social)
 - **Einsatz:** Geschenk-/Saison-Aktionen, Bundle-Geschenkidee, Instagram/Pinterest-Kachel.
 - **Seitenverhältnis:** `4:5` (`aspect_ratio: "4:5"`)
 - **Prompt:**
-  `photorealistic cozy flat lay photography, a coloring book tied with a soft ribbon presented as a gift, surrounded by colored pencils, a lit candle, a sprig of eucalyptus, a warm mug, and a folded knit blanket, on a cream linen surface, soft warm window light, top-down slightly angled view, warm cozy color palette with violet coral and gold accents, gift-worthy hygge wholesome mood, no text, no watermark, no logos`
+  `photorealistic cozy flat lay photography, a neat stack of loose printed coloring pages tied with a soft ribbon presented as a gift, surrounded by colored pencils, a lit candle, a sprig of eucalyptus, a warm mug, and a folded knit blanket, on a cream linen surface, soft warm window light, top-down slightly angled view, warm cozy color palette with violet coral and gold accents, gift-worthy hygge wholesome mood, loose printed sheets not a bound book, no text, no watermark, no logos`
 - **Vermeiden (QA):** Text/Etiketten, kalte Farben, zu symmetrisch-steril.
 
 ---
