@@ -1,11 +1,13 @@
 /**
- * Social-Content-Pipeline (Phase 2: Pins). Erzeugt aus dem Master-PDF eines Buchs
- * gebrandete 2:3-Pinterest-Pins + Manifest in public/social/<slug>/.
- *   npx tsx scripts/generate-social.ts <slug> [<slug> …]
- *   npx tsx scripts/generate-social.ts --all
- * Voraussetzung: NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY in .env.local.
+ * Social-Content-Pipeline: erzeugt pro Buch 6 Pinterest-Pins + Flip-Through- & Reveal-Video
+ * (+ Manifest) in public/social/<slug>/.
+ *   npx tsx scripts/generate-social.ts <slug> [<slug> …]   # einzelne Bücher
+ *   npx tsx scripts/generate-social.ts --all               # alle veröffentlichten
+ * Flags: --upload (nach Supabase-Bucket social-assets) · --flat (flache Markenfüllung statt
+ *        realistischer AI-Farben) · --force (Vorhandenes neu erzeugen statt überspringen).
+ * Voraussetzung: NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (+ REPLICATE_API_TOKEN) in .env.local.
  */
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createClient } from "@supabase/supabase-js";
@@ -29,6 +31,7 @@ const DOMAIN = "https://coloreo.de";
 const BUCKET = "social-assets";
 const UPLOAD = process.argv.includes("--upload");
 const FLAT = process.argv.includes("--flat"); // flache Markenfüllung statt realistischer AI-Farben
+const FORCE = process.argv.includes("--force"); // Vorhandenes neu erzeugen
 const rep = new Replicate({ auth: process.env.REPLICATE_API_TOKEN ?? "" });
 
 const linkFor = (slug: string, channel: string) =>
@@ -42,6 +45,11 @@ async function processBook(slug: string) {
     const { data: c } = await sb.from("categories").select("name_de").eq("id", book.category_id).maybeSingle();
     category = c?.name_de ?? "";
   }
+  const dir = join(root, "public", "social", slug);
+  if (!FORCE && existsSync(join(dir, "social.json")) && existsSync(join(dir, "video-flip.mp4")) && existsSync(join(dir, "video-reveal.mp4"))) {
+    console.log(`⏭  ${slug}: bereits vorhanden (--force zum Neu-Erzeugen)`);
+    return;
+  }
   const pdfPath = book.pdf_path ?? `${slug}.pdf`;
   const { data: pdfBlob, error } = await sb.storage.from("books").download(pdfPath);
   if (error || !pdfBlob) { console.warn(`  ⚠ ${slug}: PDF-Download fehlgeschlagen (${error?.message})`); return; }
@@ -49,7 +57,6 @@ async function processBook(slug: string) {
 
   console.log(`▶ ${slug} – Frames extrahieren …`);
   const frames = await pdfToFrames(pdfBytes, { scale: 2 });
-  const dir = join(root, "public", "social", slug);
   mkdirSync(dir, { recursive: true });
   const localPaths: string[] = [];
 
@@ -128,8 +135,12 @@ async function main() {
     slugs = args.filter((a) => !a.startsWith("--"));
   }
   if (!slugs.length) { console.error("Kein Slug. Nutzung: generate-social.ts <slug> | --all"); process.exit(1); }
-  console.log(`Social-Assets für ${slugs.length} Buch/Bücher:`);
-  for (const s of slugs) await processBook(s);
-  console.log("FERTIG");
+  console.log(`Social-Assets für ${slugs.length} Buch/Bücher${FLAT ? " [flach]" : ""}${UPLOAD ? " [upload]" : ""}${FORCE ? " [force]" : ""}:`);
+  let ok = 0; const failed: string[] = [];
+  for (const s of slugs) {
+    try { await processBook(s); ok++; }
+    catch (e) { failed.push(s); console.error(`✖ ${s}: ${e instanceof Error ? e.message : e}`); }
+  }
+  console.log(`FERTIG · ${ok}/${slugs.length} ok${failed.length ? ` · Fehler: ${failed.join(", ")}` : ""}`);
 }
 main().catch((e) => { console.error("FEHLER:", e instanceof Error ? e.stack : e); process.exit(1); });
