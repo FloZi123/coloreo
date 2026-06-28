@@ -1142,7 +1142,7 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `an intricate coral reef with a sea turtle and tropical fish`
 - **Cover-Prompt:** `coloring book style illustration of an intricate coral reef with a sea turtle and tropical fish, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→20):**
-  1. sunlight rays piercing the water surface
+  1. a sea turtle swimming up toward the sunlit water surface
   2. a school of fish near the surface
   3. a sea turtle gliding down
   4. an ornate jellyfish with trailing tentacles
