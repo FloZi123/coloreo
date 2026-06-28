@@ -6,7 +6,7 @@ import { hashSeed } from "./art";
 type Audience = "adult" | "kids" | "all";
 
 const LINEART =
-  "coloring book page, black and white line art, clean bold black outlines only, line art only, no shading, no grayscale, no gray, no stippling, no dots, no hatching, no texture or fill inside the shapes, every enclosed area is solid clean white to color in, the composition fills the whole page from edge to edge with distinct elements, no large empty areas, ";
+  "coloring book page, black and white line art, clean bold black outlines only, line art only, no shading, no grayscale, no gray, no stippling, no dots, no hatching, no texture or fill inside the shapes, every enclosed area is solid clean white to color in, the main subject is large and takes up most of the page, with background scenery behind and around it that fills the rest evenly, no empty center, the artwork bleeds off all four edges of the page, NO border, NO frame line, NO rectangular picture-frame around the page edges, ";
 
 function difficulty(audience: Audience): string {
   if (audience === "kids") return "simple and cute, thick bold clean outlines, large friendly shapes with big open areas to color, for young children, set in a playful scene with a few simple background elements (sun, clouds, plants, ground) so the page feels full but stays easy, ";
@@ -15,12 +15,12 @@ function difficulty(audience: Audience): string {
 }
 
 const VARIATIONS = [
-  "in a full scene with several background elements",
-  "surrounded by related elements, plants and simple decorative shapes",
-  "with a clean decorative background that fills the page",
-  "in its natural habitat with several distinct supporting elements",
-  "framed by a bold decorative border with background scenery",
-  "as a lively full-page composition with several separate elements around it",
+  "the subject large and prominent with a full background scene behind it",
+  "a large close-up of the subject in its detailed natural habitat",
+  "the subject big in the foreground with background scenery filling the rest",
+  "the subject large and central with smaller related elements behind it across the page",
+  "a complete full-page scene with the large subject and its surroundings",
+  "the subject filling most of the page within its natural environment",
 ];
 
 export function buildMotifPrompt(audience: Audience, motif: string, page: number): string {
@@ -151,9 +151,8 @@ function brandingOverlay(w: number, h: number): string {
 const clamp8 = (v: number) => (v < 0 ? 0 : v > 255 ? 255 : Math.round(v));
 
 /** Farbe kräftiger/sättigungsstärker ziehen (Filzstift-Look), dunkle Flächen anheben. */
-function vivify(r: number, g: number, b: number, floor = 70): [number, number, number] {
+function vivify(r: number, g: number, b: number, floor = 70, k = 1.5): [number, number, number] {
   const avg = (r + g + b) / 3;
-  const k = 1.5; // Sättigung
   const lift = avg < floor ? floor - avg : 0; // dunkle Flächen anheben (keine Schwarzflächen)
   return [clamp8(avg + (r - avg) * k + lift), clamp8(avg + (g - avg) * k + lift), clamp8(avg + (b - avg) * k + lift)];
 }
@@ -177,6 +176,7 @@ export async function colorizeWithinLines(
   colorSrc?: { data: Buffer; ch: number },
   floor = 70,
   grayFallback = false,
+  sat = 1.5,
 ): Promise<Buffer> {
   const { data } = await sharp(lineBin).resize(W, H, { fit: "cover" }).grayscale().raw().toBuffer({ resolveWithObject: true });
   const N = W * H;
@@ -213,7 +213,7 @@ export async function colorizeWithinLines(
       const m = px.length;
       const mr = sr / m, mg = sg / m, mb = sb / m;
       const chroma = Math.max(mr, mg, mb) - Math.min(mr, mg, mb);
-      const [vr, vg, vb] = vivify(mr, mg, mb, floor);
+      const [vr, vg, vb] = vivify(mr, mg, mb, floor, sat);
       // Graue/fast-weiße Flächen (KI-Render hatte dort kaum echte Farbe) → kräftige Palette,
       // sonst der realistische Mittelwert. Verhindert blass/ungemalt wirkende Flächen.
       const washedOut = (grayFallback && chroma < 24) || (vr > 236 && vg > 236 && vb > 236);
@@ -246,7 +246,7 @@ export async function generateCoverImage(
   let colorSrc: { data: Buffer; ch: number } | undefined;
   try {
     const colorRaw = await provider.generate(
-      `a colored illustration of ${opts.heroMotif}, natural realistic colors, flat bright colors, simple, centered, white background, no text`,
+      `a colored illustration of ${opts.heroMotif}, natural realistic muted colors, soft and believable real-world colors, simple, centered, white background, no text`,
     );
     const { data, info } = await sharp(colorRaw).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).toColourspace("srgb").raw().toBuffer({ resolveWithObject: true });
     colorSrc = { data, ch: info.channels };
@@ -255,7 +255,7 @@ export async function generateCoverImage(
   }
 
   // Linke Hälfte: dieselbe Zeichnung, Flächen INNERHALB der Linien ausgemalt (Flood-Fill).
-  const coloredRaw = await colorizeWithinLines(lineBin, W, H, colorSrc);
+  const coloredRaw = await colorizeWithinLines(lineBin, W, H, colorSrc, 70, false, 1.1);
   const coloredFull = await sharp(coloredRaw, { raw: { width: W, height: H, channels: 3 } }).png().toBuffer();
 
   const leftColored = await sharp(coloredFull).extract({ left: 0, top: 0, width: MID, height: H }).toBuffer();
