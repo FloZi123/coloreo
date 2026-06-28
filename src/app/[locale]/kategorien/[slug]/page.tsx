@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { isLocale, locales, defaultLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getCategoryBySlug, getBooks, getRatingsForBooks, tName, tDesc, tTitle } from "@/lib/data";
@@ -55,13 +56,20 @@ export default async function CategoryPage({
   return (
     <div className="container-page py-12">
       <JsonLd data={ld} />
-      <div className="mb-8 flex items-center gap-4">
-        <span className="text-5xl">{category.emoji}</span>
-        <div>
-          <h1 className="font-display text-3xl font-bold">{tName(category, locale)}</h1>
-          <p className="text-ink-soft">{tDesc(category, locale)}</p>
+      <nav className="mb-5 text-sm text-muted">
+        <Link href={`/${locale}/kategorien`} className="hover:text-primary">{dict.categories.title}</Link>
+        {" / "}
+        <span className="text-ink-soft">{tName(category, locale)}</span>
+      </nav>
+      <header className="mb-10 rounded-3xl p-8 md:p-10" style={{ background: "var(--color-beige)" }}>
+        <div className="flex items-center gap-4">
+          <span className="text-5xl md:text-6xl">{category.emoji}</span>
+          <h1 className="font-display text-3xl font-bold md:text-4xl">{tName(category, locale)}</h1>
         </div>
-      </div>
+        {tDesc(category, locale) && (
+          <p className="mt-4 max-w-2xl text-ink-soft md:text-lg">{tDesc(category, locale)}</p>
+        )}
+      </header>
 
       {books.length === 0 ? (
         <div className="card p-10 text-center text-muted">{dict.categories.noBooks}</div>
