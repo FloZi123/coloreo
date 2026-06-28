@@ -80,7 +80,10 @@ function traceSvg(png: Uint8Array): Promise<string> {
 async function vectorizeHiRes(binPng: Uint8Array, targetW = 1748): Promise<Uint8Array> {
   try {
     const svg = await traceSvg(binPng);
-    const png = await sharp(Buffer.from(svg)).resize({ width: targetW }).flatten({ background: "#ffffff" }).png().toBuffer();
+    // Graustufen + 16-Farben-Palette + max. Kompression → ~3× kleiner (≈5 MB/Buch), Schärfe
+    // bleibt erhalten (Anti-Aliasing intakt); pdf-lib-kompatibel.
+    const png = await sharp(Buffer.from(svg)).resize({ width: targetW }).flatten({ background: "#ffffff" })
+      .grayscale().png({ palette: true, colors: 16, compressionLevel: 9, effort: 10 }).toBuffer();
     return new Uint8Array(png);
   } catch {
     return binPng; // Fallback: Original-Raster
