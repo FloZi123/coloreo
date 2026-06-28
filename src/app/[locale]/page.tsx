@@ -56,9 +56,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             alt={dict.home.heroImgAlt}
             className="aspect-[16/11] w-full rounded-[1.75rem] object-cover shadow-xl"
           />
-          <div className="absolute -bottom-4 -left-4 hidden rounded-2xl bg-paper px-4 py-3 shadow-lg sm:block">
-            <div className="font-display text-sm font-bold" style={{ color: "#FFC23C" }}>★★★★★</div>
-            <div className="text-xs text-muted">{dict.home.heroBadgeLabel}</div>
+          <div className="absolute -bottom-4 -left-4 hidden items-center gap-2.5 rounded-2xl bg-paper px-4 py-3 shadow-lg sm:flex">
+            <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full text-white" style={{ background: "var(--color-success)" }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 5 5L20 7" /></svg>
+            </span>
+            <div className="text-xs font-bold text-ink-soft">{dict.home.heroBadgeLabel}</div>
           </div>
         </div>
       </section>
@@ -88,6 +90,25 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </div>
           ))}
         </div>
+      </section>
+
+      {/* SO FUNKTIONIERT'S */}
+      <section className="container-page py-14">
+        <h2 className="mb-8 text-center font-display text-2xl font-bold md:text-3xl">{dict.home.howTitle}</h2>
+        <div className="grid gap-6 sm:grid-cols-3">
+          {[
+            { n: 1, t: dict.home.howStep1Title, d: dict.home.howStep1Text },
+            { n: 2, t: dict.home.howStep2Title, d: dict.home.howStep2Text },
+            { n: 3, t: dict.home.howStep3Title, d: dict.home.howStep3Text },
+          ].map((s) => (
+            <div key={s.n} className="card flex flex-col items-center p-7 text-center">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full font-display text-lg font-extrabold text-white" style={{ background: "var(--color-primary)" }}>{s.n}</span>
+              <h3 className="mt-4 font-display text-lg font-semibold">{s.t}</h3>
+              <p className="mt-1.5 text-sm text-muted">{s.d}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mx-auto mt-6 max-w-xl text-center text-sm text-ink-soft">{dict.home.howNoPrinter}</p>
       </section>
 
       {/* FEATURED BOOKS */}
