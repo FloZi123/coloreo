@@ -6,21 +6,21 @@ import { hashSeed } from "./art";
 type Audience = "adult" | "kids" | "all";
 
 const LINEART =
-  "coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, ";
+  "coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, white background, the composition fills the whole page from edge to edge, no large empty areas, ";
 
 function difficulty(audience: Audience): string {
-  if (audience === "kids") return "very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, ";
-  if (audience === "adult") return "intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, ";
-  return "clean detailed outlines, balanced level of detail, friendly, ";
+  if (audience === "kids") return "simple and cute, thick bold clean outlines, large friendly shapes, for young children, set in a playful scene with a few simple background elements (sun, clouds, plants, ground) so the page feels full but stays easy, ";
+  if (audience === "adult") return "intricate and highly detailed, ornate decorative patterns and fine delicate linework, zentangle style, dense detail and patterns filling the entire page, ";
+  return "clean detailed outlines, balanced level of detail, friendly, with background scenery that fills the page, ";
 }
 
 const VARIATIONS = [
-  "centered composition",
-  "full body view",
-  "with a decorative patterned background",
-  "close-up portrait",
-  "in a small scene with surroundings",
-  "surrounded by ornamental flourishes",
+  "in a full scene with rich background surroundings",
+  "surrounded by related elements, plants and decorative patterns",
+  "with a detailed decorative background covering the whole page",
+  "in its natural habitat with many supporting background details",
+  "framed by an ornamental decorative border with background scenery",
+  "as a lively full-page composition with several supporting elements around it",
 ];
 
 export function buildMotifPrompt(audience: Audience, motif: string, page: number): string {
