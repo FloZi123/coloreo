@@ -193,7 +193,8 @@ Reply ONLY as a JSON array of exactly ${b.motifs.length} strings, in the same or
     // Cover
     const cover = await generateCoverImage(provider, { title: b.titleDe, categoryName: b.catName, heroMotif: b.heroMotif, pages: b.pages });
     await sb.storage.from("covers").upload(`${b.slug}.png`, cover, { contentType: "image/png", upsert: true });
-    const coverUrl = `${SUPA}/storage/v1/object/public/covers/${b.slug}.png`;
+    const ver = Date.now(); // Cache-Busting → CDN/Browser laden die NEUEN Cover/Vorschauen
+    const coverUrl = `${SUPA}/storage/v1/object/public/covers/${b.slug}.png?v=${ver}`;
     console.log("  ✓ Cover");
 
     // Motive zu vollen Szenen ausformulieren (verlässlich gefüllte Seiten)
@@ -212,7 +213,7 @@ Reply ONLY as a JSON array of exactly ${b.motifs.length} strings, in the same or
       for (let i = 0; i < pv.length; i++) {
         const path = `${b.slug}/p${i + 1}.webp`;
         await sb.storage.from("previews").upload(path, pv[i], { contentType: "image/webp", upsert: true });
-        previewUrls.push(`${SUPA}/storage/v1/object/public/previews/${path}`);
+        previewUrls.push(`${SUPA}/storage/v1/object/public/previews/${path}?v=${ver}`);
       }
     } catch (e) { console.warn("  ⚠ Vorschau:", e instanceof Error ? e.message : e); }
 
