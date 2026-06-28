@@ -129,7 +129,7 @@ export async function renderFlipThrough(book: { title: string; subtitle?: string
   let n = 0;
   const put = (b: Buffer) => writeFileSync(join(tmp, `f${String(n++).padStart(5, "0")}.png`), b);
   try {
-    const XF = 9;
+    const XF = 4; // kürzere Überblendung → schnellerer Durchlauf
     const heroFile = join(MOOD, "hero.webp");
     const segs: { scene: Buffer; ov: Buffer; frames: number }[] = [];
 
@@ -139,7 +139,7 @@ export async function renderFlipThrough(book: { title: string; subtitle?: string
     }
     // Seiten
     for (let i = 0; i < pages.length; i++) {
-      segs.push({ scene: await pageScene(pages[i].colored), ov: overlay({ progress: (i + 1) / pages.length, scrim: true }), frames: Math.round(FPS * 1.15) });
+      segs.push({ scene: await pageScene(pages[i].colored), ov: overlay({ progress: (i + 1) / pages.length, scrim: true }), frames: Math.round(FPS * 0.5) });
     }
     // Endcard
     segs.push({ scene: await endcardScene(), ov: endcardOverlay(S.ctaEndcard), frames: Math.round(FPS * 2.2) });

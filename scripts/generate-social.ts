@@ -25,7 +25,6 @@ const SUPA = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const sb = createClient(SUPA, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } });
 
 const PIN_COUNT = 6;
-const FLIP_PAGES = 6;
 const DOMAIN = "https://coloreo.shop";
 const BUCKET = "social-assets";
 const UPLOAD = process.argv.includes("--upload");
@@ -70,7 +69,6 @@ async function processBook(slug: string) {
 
   // Option A: Linienkunst-Durchblättern – KEINE KI-Kolorierung (flux trifft reale Farben nicht
   // zuverlässig; zeigt stattdessen die echten Seiten, die der Kunde bekommt).
-  const pageFrames = pickSpread(frames, Math.max(PIN_COUNT, FLIP_PAGES));
   const lineBuf = (f: Frame) => sharp(f.png).flatten({ background: "#ffffff" }).png().toBuffer();
 
   // Cover für Hook (optional)
@@ -79,8 +77,9 @@ async function processBook(slug: string) {
   const { data: covBlob } = await sb.storage.from("covers").download(coverFile);
   if (covBlob) coverBytes = Buffer.from(await covBlob.arrayBuffer());
 
-  const pinFrames = pageFrames.slice(0, PIN_COUNT);
-  const flipPages = await Promise.all(pageFrames.slice(0, FLIP_PAGES).map(async (f) => ({ frame: f, colored: await lineBuf(f) })));
+  const pinFrames = pickSpread(frames, PIN_COUNT);
+  // Flip zeigt ALLE Seiten des Buches (schneller Durchlauf)
+  const flipPages = await Promise.all(frames.map(async (f) => ({ frame: f, colored: await lineBuf(f) })));
 
   // Pro Sprache: nur die (billigen) Text-Overlays neu rendern
   for (const loc of LOCALES) {
