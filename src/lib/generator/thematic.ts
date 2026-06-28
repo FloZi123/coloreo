@@ -6,21 +6,21 @@ import { hashSeed } from "./art";
 type Audience = "adult" | "kids" | "all";
 
 const LINEART =
-  "coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, white background, the composition fills the whole page from edge to edge, no large empty areas, ";
+  "coloring book page, black and white line art, clean bold black outlines only, line art only, no shading, no grayscale, no gray, no stippling, no dots, no hatching, no texture or fill inside the shapes, every enclosed area is solid clean white to color in, the composition fills the whole page from edge to edge with distinct elements, no large empty areas, ";
 
 function difficulty(audience: Audience): string {
-  if (audience === "kids") return "simple and cute, thick bold clean outlines, large friendly shapes, for young children, set in a playful scene with a few simple background elements (sun, clouds, plants, ground) so the page feels full but stays easy, ";
-  if (audience === "adult") return "intricate and highly detailed, ornate decorative patterns and fine delicate linework, zentangle style, dense detail and patterns filling the entire page, ";
-  return "clean detailed outlines, balanced level of detail, friendly, with background scenery that fills the page, ";
+  if (audience === "kids") return "simple and cute, thick bold clean outlines, large friendly shapes with big open areas to color, for young children, set in a playful scene with a few simple background elements (sun, clouds, plants, ground) so the page feels full but stays easy, ";
+  if (audience === "adult") return "detailed with elegant decorative line patterns and clear bold outlines that form many distinct open areas to color, ornamental but not dense, plenty of clean white space inside every shape, ";
+  return "clean clear outlines, balanced detail with open areas to color, friendly, ";
 }
 
 const VARIATIONS = [
-  "in a full scene with rich background surroundings",
-  "surrounded by related elements, plants and decorative patterns",
-  "with a detailed decorative background covering the whole page",
-  "in its natural habitat with many supporting background details",
-  "framed by an ornamental decorative border with background scenery",
-  "as a lively full-page composition with several supporting elements around it",
+  "in a full scene with several background elements",
+  "surrounded by related elements, plants and simple decorative shapes",
+  "with a clean decorative background that fills the page",
+  "in its natural habitat with several distinct supporting elements",
+  "framed by a bold decorative border with background scenery",
+  "as a lively full-page composition with several separate elements around it",
 ];
 
 export function buildMotifPrompt(audience: Audience, motif: string, page: number): string {
@@ -62,7 +62,9 @@ export function motifsForCategory(slug: string): string[] {
 
 /** PNG-Linienkunst auf reines Schwarz-Weiß bereinigen (druckreine Konturen). */
 async function binarize(png: Uint8Array): Promise<Uint8Array> {
-  return new Uint8Array(await sharp(png).grayscale().threshold(140).png().toBuffer());
+  // Threshold 175 (statt 140): whitet Grau-Schattierungen/leichtes Stippling in den Ausmal-Flächen
+  // aus, behält aber die kräftigen schwarzen Konturen → reines S/W, saubere Flächen zum Ausmalen.
+  return new Uint8Array(await sharp(png).grayscale().threshold(175).png().toBuffer());
 }
 
 /**
