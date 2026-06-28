@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCart } from "@/lib/cart/store";
 import { capture } from "@/lib/analytics";
 import { computeCart, formatPrice, type CouponInput, type PricingTier } from "@/lib/pricing";
+import PaymentMarks from "@/components/PaymentMarks";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 
@@ -162,6 +163,7 @@ export default function CartView({
           {checkingOut ? dict.common.loading : "🔒 " + dict.cart.proceed}
         </button>
         <p className="text-center text-xs text-muted">{dict.common.instantDownload} · {dict.common.securePayment}</p>
+        <PaymentMarks locale={locale} withLabel={false} className="justify-center" />
       </div>
     </div>
   );

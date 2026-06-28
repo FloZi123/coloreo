@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCart } from "@/lib/cart/store";
 import { formatPrice } from "@/lib/pricing";
+import PaymentMarks from "@/components/PaymentMarks";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 
@@ -45,6 +46,7 @@ export default function ProductBuyBox({
         <span>✓ {dict.product.formatValue}</span>
         <span>✓ {dict.home.trustSecure}</span>
       </div>
+      <PaymentMarks locale={locale} className="mt-4" />
     </div>
   );
 }
