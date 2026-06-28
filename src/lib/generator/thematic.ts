@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import sharp from "sharp";
+import { trace } from "potrace";
 import type { ImageProvider } from "./imageProvider";
 import { hashSeed } from "./art";
 
@@ -67,6 +68,25 @@ async function binarize(png: Uint8Array): Promise<Uint8Array> {
   return new Uint8Array(await sharp(png).grayscale().threshold(160).png().toBuffer());
 }
 
+/** Vektorisiert die S/W-Linienkunst (potrace) und rastert sie in Druckauflösung neu →
+ *  glatte, scharfe Linien beim A4-Druck statt hochskalierter ~1-MP-Treppchen. */
+function traceSvg(png: Uint8Array): Promise<string> {
+  return new Promise((resolve, reject) => {
+    trace(Buffer.from(png), { turdSize: 2, optTolerance: 0.4, threshold: 128, color: "black", background: "white" }, (err, svg) => {
+      if (err) reject(err); else resolve(svg);
+    });
+  });
+}
+async function vectorizeHiRes(binPng: Uint8Array, targetW = 1748): Promise<Uint8Array> {
+  try {
+    const svg = await traceSvg(binPng);
+    const png = await sharp(Buffer.from(svg)).resize({ width: targetW }).flatten({ background: "#ffffff" }).png().toBuffer();
+    return new Uint8Array(png);
+  } catch {
+    return binPng; // Fallback: Original-Raster
+  }
+}
+
 /**
  * Master-PDF aus expliziter Motivliste: pro Seite ein KI-Bild (Linienkunst),
  * nach Zielgruppe in Schwierigkeit, S/W-bereinigt, eingebettet auf A4.
@@ -88,7 +108,7 @@ export async function generateMasterFromMotifs(
       batch.map(async (p) => {
         const motif = pool[p % pool.length];
         const raw = await provider.generate(buildMotifPrompt(book.audience, motif, p));
-        return { p, bytes: await binarize(raw) };
+        return { p, bytes: await vectorizeHiRes(await binarize(raw)) };
       })
     );
     for (const r of results) images[r.p] = r.bytes;
