@@ -127,6 +127,29 @@ Antworte NUR als JSON: {"de":"...","en":"..."}` }],
     }
   }
 
+  // Motive zu vollen, gefüllten Szenen ausformulieren (gegen leere Einzelmotiv-Seiten).
+  async function sceneify(b: Book): Promise<string[]> {
+    if (!anthropic || !b.motifs.length) return b.motifs;
+    try {
+      const res = await anthropic.messages.create({
+        model: "claude-sonnet-4-6", max_tokens: 1400,
+        messages: [{ role: "user", content: `Coloring-book page motifs for the theme "${b.catName}". For EACH motif, rewrite it as ONE short vivid English image-prompt phrase describing a FULL scene that fills the whole page: keep the main subject large and prominent, and add fitting background and surrounding elements (its habitat, plants, related objects, sky/water/ground) so there is no empty space. Do NOT add any border or frame. Keep each phrase under 25 words.
+
+Motifs (${b.motifs.length}):
+${b.motifs.map((m, i) => `${i + 1}. ${m}`).join("\n")}
+
+Reply ONLY as a JSON array of exactly ${b.motifs.length} strings, in the same order.` }],
+      });
+      const txt = res.content.filter((c) => c.type === "text").map((c) => (c as { text: string }).text).join("");
+      const arr = JSON.parse(txt.slice(txt.indexOf("["), txt.lastIndexOf("]") + 1)) as unknown[];
+      if (Array.isArray(arr) && arr.length === b.motifs.length) return arr.map((s) => String(s));
+      return b.motifs;
+    } catch (e) {
+      console.warn("  ⚠ Szenen (Fallback Originalmotive):", e instanceof Error ? e.message : e);
+      return b.motifs;
+    }
+  }
+
   const books = parseConcept(readFileSync(join(root, "MALBUCH-KONZEPT.md"), "utf8"));
   const argSlugs = process.argv.slice(2).filter((a) => !a.startsWith("--"));
   const COVERS_ONLY = process.argv.includes("--covers-only"); // nur Cover neu (text-frei), Seiten/DB unangetastet
@@ -173,8 +196,12 @@ Antworte NUR als JSON: {"de":"...","en":"..."}` }],
     const coverUrl = `${SUPA}/storage/v1/object/public/covers/${b.slug}.png`;
     console.log("  ✓ Cover");
 
+    // Motive zu vollen Szenen ausformulieren (verlässlich gefüllte Seiten)
+    const sceneMotifs = await sceneify(b);
+    console.log(`  ✓ Szenen (${sceneMotifs.length})`);
+
     // Master-PDF
-    const pdf = await generateMasterFromMotifs(provider, { slug: b.slug, titleDe: b.titleDe, audience: b.audience }, b.motifs, b.pages, { concurrency: 4 });
+    const pdf = await generateMasterFromMotifs(provider, { slug: b.slug, titleDe: b.titleDe, audience: b.audience }, sceneMotifs, b.pages, { concurrency: 4 });
     await sb.storage.from("books").upload(`${b.slug}.pdf`, pdf, { contentType: "application/pdf", upsert: true });
     console.log(`  ✓ ${b.pages} Seiten`);
 

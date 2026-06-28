@@ -62,9 +62,9 @@ export function motifsForCategory(slug: string): string[] {
 
 /** PNG-Linienkunst auf reines Schwarz-Weiß bereinigen (druckreine Konturen). */
 async function binarize(png: Uint8Array): Promise<Uint8Array> {
-  // Threshold 175 (statt 140): whitet Grau-Schattierungen/leichtes Stippling in den Ausmal-Flächen
-  // aus, behält aber die kräftigen schwarzen Konturen → reines S/W, saubere Flächen zum Ausmalen.
-  return new Uint8Array(await sharp(png).grayscale().threshold(175).png().toBuffer());
+  // Threshold 160: whitet Grau-Schattierungen/Stippling aus (saubere Ausmal-Flächen), aber nicht
+  // so hoch, dass dunkle Schattierungen zu großen schwarzen Flächen zusammenlaufen.
+  return new Uint8Array(await sharp(png).grayscale().threshold(160).png().toBuffer());
 }
 
 /**
