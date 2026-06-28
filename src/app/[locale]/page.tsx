@@ -44,8 +44,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <p className="mt-5 max-w-[46ch] text-lg text-muted">{dict.home.heroSubtitle}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href={p("/welten")} className="btn-primary px-7 py-3.5">{dict.home.heroCta}</Link>
-            <Link href={p("/welten/anti-stress")} className="rounded-full border-2 border-ink px-7 py-3.5 font-extrabold text-ink transition hover:bg-ink hover:text-paper">
-              {dict.home.forAdults}
+            <Link href={p("/bundles")} className="rounded-full border-2 border-ink px-7 py-3.5 font-extrabold text-ink transition hover:bg-ink hover:text-paper">
+              {dict.home.heroCtaBundles}
             </Link>
           </div>
         </div>
