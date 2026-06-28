@@ -133,23 +133,16 @@ function pdfText(s: string): string {
     .replace(/[^\x20-\xFF]/g, "");
 }
 
-function esc(s: string) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-function brandingOverlay(w: number, h: number, title: string, category: string, pages: number): string {
+function brandingOverlay(w: number, h: number): string {
   const brand = "'Fredoka', 'Baloo 2', 'Segoe UI', Arial, sans-serif";
-  // Coloreo-Wortmarke: c o(coral) l o(blau) re o(grün), helle Grundbuchstaben auf dunklem Balken.
+  // Sprachneutral: NUR die Coloreo-Wortmarke (kein eingebrannter Titel/Kategorie → i18n-sicher).
+  // Titel, Kategorie und Seitenzahl stehen lokalisiert als HTML auf der Storefront.
   const wordmark = `<text x="${w / 2}" y="50" text-anchor="middle" font-family="${brand}" font-size="36" font-weight="700" letter-spacing="-1">` +
     `<tspan fill="#FBF7F0">c</tspan><tspan fill="#FF5A4D">o</tspan><tspan fill="#FBF7F0">l</tspan>` +
     `<tspan fill="#3B8EEA">o</tspan><tspan fill="#FBF7F0">re</tspan><tspan fill="#3FBF87">o</tspan></text>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
     <rect x="0" y="0" width="${w}" height="76" fill="rgba(28,24,21,0.78)"/>
     ${wordmark}
-    <rect x="0" y="${h - 150}" width="${w}" height="150" fill="rgba(250,247,240,0.86)"/>
-    <text x="${w / 2}" y="${h - 96}" text-anchor="middle" font-family="${brand}" font-size="34" font-weight="700" fill="#221E1B">${esc(title)}</text>
-    <text x="${w / 2}" y="${h - 58}" text-anchor="middle" font-family="${brand}" font-size="17" fill="#6f675c">${esc(category)}</text>
-    <text x="${w / 2}" y="${h - 30}" text-anchor="middle" font-family="${brand}" font-size="15" fill="#9a9388">Malbuch · ${pages} Seiten</text>
   </svg>`;
 }
 
@@ -266,7 +259,7 @@ export async function generateCoverImage(
   const leftColored = await sharp(coloredFull).extract({ left: 0, top: 0, width: MID, height: H }).toBuffer();
   const rightLines = await sharp(lineFull).extract({ left: MID, top: 0, width: W - MID, height: H }).toBuffer();
   const divider = Buffer.from(`<svg width="${W}" height="${H}"><rect x="${MID - 1}" y="0" width="2" height="${H}" fill="#1a1a1a"/></svg>`);
-  const overlay = Buffer.from(brandingOverlay(W, H, opts.title, opts.categoryName, opts.pages));
+  const overlay = Buffer.from(brandingOverlay(W, H));
 
   return new Uint8Array(await sharp({ create: { width: W, height: H, channels: 3, background: { r: 255, g: 255, b: 255 } } })
     .composite([

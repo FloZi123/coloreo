@@ -128,7 +128,8 @@ Antworte NUR als JSON: {"de":"...","en":"..."}` }],
   }
 
   const books = parseConcept(readFileSync(join(root, "MALBUCH-KONZEPT.md"), "utf8"));
-  const argSlugs = process.argv.slice(2);
+  const argSlugs = process.argv.slice(2).filter((a) => !a.startsWith("--"));
+  const COVERS_ONLY = process.argv.includes("--covers-only"); // nur Cover neu (text-frei), Seiten/DB unangetastet
   const DEFAULT = ["mandala-reise-durch-den-tag", "botanik-gewaechshaus", "cottagecore-tag-im-landhaus", "dark-academia-alte-bibliothek"];
   // + erstes Kinderbuch (K1, Buch 1)
   const k1 = books.find((b) => b.catCode === "K1" && b.bookNum === 1);
@@ -147,6 +148,16 @@ Antworte NUR als JSON: {"de":"...","en":"..."}` }],
 
   for (const b of targets) {
     console.log(`\n▶ ${b.slug} …`);
+
+    if (COVERS_ONLY) {
+      // Nur das (jetzt text-freie) Cover neu erzeugen – Seiten/Beschreibungen/DB bleiben unangetastet.
+      const cover = await generateCoverImage(provider, { title: b.titleDe, categoryName: b.catName, heroMotif: b.heroMotif, pages: b.pages });
+      await sb.storage.from("covers").upload(`${b.slug}.png`, cover, { contentType: "image/png", upsert: true });
+      console.log("  ✓ Cover (nur Cover, text-frei)");
+      results.push({ slug: b.slug, cover: `${SUPA}/storage/v1/object/public/covers/${b.slug}.png` });
+      continue;
+    }
+
     // Kategorie sicherstellen
     const { data: cat } = await sb.from("categories")
       .upsert({ slug: b.catSlug, name_de: b.catName, name_en: b.catNameEn, emoji: CAT_EMOJI[b.catSlug] ?? "🎨", audience: b.audience, is_active: true }, { onConflict: "slug" })
