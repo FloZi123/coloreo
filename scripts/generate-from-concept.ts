@@ -25,6 +25,7 @@ interface Book {
 const CAT_EMOJI: Record<string, string> = {
   "mandala-meditation": "🌀", "botanischer-garten": "🌿", "cottagecore": "🏡",
   "dark-academia": "📚", "niedliche-tiere": "🐻", "unterwasserwelt": "🌊",
+  "dino-welt": "🦕",
 };
 
 function parseConcept(md: string): Book[] {
