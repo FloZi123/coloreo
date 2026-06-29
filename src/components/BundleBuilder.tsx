@@ -6,6 +6,7 @@ import { useCart } from "@/lib/cart/store";
 import { resolveTier, formatPrice, type PricingTier } from "@/lib/pricing";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
+import { Emoji } from "@/components/Emoji";
 
 export interface BuilderBook {
   id: string;
@@ -67,7 +68,7 @@ export default function BundleBuilder({
               }`}
             >
               {isSel && <span className="absolute right-2 top-2 text-primary">✓</span>}
-              <span className="text-3xl">{b.emoji}</span>
+              <span className="text-3xl"><Emoji emoji={b.emoji} label={b.title} /></span>
               <span className="line-clamp-2 text-[11px] font-semibold text-ink-soft">{b.title}</span>
               <span className="text-xs font-bold text-primary">{formatPrice(b.priceCents, locale)}</span>
             </button>

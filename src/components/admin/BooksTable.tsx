@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { setBookStatus, toggleFeatured, updateBook } from "@/app/admin/actions";
+import { Emoji } from "@/components/Emoji";
 
 interface Row {
   id: string;
@@ -74,7 +75,7 @@ export default function BooksTable({ books, categories }: { books: Row[]; catego
                     </div>
                   </div>
                 </td>
-                <td className="p-3 text-muted">{b.category?.emoji} {b.category?.name_de}</td>
+                <td className="p-3 text-muted"><Emoji emoji={b.category?.emoji} label={b.category?.name_de} /> {b.category?.name_de}</td>
                 <td className="p-3 font-semibold">{(b.price_cents / 100).toFixed(2)} €</td>
                 <td className="p-3">
                   <button onClick={() => start(() => setBookStatus(b.id, b.status === "published" ? "draft" : "published"))} className={`rounded-full px-2.5 py-1 text-xs font-semibold ${b.status === "published" ? "bg-success/15 text-success" : "bg-muted/15 text-muted"}`}>{b.status}</button>

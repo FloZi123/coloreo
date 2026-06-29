@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { approveGeneration, rejectGeneration } from "@/app/admin/actions";
+import { Emoji } from "@/components/Emoji";
 
 interface Item {
   id: string;
@@ -183,7 +184,7 @@ export default function GeneratorView({ items, categories }: { items: Item[]; ca
         {items.map((it) => (
           <div key={it.id} className="card flex items-center justify-between p-4">
             <div>
-              <div className="font-display font-semibold">{it.category?.emoji} {it.suggested_title_de}</div>
+              <div className="font-display font-semibold"><Emoji emoji={it.category?.emoji} label={it.category?.name_de} /> {it.suggested_title_de}</div>
               <div className="text-sm text-muted">{it.rationale}</div>
               <span className="mt-1 inline-block rounded-full bg-primary-soft px-2 py-0.5 text-[11px] font-semibold text-primary">{STATUS_LABEL[it.status] ?? it.status}</span>
             </div>

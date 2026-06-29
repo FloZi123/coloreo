@@ -5,6 +5,7 @@ import { useCart } from "@/lib/cart/store";
 import { formatPrice } from "@/lib/pricing";
 import { showRating } from "@/lib/reviews";
 import Stars from "@/components/Stars";
+import { Emoji } from "@/components/Emoji";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 
@@ -42,7 +43,7 @@ export default function BookCard({
             <img src={book.coverUrl} alt={book.title} className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center bg-primary-soft">
-              <span className="text-5xl">{book.emoji ?? "🎨"}</span>
+              <span className="text-5xl"><Emoji emoji={book.emoji} label={book.title} /></span>
               <span className="mt-3 px-4 text-center font-display text-sm font-semibold text-ink-soft">
                 {book.title}
               </span>

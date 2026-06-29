@@ -2,6 +2,7 @@ import Link from "next/link";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getWorlds, getCategories, tName, tDesc } from "@/lib/data";
+import { Emoji } from "@/components/Emoji";
 
 export default async function CategoriesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
@@ -16,7 +17,7 @@ export default async function CategoriesPage({ params }: { params: Promise<{ loc
       className="card flex items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:shadow-md"
       style={{ borderColor: accent ? accent + "40" : undefined }}
     >
-      <span className="text-4xl">{c.emoji}</span>
+      <span className="text-4xl"><Emoji emoji={c.emoji} label={tName(c, locale)} /></span>
       <span>
         <span className="block font-display font-semibold">{tName(c, locale)}</span>
         <span className="block text-xs text-muted">{tDesc(c, locale)}</span>
@@ -35,7 +36,7 @@ export default async function CategoriesPage({ params }: { params: Promise<{ loc
         return (
           <section key={w.id} className="mt-10">
             <Link href={`/${locale}/welten/${w.slug}`} className="mb-4 flex items-center gap-2 font-display text-xl font-bold hover:text-primary">
-              <span>{w.emoji}</span> {tName(w, locale)} <span className="text-sm font-normal text-muted">→</span>
+              <span><Emoji emoji={w.emoji} label={tName(w, locale)} /></span> {tName(w, locale)} <span className="text-sm font-normal text-muted">→</span>
             </Link>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{cats.map((c) => Card(c, w.accent))}</div>
           </section>

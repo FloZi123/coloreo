@@ -12,6 +12,7 @@ import BookCard from "@/components/BookCard";
 import BookPreviewViewer from "@/components/BookPreviewViewer";
 import JsonLd from "@/components/JsonLd";
 import Stars from "@/components/Stars";
+import { Emoji } from "@/components/Emoji";
 
 export async function generateMetadata({
   params,
@@ -100,7 +101,7 @@ export default async function BookPage({
               <img src={book.cover_url} alt={tTitle(book, locale)} className="h-full w-full object-cover" />
             ) : (
               <div className="flex h-full w-full flex-col items-center justify-center bg-primary-soft">
-                <span className="text-7xl">{category?.emoji ?? "🎨"}</span>
+                <span className="text-7xl"><Emoji emoji={category?.emoji} label={category ? tName(category, locale) : undefined} /></span>
                 <span className="mt-4 px-6 text-center font-display text-lg font-semibold text-ink-soft">{tTitle(book, locale)}</span>
               </div>
             )}
@@ -131,7 +132,7 @@ export default async function BookPage({
         <div>
           {category && (
             <span className="inline-flex items-center rounded-full border bg-surface px-4 py-1.5 text-xs font-extrabold uppercase tracking-wider text-muted">
-              {category.emoji} {tName(category, locale)}
+              <Emoji emoji={category.emoji} label={tName(category, locale)} /> {tName(category, locale)}
             </span>
           )}
           <h1 className="mt-4 font-display text-4xl font-bold leading-tight">{tTitle(book, locale)}</h1>

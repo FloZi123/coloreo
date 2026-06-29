@@ -5,6 +5,7 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { getWorldBySlug, getCategoriesByWorld, getRatingsForBooks, tName, tDesc, tTitle, type Book } from "@/lib/data";
 import { createPublicClient } from "@/lib/supabase/public";
 import BookCard from "@/components/BookCard";
+import { Emoji } from "@/components/Emoji";
 
 export default async function WorldPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale: raw, slug } = await params;
@@ -33,7 +34,7 @@ export default async function WorldPage({ params }: { params: Promise<{ locale: 
       <section style={{ background: accent + "18" }}>
         <div className="container-page grid items-center gap-8 py-12 md:grid-cols-[1.3fr_1fr]">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 flex-none items-center justify-center rounded-2xl text-4xl" style={{ background: accent + "30" }}>{world.emoji}</div>
+            <div className="flex h-16 w-16 flex-none items-center justify-center rounded-2xl text-4xl" style={{ background: accent + "30" }}><Emoji emoji={world.emoji} label={tName(world, locale)} /></div>
             <div>
               <h1 className="font-display text-3xl font-bold">{tName(world, locale)}</h1>
               <p className="text-ink-soft">{tDesc(world, locale)}</p>
@@ -51,7 +52,7 @@ export default async function WorldPage({ params }: { params: Promise<{ locale: 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {categories.map((c) => (
             <Link key={c.id} href={`/${locale}/kategorien/${c.slug}`} className="card flex flex-col items-center gap-2 p-5 text-center transition hover:-translate-y-1 hover:shadow-md" style={{ borderColor: accent + "40" }}>
-              <span className="text-4xl">{c.emoji}</span>
+              <span className="text-4xl"><Emoji emoji={c.emoji} label={tName(c, locale)} /></span>
               <span className="font-display text-sm font-semibold">{tName(c, locale)}</span>
             </Link>
           ))}

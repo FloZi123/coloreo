@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import { createCategory, toggleCategory } from "@/app/admin/actions";
+import { Emoji } from "@/components/Emoji";
 
 interface Cat { id: string; name_de: string; emoji: string | null; audience: string; is_active: boolean; bookCount: number }
 
@@ -29,7 +30,7 @@ export default function CategoriesManager({ categories }: { categories: Cat[] })
           <tbody>
             {categories.map((c) => (
               <tr key={c.id} className="border-t">
-                <td className="p-3 font-semibold">{c.emoji} {c.name_de}</td>
+                <td className="p-3 font-semibold"><Emoji emoji={c.emoji} label={c.name_de} /> {c.name_de}</td>
                 <td className="p-3 text-muted">{c.audience === "kids" ? "Kinder" : c.audience === "adult" ? "Erwachsene" : "Alle"}</td>
                 <td className="p-3 text-muted">{c.bookCount}</td>
                 <td className="p-3"><button onClick={() => start(() => toggleCategory(c.id, c.is_active))} className={`rounded-full px-2.5 py-1 text-xs font-semibold ${c.is_active ? "bg-success/15 text-success" : "bg-muted/15 text-muted"}`}>{c.is_active ? "aktiv" : "inaktiv"}</button></td>

@@ -6,6 +6,7 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { getCategoryBySlug, getBooks, getRatingsForBooks, tName, tDesc, tTitle } from "@/lib/data";
 import BookCard from "@/components/BookCard";
 import JsonLd from "@/components/JsonLd";
+import { Emoji } from "@/components/Emoji";
 
 export async function generateMetadata({
   params,
@@ -63,7 +64,7 @@ export default async function CategoryPage({
       </nav>
       <header className="mb-10 rounded-3xl p-8 md:p-10" style={{ background: "var(--color-beige)" }}>
         <div className="flex items-center gap-4">
-          <span className="text-5xl md:text-6xl">{category.emoji}</span>
+          <span className="text-5xl md:text-6xl"><Emoji emoji={category.emoji} label={tName(category, locale)} /></span>
           <h1 className="font-display text-3xl font-bold md:text-4xl">{tName(category, locale)}</h1>
         </div>
         {tDesc(category, locale) && (

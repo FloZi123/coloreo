@@ -7,6 +7,7 @@ import FreebieForm from "@/components/FreebieForm";
 import JsonLd from "@/components/JsonLd";
 import TrustBadges from "@/components/TrustBadges";
 import DownloadCounter from "@/components/DownloadCounter";
+import { Emoji } from "@/components/Emoji";
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
@@ -166,7 +167,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               className="group card overflow-hidden p-6 transition hover:-translate-y-1 hover:shadow-lg"
               style={{ borderColor: w.accent ?? undefined }}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl text-2xl" style={{ background: (w.accent ?? "#7C4DFF") + "22" }}>{w.emoji}</div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl text-2xl" style={{ background: (w.accent ?? "#7C4DFF") + "22" }}><Emoji emoji={w.emoji} label={tName(w, locale)} /></div>
               <h3 className="mt-4 font-display text-xl font-bold">{tName(w, locale)}</h3>
               <p className="mt-1 text-sm text-ink-soft">{tDesc(w, locale)}</p>
               <span className="mt-3 inline-block text-sm font-semibold" style={{ color: w.accent ?? "#7C4DFF" }}>{dict.home.explore} →</span>
