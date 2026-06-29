@@ -176,6 +176,38 @@ Reply ONLY as a JSON array of exactly ${b.motifs.length} strings, in the same or
     }
   }
 
+  // Kategorie-Beschreibung (DE+EN), einmal pro Kategorie via Claude, gecacht.
+  const catDescCache = new Map<string, { de: string; en: string }>();
+  async function genCategoryDesc(b: Book): Promise<{ de: string; en: string }> {
+    const hit = catDescCache.get(b.catSlug);
+    if (hit) return hit;
+    const fb = {
+      de: `${b.catName}: liebevoll gezeichnete Ausmal-Motive als druckfertiges A4-PDF zum Sofort-Download.`,
+      en: `${b.catNameEn}: lovingly drawn coloring pages as a print-ready A4 PDF for instant download.`,
+    };
+    let out = fb;
+    if (anthropic) {
+      try {
+        const aud = b.audience === "kids" ? "Kinder" : b.audience === "all" ? "Familie/alle" : "Erwachsene";
+        const res = await anthropic.messages.create({
+          model: "claude-sonnet-4-6", max_tokens: 300,
+          messages: [{ role: "user", content: `Kurzbeschreibung einer Malbuch-KATEGORIE im Shop "Coloreo".
+Kategorie: "${b.catName}" · Zielgruppe: ${aud}
+Beispiel-Motive: ${b.motifs.slice(0, 6).join(", ")}
+Schreibe je EINEN knackigen, verkaufsstarken Satz DE und EN, der das Thema der Kategorie beschreibt (EN keine wörtliche Übersetzung, max ~18 Wörter, Tonfall passend zur Zielgruppe).
+Antworte NUR als JSON: {"de":"...","en":"..."}` }],
+        });
+        const txt = res.content.filter((c) => c.type === "text").map((c) => (c as { text: string }).text).join("");
+        const j = JSON.parse(txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1));
+        out = { de: (j.de || fb.de).trim(), en: (j.en || fb.en).trim() };
+      } catch (e) {
+        console.warn("  ⚠ Kategorie-Beschreibung (Fallback):", e instanceof Error ? e.message : e);
+      }
+    }
+    catDescCache.set(b.catSlug, out);
+    return out;
+  }
+
   const books = parseConcept(readFileSync(join(root, "MALBUCH-KONZEPT.md"), "utf8"));
   const argSlugs = process.argv.slice(2).filter((a) => !a.startsWith("--"));
   const COVERS_ONLY = process.argv.includes("--covers-only"); // nur Cover neu (text-frei), Seiten/DB unangetastet
@@ -214,8 +246,9 @@ Reply ONLY as a JSON array of exactly ${b.motifs.length} strings, in the same or
     // Kategorie sicherstellen
     const wId = worldId.get(CAT_WORLD[b.catSlug] ?? "") ?? null;
     if (!wId) console.warn(`  ⚠ Keine Welt für Kategorie ${b.catSlug} (world_id bleibt null)`);
+    const catDesc = await genCategoryDesc(b);
     const { data: cat } = await sb.from("categories")
-      .upsert({ slug: b.catSlug, name_de: b.catName, name_en: b.catNameEn, emoji: CAT_EMOJI[b.catSlug] ?? "🎨", audience: b.audience, is_active: true, world_id: wId }, { onConflict: "slug" })
+      .upsert({ slug: b.catSlug, name_de: b.catName, name_en: b.catNameEn, description_de: catDesc.de, description_en: catDesc.en, emoji: CAT_EMOJI[b.catSlug] ?? "🎨", audience: b.audience, is_active: true, world_id: wId }, { onConflict: "slug" })
       .select("id").single();
 
     // Beschreibungen (DE+EN) via Claude
