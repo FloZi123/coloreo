@@ -30,7 +30,7 @@ const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: st
       html: `<p>Diese Datenschutzerklärung klärt über Art, Umfang und Zweck der Verarbeitung personenbezogener Daten beim Besuch und bei der Nutzung von coloreo.shop gemäß der Datenschutz-Grundverordnung (DSGVO) auf.</p>
 
 <h3>1. Verantwortlicher</h3>
-<p>FZ-Capital GmbH<br/>${PH}<br/>Geschäftsführer: ${PH}<br/>E-Mail: hallo@coloreo.shop</p>
+<p>Florian Zinkl<br/>${PH}<br/>E-Mail: hallo@coloreo.shop</p>
 
 <h3>2. Verarbeitete Daten, Zwecke und Rechtsgrundlagen</h3>
 <p><strong>a) Kauf &amp; Bereitstellung der Malbücher.</strong> Beim Kauf verarbeiten wir Ihre E-Mail-Adresse, Bestelldaten (gekaufte Produkte, Bestellnummer, Betrag) sowie die über unseren Zahlungsdienstleister abgewickelten Zahlungsdaten. Zweck: Vertragsabwicklung, Bereitstellung des Download-Links und Versand der Kaufbestätigung. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung), für die steuerliche Aufbewahrung Art. 6 Abs. 1 lit. c DSGVO.</p>
@@ -66,7 +66,7 @@ const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: st
       html: `<p>This privacy policy explains the nature, scope and purpose of the processing of personal data when visiting and using coloreo.shop in accordance with the General Data Protection Regulation (GDPR).</p>
 
 <h3>1. Controller</h3>
-<p>FZ-Capital GmbH<br/>${PH}<br/>Managing Director: ${PH}<br/>Email: hallo@coloreo.shop</p>
+<p>Florian Zinkl<br/>${PH}<br/>Email: hallo@coloreo.shop</p>
 
 <h3>2. Data processed, purposes and legal bases</h3>
 <p><strong>a) Purchase &amp; delivery.</strong> On purchase we process your email address, order data (products, order number, amount) and payment data handled by our payment provider. Purpose: contract performance, provision of the download link, order confirmation. Legal basis: Art. 6(1)(b) GDPR; for tax retention Art. 6(1)(c) GDPR.</p>
@@ -101,13 +101,13 @@ const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: st
     de: {
       title: "Allgemeine Geschäftsbedingungen",
       html: `<h3>§ 1 Geltungsbereich &amp; Anbieter</h3>
-<p>Diese Allgemeinen Geschäftsbedingungen gelten für alle Verträge über den Kauf digitaler Malbücher (PDF-Dateien) über coloreo.shop zwischen der FZ-Capital GmbH (nachfolgend „Anbieter") und Ihnen als Kunde. Anschrift und Vertretung siehe Impressum.</p>
+<p>Diese Allgemeinen Geschäftsbedingungen gelten für alle Verträge über den Kauf digitaler Malbücher (PDF-Dateien) über coloreo.shop zwischen Florian Zinkl (nachfolgend „Anbieter") und Ihnen als Kunde. Anschrift und Anbieterkennzeichnung siehe Impressum.</p>
 
 <h3>§ 2 Vertragsschluss</h3>
 <p>Die Darstellung der Produkte im Shop stellt kein bindendes Angebot dar. Durch Anklicken des Bezahl-Buttons im Bestellabschluss geben Sie ein verbindliches Angebot zum Kauf der im Warenkorb enthaltenen digitalen Produkte ab. Der Vertrag kommt mit der Bestätigung der Bestellung bzw. der Bereitstellung des Downloads zustande. Der Kauf ist als Gast oder mit Kundenkonto möglich.</p>
 
 <h3>§ 3 Preise &amp; Zahlung</h3>
-<p>Es gelten die zum Zeitpunkt der Bestellung im Shop angegebenen Preise. Alle Preise verstehen sich in Euro inklusive der gesetzlichen Umsatzsteuer. Mengenrabatte und Bundle-Preise werden vor Abschluss transparent im Warenkorb angezeigt. Die Zahlung erfolgt über den Dienstleister Stripe per Kreditkarte oder PayPal. Mit Abschluss der Zahlung wird der Kaufbetrag fällig.</p>
+<p>Es gelten die zum Zeitpunkt der Bestellung im Shop angegebenen Preise in Euro. Als Kleinunternehmer im Sinne des § 19 UStG erheben wir keine Umsatzsteuer und weisen diese daher nicht aus. Mengenrabatte und Bundle-Preise werden vor Abschluss transparent im Warenkorb angezeigt. Die Zahlung erfolgt über den Dienstleister Stripe per Kreditkarte oder PayPal. Mit Abschluss der Zahlung wird der Kaufbetrag fällig.</p>
 
 <h3>§ 4 Lieferung digitaler Inhalte</h3>
 <p>Die Lieferung erfolgt ausschließlich digital. Unmittelbar nach erfolgreichem Zahlungseingang erhalten Sie einen Download-Link – angezeigt im Shop und per E-Mail – sowie, bei bestehendem Konto, Zugriff über „Meine Bibliothek". Download-Links sind aus Sicherheitsgründen signiert und zeitlich befristet; bei Bedarf kann ein neuer Link angefordert werden. Es entstehen keine Versandkosten.</p>
@@ -136,13 +136,13 @@ const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: st
     en: {
       title: "Terms & Conditions",
       html: `<h3>§ 1 Scope &amp; provider</h3>
-<p>These terms apply to all contracts for the purchase of digital coloring books (PDF files) via coloreo.shop between FZ-Capital GmbH ("provider") and you as the customer. Address and representation: see Imprint.</p>
+<p>These terms apply to all contracts for the purchase of digital coloring books (PDF files) via coloreo.shop between Florian Zinkl ("provider") and you as the customer. Address and provider details: see Imprint.</p>
 
 <h3>§ 2 Conclusion of contract</h3>
 <p>The presentation of products is not a binding offer. By clicking the payment button at checkout you submit a binding offer to purchase the digital products in your cart. The contract is concluded upon order confirmation or provision of the download. Purchase is possible as a guest or with an account.</p>
 
 <h3>§ 3 Prices &amp; payment</h3>
-<p>The prices stated in the shop at the time of order apply, in Euro including statutory VAT. Quantity discounts and bundle prices are shown transparently in the cart before checkout. Payment is processed via Stripe by credit card or PayPal.</p>
+<p>The prices stated in the shop at the time of order apply, in Euro. As a small business under § 19 of the German VAT Act (UStG) we do not charge VAT and therefore do not show it. Quantity discounts and bundle prices are shown transparently in the cart before checkout. Payment is processed via Stripe by credit card or PayPal.</p>
 
 <h3>§ 4 Delivery of digital content</h3>
 <p>Delivery is exclusively digital. Immediately after successful payment you receive a download link – shown in the shop and by email – and, with an account, access via "My Library". Download links are signed and time-limited for security; a new link can be requested. No shipping costs apply.</p>
@@ -174,7 +174,7 @@ const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: st
       title: "Widerrufsbelehrung",
       html: `<h3>Widerrufsrecht</h3>
 <p>Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsschlusses.</p>
-<p>Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (FZ-Capital GmbH, Anschrift siehe Impressum, E-Mail: hallo@coloreo.shop) mittels einer eindeutigen Erklärung (z. B. per E-Mail) über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das unten stehende Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist. Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung vor Ablauf der Frist absenden.</p>
+<p>Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (Florian Zinkl, Anschrift siehe Impressum, E-Mail: hallo@coloreo.shop) mittels einer eindeutigen Erklärung (z. B. per E-Mail) über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das unten stehende Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist. Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung vor Ablauf der Frist absenden.</p>
 
 <h3>Folgen des Widerrufs</h3>
 <p>Wenn Sie diesen Vertrag widerrufen, haben wir Ihnen alle Zahlungen, die wir von Ihnen erhalten haben, unverzüglich und spätestens binnen vierzehn Tagen ab Eingang Ihrer Widerrufsmitteilung zurückzuzahlen. Für die Rückzahlung verwenden wir dasselbe Zahlungsmittel, das Sie bei der ursprünglichen Transaktion eingesetzt haben; Entgelte entstehen Ihnen dadurch nicht.</p>
@@ -187,7 +187,7 @@ const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: st
 
 <h3>Muster-Widerrufsformular</h3>
 <p>(Wenn Sie den Vertrag widerrufen wollen, füllen Sie bitte dieses Formular aus und senden es zurück.)</p>
-<p>— An: FZ-Capital GmbH, ${PH}, E-Mail: hallo@coloreo.shop<br/>
+<p>— An: Florian Zinkl, ${PH}, E-Mail: hallo@coloreo.shop<br/>
 — Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über den Kauf der folgenden digitalen Inhalte:<br/>
 — Bestellt am (*) / Bestellnummer:<br/>
 — Name des/der Verbraucher(s):<br/>
@@ -199,7 +199,7 @@ const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: st
       title: "Right of Withdrawal",
       html: `<h3>Right of withdrawal</h3>
 <p>You have the right to withdraw from this contract within fourteen days without giving any reason. The withdrawal period is fourteen days from the day of conclusion of the contract.</p>
-<p>To exercise your right of withdrawal, you must inform us (FZ-Capital GmbH, address see Imprint, email: hallo@coloreo.shop) of your decision to withdraw by a clear statement (e.g. by email). You may use the model withdrawal form below, but it is not mandatory. To meet the deadline it is sufficient to send your notification before the period expires.</p>
+<p>To exercise your right of withdrawal, you must inform us (Florian Zinkl, address see Imprint, email: hallo@coloreo.shop) of your decision to withdraw by a clear statement (e.g. by email). You may use the model withdrawal form below, but it is not mandatory. To meet the deadline it is sufficient to send your notification before the period expires.</p>
 
 <h3>Consequences of withdrawal</h3>
 <p>If you withdraw from this contract, we will reimburse all payments received from you without undue delay and at the latest within fourteen days of receiving your notification. We will use the same means of payment you used for the original transaction; you will not incur any fees.</p>
@@ -209,7 +209,7 @@ const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: st
 
 <h3>Model withdrawal form</h3>
 <p>(Complete and return this form only if you wish to withdraw from the contract.)</p>
-<p>— To: FZ-Capital GmbH, ${PH}, email: hallo@coloreo.shop<br/>
+<p>— To: Florian Zinkl, ${PH}, email: hallo@coloreo.shop<br/>
 — I/we (*) hereby withdraw from the contract for the purchase of the following digital content:<br/>
 — Ordered on (*) / order number:<br/>
 — Name of consumer(s):<br/>
@@ -223,13 +223,13 @@ const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: st
       title: "Kontakt",
       html: `<p>Du erreichst uns jederzeit per E-Mail unter <a href="mailto:hallo@coloreo.shop">hallo@coloreo.shop</a>. Wir kümmern uns schnellstmöglich um dein Anliegen – egal ob Bestellung, Download oder Produktfrage.</p>
 <p>Für sofortige Hilfe nutze gern den Chat-Assistenten unten rechts: Er unterstützt dich rund um die Uhr bei Fragen zu Bestellungen, Downloads, Formaten, Drucken, Zahlung und Widerruf.</p>
-<p>Anbieter: FZ-Capital GmbH – vollständige Anbieterkennzeichnung siehe <a href="/impressum">Impressum</a>.</p>`,
+<p>Anbieter: Florian Zinkl – vollständige Anbieterkennzeichnung siehe <a href="/impressum">Impressum</a>.</p>`,
     },
     en: {
       title: "Contact",
       html: `<p>Reach us anytime by email at <a href="mailto:hallo@coloreo.shop">hallo@coloreo.shop</a>. We will take care of your request as quickly as possible – whether it concerns an order, a download or a product question.</p>
 <p>For instant help, use the chat assistant in the bottom right: available around the clock for orders, downloads, formats, printing, payment and withdrawal.</p>
-<p>Provider: FZ-Capital GmbH – full provider details in the <a href="/impressum">Imprint</a>.</p>`,
+<p>Provider: Florian Zinkl – full provider details in the <a href="/impressum">Imprint</a>.</p>`,
     },
   },
 };
