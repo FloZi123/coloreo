@@ -73,7 +73,21 @@ export async function sendTestEmail(to: string): Promise<void> {
   await send(to, "Coloreo SMTP-Test", html);
 }
 
-async function send(to: string, subject: string, html: string): Promise<void> {
+/** Grobe HTML→Text-Umwandlung für den Plain-Text-Teil (verbessert die Zustellbarkeit). */
+function htmlToText(html: string): string {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<a [^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/gi, "$2 ($1)")
+    .replace(/<\/(p|div|h\d|li|tr)>/gi, "\n")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+async function send(to: string, subject: string, html: string, extraHeaders?: Record<string, string>): Promise<void> {
   const cfg = smtpConfig();
   if (!cfg) {
     // In Produktion ist fehlendes SMTP ein echter Konfigurationsfehler → als error loggen (sichtbar in Vercel-Logs)
@@ -87,7 +101,7 @@ async function send(to: string, subject: string, html: string): Promise<void> {
     secure: cfg.secure,
     auth: { user: cfg.user, pass: cfg.pass },
   });
-  await transporter.sendMail({ from: cfg.from, to, subject, html });
+  await transporter.sendMail({ from: cfg.from, to, subject, html, text: htmlToText(html), headers: extraHeaders });
   console.log(`[email] ✓ gesendet (SMTP ${cfg.host}): ${subject} → ${to}`);
 }
 
@@ -175,10 +189,16 @@ export async function sendFreebieEmail(opts: { email: string; locale: Locale; do
 }
 
 // ── Lifecycle-Flows (Modul C) ──────────────────────────────────────────────
+function unsubUrl(email: string): string {
+  return `${SITE}/api/newsletter/unsubscribe?e=${encodeURIComponent(email)}&t=${unsubToken(email)}`;
+}
+/** RFC 8058: List-Unsubscribe(-Post) verbessert die Bulk-Zustellbarkeit (Gmail/Outlook). */
+function unsubHeaders(email: string): Record<string, string> {
+  return { "List-Unsubscribe": `<${unsubUrl(email)}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" };
+}
 function marketingLayout(title: string, inner: string, email: string, locale: string): string {
-  const unsub = `${SITE}/api/newsletter/unsubscribe?e=${encodeURIComponent(email)}&t=${unsubToken(email)}`;
   const label = locale === "de" ? "Vom Newsletter abmelden" : "Unsubscribe";
-  return layout(title, inner + `<p style="text-align:center;color:#b8b1a6;font-size:11px;margin-top:18px"><a href="${unsub}" style="color:#b8b1a6">${label}</a></p>`);
+  return layout(title, inner + `<p style="text-align:center;color:#b8b1a6;font-size:11px;margin-top:18px"><a href="${unsubUrl(email)}" style="color:#b8b1a6">${label}</a></p>`);
 }
 
 interface MkMsg {
@@ -206,19 +226,19 @@ const btn = (href: string, label: string) => `<p style="margin-top:18px"><a href
 
 export async function sendAbandonedCart(o: { email: string; locale: string }): Promise<void> {
   const t = mk(o.locale);
-  await send(o.email, t.cartSubj, marketingLayout(t.cartTitle, `<p>${t.cartBody}</p>${btn(`${SITE}/${o.locale}/warenkorb`, t.cartCta)}`, o.email, o.locale));
+  await send(o.email, t.cartSubj, marketingLayout(t.cartTitle, `<p>${t.cartBody}</p>${btn(`${SITE}/${o.locale}/warenkorb`, t.cartCta)}`, o.email, o.locale), unsubHeaders(o.email));
 }
 export async function sendCrossSell(o: { email: string; locale: string }): Promise<void> {
   const t = mk(o.locale);
-  await send(o.email, t.crossSubj, marketingLayout(t.crossTitle, `<p>${t.crossBody}</p>${btn(`${SITE}/${o.locale}/bundles`, t.crossCta)}`, o.email, o.locale));
+  await send(o.email, t.crossSubj, marketingLayout(t.crossTitle, `<p>${t.crossBody}</p>${btn(`${SITE}/${o.locale}/bundles`, t.crossCta)}`, o.email, o.locale), unsubHeaders(o.email));
 }
 export async function sendReviewRequest(o: { email: string; locale: string; books: { title: string; url: string }[] }): Promise<void> {
   const t = mk(o.locale);
   const list = o.books.map((b) => `<li style="margin:6px 0"><a href="${b.url}" style="color:#FF5A4D;font-weight:bold">${b.title}</a></li>`).join("");
-  await send(o.email, t.revSubj, marketingLayout(t.revTitle, `<p>${t.revBody}</p><ul>${list}</ul>`, o.email, o.locale));
+  await send(o.email, t.revSubj, marketingLayout(t.revTitle, `<p>${t.revBody}</p><ul>${list}</ul>`, o.email, o.locale), unsubHeaders(o.email));
 }
 export async function sendWinBack(o: { email: string; locale: string; coupon?: string }): Promise<void> {
   const t = mk(o.locale);
   const coupon = o.coupon ? `<p>${t.winCoupon(o.coupon)}</p>` : "";
-  await send(o.email, t.winSubj, marketingLayout(t.winTitle, `<p>${t.winBody}</p>${coupon}${btn(`${SITE}/${o.locale}/welten`, t.winCta)}`, o.email, o.locale));
+  await send(o.email, t.winSubj, marketingLayout(t.winTitle, `<p>${t.winBody}</p>${coupon}${btn(`${SITE}/${o.locale}/welten`, t.winCta)}`, o.email, o.locale), unsubHeaders(o.email));
 }
