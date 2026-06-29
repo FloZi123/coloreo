@@ -2,26 +2,25 @@ import type { Locale } from "@/i18n/config";
 
 type LegalKey = "impressum" | "datenschutz" | "agb" | "widerruf" | "kontakt";
 
-const PH = "【 PLATZHALTER – vor Go-Live durch echte Angaben ersetzen 】";
-
 const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: string }>>> = {
   impressum: {
     de: {
       title: "Impressum",
-      html: `<p>Angaben gemäß § 5 TMG:</p>
-<p>${PH}<br/>Firmenname / Inhaber<br/>Straße &amp; Hausnummer<br/>PLZ Ort, Deutschland</p>
-<p><strong>Vertreten durch:</strong> ${PH}</p>
-<p><strong>Kontakt:</strong><br/>E-Mail: ${PH}<br/>Telefon: ${PH}</p>
-<p><strong>Umsatzsteuer-ID:</strong> ${PH}</p>
-<p><strong>Verantwortlich i.S.d. § 18 Abs. 2 MStV:</strong> ${PH}</p>
-<p>Plattform der EU-Kommission zur Online-Streitbeilegung: https://ec.europa.eu/consumers/odr</p>`,
+      html: `<p>Angaben gemäß § 5 DDG:</p>
+<p>Florian Zinkl<br/>Niesaß 2<br/>92526 Oberviechtach<br/>Deutschland</p>
+<p><strong>Kontakt:</strong><br/>E-Mail: hallo@coloreo.shop</p>
+<p><strong>Umsatzsteuer:</strong> Als Kleinunternehmer im Sinne des § 19 UStG wird keine Umsatzsteuer berechnet und ausgewiesen.</p>
+<p><strong>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</strong> Florian Zinkl, Anschrift wie oben.</p>
+<p>Plattform der EU-Kommission zur Online-Streitbeilegung: https://ec.europa.eu/consumers/odr<br/>Wir sind nicht verpflichtet und nicht bereit, an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>`,
     },
     en: {
       title: "Imprint",
-      html: `<p>Information pursuant to § 5 TMG (German Telemedia Act):</p>
-<p>${PH}<br/>Company / Owner<br/>Street &amp; No.<br/>Postal code, City, Germany</p>
-<p><strong>Contact:</strong> Email: ${PH} · Phone: ${PH}</p>
-<p><strong>VAT ID:</strong> ${PH}</p>`,
+      html: `<p>Information pursuant to § 5 DDG (German Digital Services Act):</p>
+<p>Florian Zinkl<br/>Niesaß 2<br/>92526 Oberviechtach<br/>Germany</p>
+<p><strong>Contact:</strong><br/>Email: hallo@coloreo.shop</p>
+<p><strong>VAT:</strong> As a small business under § 19 of the German VAT Act (UStG), no VAT is charged or shown.</p>
+<p><strong>Responsible for content pursuant to § 18 (2) MStV:</strong> Florian Zinkl, address as above.</p>
+<p>EU online dispute resolution platform: https://ec.europa.eu/consumers/odr. We are not obliged or willing to participate in dispute resolution proceedings before a consumer arbitration board.</p>`,
     },
   },
   datenschutz: {
@@ -30,7 +29,7 @@ const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: st
       html: `<p>Diese Datenschutzerklärung klärt über Art, Umfang und Zweck der Verarbeitung personenbezogener Daten beim Besuch und bei der Nutzung von coloreo.shop gemäß der Datenschutz-Grundverordnung (DSGVO) auf.</p>
 
 <h3>1. Verantwortlicher</h3>
-<p>Florian Zinkl<br/>${PH}<br/>E-Mail: hallo@coloreo.shop</p>
+<p>Florian Zinkl<br/>Niesaß 2<br/>92526 Oberviechtach<br/>E-Mail: hallo@coloreo.shop</p>
 
 <h3>2. Verarbeitete Daten, Zwecke und Rechtsgrundlagen</h3>
 <p><strong>a) Kauf &amp; Bereitstellung der Malbücher.</strong> Beim Kauf verarbeiten wir Ihre E-Mail-Adresse, Bestelldaten (gekaufte Produkte, Bestellnummer, Betrag) sowie die über unseren Zahlungsdienstleister abgewickelten Zahlungsdaten. Zweck: Vertragsabwicklung, Bereitstellung des Download-Links und Versand der Kaufbestätigung. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung), für die steuerliche Aufbewahrung Art. 6 Abs. 1 lit. c DSGVO.</p>
@@ -66,7 +65,7 @@ const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: st
       html: `<p>This privacy policy explains the nature, scope and purpose of the processing of personal data when visiting and using coloreo.shop in accordance with the General Data Protection Regulation (GDPR).</p>
 
 <h3>1. Controller</h3>
-<p>Florian Zinkl<br/>${PH}<br/>Email: hallo@coloreo.shop</p>
+<p>Florian Zinkl<br/>Niesaß 2<br/>92526 Oberviechtach<br/>Email: hallo@coloreo.shop</p>
 
 <h3>2. Data processed, purposes and legal bases</h3>
 <p><strong>a) Purchase &amp; delivery.</strong> On purchase we process your email address, order data (products, order number, amount) and payment data handled by our payment provider. Purpose: contract performance, provision of the download link, order confirmation. Legal basis: Art. 6(1)(b) GDPR; for tax retention Art. 6(1)(c) GDPR.</p>
@@ -187,7 +186,7 @@ const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: st
 
 <h3>Muster-Widerrufsformular</h3>
 <p>(Wenn Sie den Vertrag widerrufen wollen, füllen Sie bitte dieses Formular aus und senden es zurück.)</p>
-<p>— An: Florian Zinkl, ${PH}, E-Mail: hallo@coloreo.shop<br/>
+<p>— An: Florian Zinkl, Niesaß 2, 92526 Oberviechtach, E-Mail: hallo@coloreo.shop<br/>
 — Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über den Kauf der folgenden digitalen Inhalte:<br/>
 — Bestellt am (*) / Bestellnummer:<br/>
 — Name des/der Verbraucher(s):<br/>
@@ -209,7 +208,7 @@ const content: Record<LegalKey, Partial<Record<Locale, { title: string; html: st
 
 <h3>Model withdrawal form</h3>
 <p>(Complete and return this form only if you wish to withdraw from the contract.)</p>
-<p>— To: Florian Zinkl, ${PH}, email: hallo@coloreo.shop<br/>
+<p>— To: Florian Zinkl, Niesaß 2, 92526 Oberviechtach, email: hallo@coloreo.shop<br/>
 — I/we (*) hereby withdraw from the contract for the purchase of the following digital content:<br/>
 — Ordered on (*) / order number:<br/>
 — Name of consumer(s):<br/>
