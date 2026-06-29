@@ -16,10 +16,69 @@ function smtpConfig() {
   return { host, port, user, pass, from, secure: port === 465 };
 }
 
+/** Kompakter, geheimnisfreier Status der SMTP-Variablen (fürs Logging). */
+function smtpStatus(): string {
+  const flag = (v?: string) => (!v ? "FEHLT" : v.includes("PLACEHOLDER") ? "PLACEHOLDER" : "ok");
+  return `HOST=${flag(process.env.SMTP_HOST)} USER=${flag(process.env.SMTP_USER)} PASS=${flag(process.env.SMTP_PASS)} PORT=${process.env.SMTP_PORT ?? "(587)"} FROM=${flag(process.env.SMTP_FROM || process.env.EMAIL_FROM)}`;
+}
+
+/** Diagnose für den Admin-Endpoint: welche Variablen sind gesetzt (maskiert), ist SMTP nutzbar. */
+export function smtpDiagnostics() {
+  const mask = (v?: string) => {
+    if (!v) return "FEHLT";
+    if (v.includes("PLACEHOLDER")) return "PLACEHOLDER (Standardwert – nicht ersetzt)";
+    return v.length <= 4 ? "•••" : `${v.slice(0, 2)}…${v.slice(-2)} (${v.length} Zeichen)`;
+  };
+  const cfg = smtpConfig();
+  return {
+    configured: !!cfg,
+    site: SITE,
+    nodeEnv: process.env.NODE_ENV ?? "(unset)",
+    vars: {
+      SMTP_HOST: process.env.SMTP_HOST?.includes("PLACEHOLDER") ? "PLACEHOLDER" : (process.env.SMTP_HOST || "FEHLT"),
+      SMTP_PORT: process.env.SMTP_PORT ?? "(default 587)",
+      SMTP_USER: mask(process.env.SMTP_USER),
+      SMTP_PASS: mask(process.env.SMTP_PASS),
+      SMTP_FROM: process.env.SMTP_FROM || process.env.EMAIL_FROM || "FEHLT (fällt auf noreply@example.com zurück!)",
+      secure: cfg ? cfg.secure : "—",
+    },
+  };
+}
+
+/** Prüft die SMTP-Verbindung & Login (kein Versand). */
+export async function verifySmtp(): Promise<{ ok: boolean; error?: string }> {
+  const cfg = smtpConfig();
+  if (!cfg) return { ok: false, error: "SMTP nicht konfiguriert – Variablen fehlen oder enthalten PLACEHOLDER" };
+  const transporter = nodemailer.createTransport({
+    host: cfg.host,
+    port: cfg.port,
+    secure: cfg.secure,
+    auth: { user: cfg.user, pass: cfg.pass },
+  });
+  try {
+    await transporter.verify();
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? `${e.name}: ${e.message}` : String(e) };
+  }
+}
+
+/** Versendet eine Testmail an die angegebene Adresse (wirft bei Fehler). */
+export async function sendTestEmail(to: string): Promise<void> {
+  const html = layout(
+    "SMTP-Test ✅",
+    `<p>Diese Testmail bestätigt, dass der Coloreo-Mailversand funktioniert.</p>
+     <p style="color:#9a9388;font-size:13px">Absender: ${(smtpConfig()?.from) ?? "—"}</p>`,
+  );
+  await send(to, "Coloreo SMTP-Test", html);
+}
+
 async function send(to: string, subject: string, html: string): Promise<void> {
   const cfg = smtpConfig();
   if (!cfg) {
-    console.warn("[email] SMTP nicht konfiguriert – Mail übersprungen für", to);
+    // In Produktion ist fehlendes SMTP ein echter Konfigurationsfehler → als error loggen (sichtbar in Vercel-Logs)
+    const log = process.env.NODE_ENV === "production" ? console.error : console.warn;
+    log("[email] SMTP nicht konfiguriert – Mail übersprungen für", to, "·", smtpStatus());
     return;
   }
   const transporter = nodemailer.createTransport({
