@@ -188,6 +188,27 @@ export async function sendFreebieEmail(opts: { email: string; locale: Locale; do
   await send(opts.email, t.freebieSubject, html);
 }
 
+// ── Auth: Magic-Link (selbst versendet, mehrsprachig + gebrandet) ───────────
+const AUTH: Record<Locale, { title: string; intro: string; btn: string; note: string; subject: string }> = {
+  de: { title: "Dein Login-Link 🔑", intro: "Klicke auf den Button, um dich sicher in deine Bibliothek einzuloggen – kein Passwort nötig.", btn: "Jetzt anmelden", note: "Der Link ist 1 Stunde gültig und nur einmal nutzbar. Falls du das nicht angefordert hast, ignoriere diese E-Mail einfach.", subject: "Dein Coloreo Login-Link" },
+  en: { title: "Your login link 🔑", intro: "Click the button to securely sign in to your library – no password needed.", btn: "Sign in now", note: "This link is valid for 1 hour and can be used once. If you didn't request it, just ignore this email.", subject: "Your Coloreo login link" },
+  fr: { title: "Votre lien de connexion 🔑", intro: "Cliquez sur le bouton pour vous connecter en toute sécurité à votre bibliothèque – sans mot de passe.", btn: "Se connecter", note: "Ce lien est valable 1 heure et utilisable une seule fois. Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.", subject: "Votre lien de connexion Coloreo" },
+  es: { title: "Tu enlace de acceso 🔑", intro: "Haz clic en el botón para acceder de forma segura a tu biblioteca, sin contraseña.", btn: "Iniciar sesión", note: "Este enlace es válido durante 1 hora y se puede usar una sola vez. Si no lo solicitaste, ignora este correo.", subject: "Tu enlace de acceso a Coloreo" },
+  it: { title: "Il tuo link di accesso 🔑", intro: "Clicca sul pulsante per accedere in sicurezza alla tua libreria, senza password.", btn: "Accedi ora", note: "Questo link è valido per 1 ora e utilizzabile una sola volta. Se non l'hai richiesto, ignora questa email.", subject: "Il tuo link di accesso Coloreo" },
+  nl: { title: "Je inloglink 🔑", intro: "Klik op de knop om veilig in te loggen op je bibliotheek – geen wachtwoord nodig.", btn: "Nu inloggen", note: "Deze link is 1 uur geldig en eenmalig te gebruiken. Heb je dit niet aangevraagd, negeer dan deze e-mail.", subject: "Je Coloreo-inloglink" },
+};
+
+export async function sendMagicLink(opts: { email: string; locale: Locale; url: string }): Promise<void> {
+  const t = AUTH[opts.locale] ?? AUTH.en;
+  const html = layout(
+    t.title,
+    `<p>${t.intro}</p>
+     <p><a href="${opts.url}" style="${BTN}">${t.btn}</a></p>
+     <p style="color:#9a9388;font-size:13px">${t.note}</p>`,
+  );
+  await send(opts.email, t.subject, html);
+}
+
 // ── Lifecycle-Flows (Modul C) ──────────────────────────────────────────────
 function unsubUrl(email: string): string {
   return `${SITE}/api/newsletter/unsubscribe?e=${encodeURIComponent(email)}&t=${unsubToken(email)}`;

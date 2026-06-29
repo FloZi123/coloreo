@@ -1,7 +1,6 @@
 "use client";
 
 import { use, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = use(params);
@@ -16,14 +15,22 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
     if (!email.includes("@")) return;
     setLoading(true);
     setError("");
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/${locale}/bibliothek` },
+    // Magic-Link wird serverseitig erzeugt und über unsere gebrandete,
+    // lokalisierte E-Mail versendet (statt Supabase-Default-Template).
+    const res = await fetch("/api/auth/magic-link", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, locale }),
     });
+    const json = await res.json().catch(() => ({}));
     setLoading(false);
-    if (error) setError(error.message);
-    else setSent(true);
+    if (!res.ok || !json.ok) {
+      setError(
+        json.error === "rate_limited"
+          ? de ? "Zu viele Versuche – bitte in ein paar Minuten erneut." : "Too many attempts – please try again in a few minutes."
+          : de ? "Etwas ist schiefgelaufen. Bitte später erneut versuchen." : "Something went wrong. Please try again later.",
+      );
+    } else setSent(true);
   }
 
   return (
