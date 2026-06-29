@@ -9,6 +9,8 @@ import TrustBadges from "@/components/TrustBadges";
 import DownloadCounter from "@/components/DownloadCounter";
 import { Emoji } from "@/components/Emoji";
 
+export const revalidate = 600; // ISR: Katalog-Änderungen erscheinen ohne Redeploy (alle 10 Min)
+
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : "de";

@@ -4,6 +4,8 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { getWorlds, tName, tDesc } from "@/lib/data";
 import { Emoji } from "@/components/Emoji";
 
+export const revalidate = 600; // ISR: Katalog-Änderungen erscheinen ohne Redeploy (alle 10 Min)
+
 export default async function WorldsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : "de";

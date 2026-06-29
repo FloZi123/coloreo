@@ -23,9 +23,29 @@ interface Book {
 }
 
 const CAT_EMOJI: Record<string, string> = {
+  // A* (Erwachsene)
   "mandala-meditation": "🌀", "botanischer-garten": "🌿", "cottagecore": "🏡",
-  "dark-academia": "📚", "niedliche-tiere": "🐻", "unterwasserwelt": "🌊",
-  "dino-welt": "🦕",
+  "dark-academia": "📚", "mond-mystik": "🌙", "sternzeichen-kosmos": "🌌",
+  "japan-zen": "⛩️", "gothic-skulls": "💀", "achtsamkeit-affirmationen": "🧘",
+  "vintage-steampunk": "⚙️", "unterwasserwelt": "🌊", "schmetterlinge-libellen": "🦋",
+  // K* (Kinder/Familie)
+  "niedliche-tiere": "🐻", "gemuetliche-freunde": "🧸", "dino-welt": "🦕",
+  "fahrzeuge-maschinen": "🚗", "weltraum-planeten": "🚀", "einhoerner-regenbogen": "🦄",
+  "zauberwald-feen": "🧚", "meerjungfrauen": "🧜", "bauernhof": "🐄",
+  "kawaii-food": "🍰", "dschungel-safari": "🦁", "jahreszeiten-feste": "🍂",
+};
+
+// Kategorie → Welt (slug). A* in thematische Welten, K* in die Kinderwelt.
+const CAT_WORLD: Record<string, string> = {
+  "mandala-meditation": "anti-stress", "japan-zen": "anti-stress", "achtsamkeit-affirmationen": "anti-stress",
+  "botanischer-garten": "natur-botanik", "cottagecore": "natur-botanik",
+  "dark-academia": "vintage-lifestyle", "vintage-steampunk": "vintage-lifestyle",
+  "mond-mystik": "fantasy-kosmos", "sternzeichen-kosmos": "fantasy-kosmos", "gothic-skulls": "fantasy-kosmos",
+  "unterwasserwelt": "tierwelt", "schmetterlinge-libellen": "tierwelt",
+  "niedliche-tiere": "kinderwelt", "gemuetliche-freunde": "kinderwelt", "dino-welt": "kinderwelt",
+  "fahrzeuge-maschinen": "kinderwelt", "weltraum-planeten": "kinderwelt", "einhoerner-regenbogen": "kinderwelt",
+  "zauberwald-feen": "kinderwelt", "meerjungfrauen": "kinderwelt", "bauernhof": "kinderwelt",
+  "kawaii-food": "kinderwelt", "dschungel-safari": "kinderwelt", "jahreszeiten-feste": "kinderwelt",
 };
 
 function parseConcept(md: string): Book[] {
@@ -99,6 +119,11 @@ async function main() {
   }
   const SUPA = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const sb = createClient(SUPA, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } });
+
+  // Welten-Map (slug → id) für die world_id-Zuordnung der Kategorien.
+  const { data: worldRows } = await sb.from("worlds").select("id, slug");
+  const worldId = new Map((worldRows ?? []).map((w) => [w.slug as string, w.id as string]));
+  const STATUS = process.env.DRAFT ? "draft" : "published"; // Auto-Publish (DRAFT=1 → als Entwurf)
   const anthropic = process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_API_KEY.includes("PLACEHOLDER")
     ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : null;
 
@@ -163,7 +188,11 @@ Reply ONLY as a JSON array of exactly ${b.motifs.length} strings, in the same or
   console.log(`Geparst: ${books.length} Bücher. Generiere ${targets.length}:`);
   for (const b of targets) {
     console.log(`  - ${b.slug} (${b.catName}, ${b.audience}, ${b.pages} S., ${b.motifs.length} Motive) "${b.titleDe}"`);
-    if (process.env.DRY) { console.log(`      Motiv1: ${b.motifs[0]} | hero: ${b.heroMotif} | desc: ${b.descDe.slice(0, 60)}…`); }
+    if (process.env.DRY) {
+      const ws = CAT_WORLD[b.catSlug];
+      console.log(`      Welt: ${ws ?? "(KEINE!)"} ${ws && worldId.get(ws) ? "✓" : "✗ id fehlt"} | emoji: ${CAT_EMOJI[b.catSlug] ?? "🎨(default)"} | status: ${STATUS}`);
+      console.log(`      Motiv1: ${b.motifs[0]} | hero: ${b.heroMotif} | desc: ${b.descDe.slice(0, 60)}…`);
+    }
   }
   if (process.env.DRY) { console.log("DRY-RUN — keine Generierung."); return; }
 
@@ -183,8 +212,10 @@ Reply ONLY as a JSON array of exactly ${b.motifs.length} strings, in the same or
     }
 
     // Kategorie sicherstellen
+    const wId = worldId.get(CAT_WORLD[b.catSlug] ?? "") ?? null;
+    if (!wId) console.warn(`  ⚠ Keine Welt für Kategorie ${b.catSlug} (world_id bleibt null)`);
     const { data: cat } = await sb.from("categories")
-      .upsert({ slug: b.catSlug, name_de: b.catName, name_en: b.catNameEn, emoji: CAT_EMOJI[b.catSlug] ?? "🎨", audience: b.audience, is_active: true }, { onConflict: "slug" })
+      .upsert({ slug: b.catSlug, name_de: b.catName, name_en: b.catNameEn, emoji: CAT_EMOJI[b.catSlug] ?? "🎨", audience: b.audience, is_active: true, world_id: wId }, { onConflict: "slug" })
       .select("id").single();
 
     // Beschreibungen (DE+EN) via Claude
@@ -225,9 +256,9 @@ Reply ONLY as a JSON array of exactly ${b.motifs.length} strings, in the same or
       i18n: { de: { title: b.titleDe, description: desc.de }, en: { title: b.titleEn, description: desc.en } },
       audience: b.audience, price_cents: b.priceCents, page_count: b.pages,
       cover_url: coverUrl, pdf_path: `${b.slug}.pdf`, preview_urls: previewUrls,
-      status: "draft", source: "ai_generated", tags: [b.catSlug, "konzept", "pdf"],
+      status: STATUS, source: "ai_generated", tags: [b.catSlug, "konzept", "pdf"],
     }, { onConflict: "slug" });
-    console.log("  ✓ in DB (draft)");
+    console.log(`  ✓ in DB (${STATUS})`);
     results.push({ slug: b.slug, cover: coverUrl });
   }
 
