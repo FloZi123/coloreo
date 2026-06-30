@@ -54,6 +54,36 @@ function parse(md: string): Book[] {
 // Abschluss-Muster (Erzählbogen-Ende) — wie in der Goal-Bedingung vorgegeben.
 const CLOSING = /sunset|back|home|nest|together|all the|end of the day|zurück|abend|sicher/i;
 
+// Echtes Finale (Seiten-QA): Abschlussbild, strenger als CLOSING.
+const FINALE = /sunset|together|back home|cozy evening|good ?night|gute nacht|zur[üu]ck|am abend/i;
+
+// Aktions-/Verb-Tokens (Pose) — Gerundien & Verben, die eine Tätigkeit/Pose ausdrücken.
+const VERBS = new Set([
+  "holding", "baking", "walking", "reading", "flying", "fishing", "gardening", "sleeping", "prancing",
+  "resting", "drinking", "leaping", "nuzzling", "galloping", "gazing", "trotting", "dancing", "splashing",
+  "peeking", "standing", "wading", "playing", "climbing", "swimming", "exploring", "floating", "chasing",
+  "discovering", "singing", "waking", "sipping", "watering", "stacking", "knitting", "watching", "picking",
+  "arranging", "brewing", "relaxing", "sharing", "lighting", "strolling", "building", "paddling", "napping",
+  "digging", "sailing", "waving", "finding", "fluttering", "gliding", "riding", "chatting", "collecting",
+  "hugging", "swinging", "painting", "serving", "pouring", "greeting", "frosting", "carrying", "writing",
+  "tidying", "blooming", "glowing", "swirling", "radiating", "drifting", "rising", "shining", "sparkling",
+  "flowing", "growing", "sprouting", "roaring", "hatching", "crossing", "jumping", "hopping", "running",
+  "soaring", "perching", "stretching", "rolling", "balancing", "blossoming", "twirling", "gathering",
+  "exploring", "munching", "splashing", "tumbling", "snoozing", "stargazing", "weaving", "casting",
+  "racing", "zooming", "driving", "lifting", "hauling", "orbiting", "hovering", "sledding",
+  "decorating", "smiling", "swaying", "marching", "parading", "snorkeling", "diving", "sniffing",
+]);
+
+// Schauplatz-/Verbinder-Tokens, die für den "Pose-Kern" entfernt werden (Hintergrund weg).
+const PLACE_STOP = new Set([
+  "the", "a", "an", "in", "on", "by", "near", "over", "under", "across", "along", "among", "beside",
+  "atop", "within", "at", "through", "deep", "of", "from", "behind", "out", "into", "to", "past",
+]);
+function poseCore(m: string): string {
+  return m.toLowerCase().replace(/[^a-zäöüß ]/g, " ").split(/\s+/)
+    .filter((w) => w && !PLACE_STOP.has(w) && !PLACES.includes(w)).join(" ").trim();
+}
+
 // Schauplatz-/Szenerie-Begriffe (Ort, an dem die Szene spielt).
 const PLACES = [
   "cave", "river", "jungle", "lake", "hill", "hilltop", "forest", "wood", "woods", "meadow",
@@ -110,6 +140,20 @@ function checkBook(b: Book): string[] {
   // 5) Flacher Titel
   if (isFlatTitle(b.titleDe)) errs.push(`Flacher Titel DE: "${b.titleDe}"`);
   if (isFlatTitle(b.titleEn)) errs.push(`Flacher Titel EN: "${b.titleEn}"`);
+  // 6) Posen-Vielfalt
+  if (n > 0) {
+    const cores = norm.map(poseCore);
+    const dupCore = cores.find((c, i) => c && cores.indexOf(c) !== i);
+    if (dupCore) errs.push(`Nahezu identische Pose (gleicher Kern ohne Hintergrund): "${dupCore}"`);
+    const verbs = new Set<string>();
+    for (const m of norm) for (const w of m.split(/[^a-zäöüß]+/)) if (VERBS.has(w)) verbs.add(w);
+    if (verbs.size / n < 0.6) errs.push(`Posen/Aktions-Vielfalt ${((verbs.size / n) * 100) | 0}% (<60%, ${verbs.size} Verben/${n})`);
+  }
+  // 7) Finale (echtes Abschlussbild)
+  if (n > 0) {
+    const last = norm[n - 1];
+    if (last === norm[0] || !FINALE.test(last)) errs.push(`Kein echtes Finale: "${b.motifs[n - 1]}"`);
+  }
   return errs;
 }
 

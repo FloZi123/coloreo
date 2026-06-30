@@ -7,7 +7,7 @@ import { hashSeed } from "./art";
 type Audience = "adult" | "kids" | "all";
 
 const LINEART =
-  "coloring book page, black and white line art, clean bold black outlines only, line art only, no shading, no grayscale, no gray, no stippling, no dots, no hatching, no texture or fill inside the shapes, every enclosed area is solid clean white to color in, the main subject is large and takes up most of the page, with background scenery behind and around it that fills the rest evenly, no empty center, the artwork bleeds off all four edges of the page, NO border, NO frame line, NO rectangular picture-frame around the page edges, ";
+  "coloring book page, black and white line art, clean bold black outlines only, uniform consistent line weight, even stroke thickness throughout, line art only, no shading, no grayscale, no gray, no stippling, no dots, no hatching, no texture or fill inside the shapes, every enclosed area is solid clean white to color in, the main subject is large and takes up most of the page, with background scenery behind and around it that fills the rest evenly, no empty center, the artwork bleeds off all four edges of the page, NO border, NO frame line, NO rectangular picture-frame around the page edges, ";
 
 function difficulty(audience: Audience): string {
   if (audience === "kids") return "simple and cute, thick bold clean outlines, large friendly shapes with big open areas to color, for young children, set in a playful scene with a few simple background elements (sun, clouds, plants, ground) so the page feels full but stays easy, ";

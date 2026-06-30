@@ -49,6 +49,25 @@ Cover-Guard (`coverMetrics`: Linien-Tinte/Kolorierung, bis 3 Versuche) bleibt zu
 
 ---
 
+## Seiten-QA-Regel
+
+**Verbindlicher Standard für die Motiv-Listen jedes Buchs** — geprüft maschinell durch
+`scripts/validate-stories.ts` (`PASS 72/72`), zusätzlich zu Story-/Varianz-Regel:
+
+1. **Posen-Vielfalt:** Keine zwei nahezu identischen Motive (gleicher Kern ohne Schauplatz/
+   Hintergrund = Verstoß) und **≥ 60 % unterschiedliche Aktions-/Verb-Tokens** über die Seiten
+   (jede Seite eine andere Tätigkeit/Pose — „gleiche Pose, nur anderer Hintergrund" fällt durch).
+2. **Finale:** Das letzte Motiv jedes Buchs ist ein echtes Abschlussbild (Muster
+   `sunset | … together | back home | cozy evening | goodnight | gute nacht | zurück | am abend`)
+   und unterscheidet sich vom ersten Motiv.
+
+Zentrale Linien-Vereinheitlichung: Der Seiten-Linienkunst-Prompt (`LINEART` in
+`src/lib/generator/thematic.ts`) enthält „uniform consistent line weight, even stroke thickness
+throughout"; die Binarisierungs-Schwelle (`sharp.threshold(160)`) ist für alle Bücher identisch,
+damit Strichstärke und Kontrast seitenübergreifend konsistent sind.
+
+---
+
 ## 0. Wie dieses Dokument zu lesen ist
 
 Dieses Dokument ist die **vollständige Produktions-Spezifikation**. Pro Buch findest du:
@@ -197,24 +216,24 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of an intricate sunrise mandala with radiating sun rays and lotus petals, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→20):**
   1. a delicate sunrise mandala with thin radiating rays
-  2. a dewdrop mandala with morning leaves
+  2. a dewdrop mandala glowing with morning leaves
   3. a blooming flower mandala opening up
-  4. a songbird mandala with feather patterns
-  5. a teacup and steam mandala
-  6. a sun-at-its-peak mandala with sharp rays
-  7. a butterfly and meadow mandala
+  4. a songbird mandala swirling with feather patterns
+  5. a teacup and blooming steam mandala
+  6. a sun-radiating at-its-peak mandala with sharp rays
+  7. a butterfly and drifting meadow mandala
   8. a flowing water and ripple mandala
-  9. a tree-of-life mandala
-  10. a wheat field and breeze mandala
-  11. a sunflower mandala facing the sun
-  12. an afternoon cloud mandala
-  13. a sunset mandala with layered petals
-  14. a candle flame mandala
-  15. an owl mandala with night feathers
-  16. a crescent moon mandala
-  17. a star cluster mandala
-  18. a dreamcatcher-style mandala
-  19. a galaxy spiral mandala
+  9. a tree-of-life mandala blossoming
+  10. a wheat field floating and breeze mandala
+  11. a sunflower mandala rising facing the sun
+  12. an afternoon cloud sparkling mandala
+  13. a sunset mandala flowing with layered petals
+  14. a candle flame weaving mandala
+  15. an owl mandala twirling with night feathers
+  16. a crescent moon shining mandala
+  17. a star cluster swaying mandala
+  18. a dreamcatcher-style mandala glowing
+  19. a galaxy spiral swirling mandala
   20. a deep-night mandala with dense stars and moon, and finally everything comes back together
 - **Beispiel-Seitenprompts:**
   - *Seite 1:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a delicate sunrise mandala with thin radiating rays, centered composition`
@@ -229,21 +248,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a bold simple flower mandala on a soft sunrise sky background`
 - **Cover-Prompt:** `coloring book style illustration of a bold simple flower mandala with thick clean outlines and large petals, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a soft circle mandala surrounded by soft clouds
-  2. a gentle ripple mandala framed by garden leaves
-  3. a lotus mandala beside still water
-  4. a crescent-moon mandala under a crescent moon
-  5. a wave mandala ringed by tiny stars
-  6. a petal mandala over a calm meadow
-  7. a spiral mandala by a quiet pond
-  8. a feather mandala in the morning sky
-  9. a bubble mandala surrounded by soft clouds
-  10. a leaf mandala framed by garden leaves
-  11. a star mandala beside still water
-  12. a seashell mandala under a crescent moon
-  13. a cloud mandala ringed by tiny stars
-  14. a sunburst mandala over a calm meadow
-  15. a rose mandala by a quiet pond
+  1. a soft circle mandala surrounded glowing by soft clouds
+  2. a gentle ripple mandala framed swirling by garden leaves
+  3. a lotus mandala blooming beside still water
+  4. a crescent-moon mandala radiating under a crescent moon
+  5. a wave mandala ringed drifting by tiny stars
+  6. a petal mandala blossoming over a calm meadow
+  7. a spiral mandala floating by a quiet pond
+  8. a feather mandala rising in the morning sky
+  9. a bubble mandala surrounded sparkling by soft clouds
+  10. a leaf mandala framed flowing by garden leaves
+  11. a star mandala weaving beside still water
+  12. a seashell mandala twirling under a crescent moon
+  13. a cloud mandala ringed shining by tiny stars
+  14. a sunburst mandala swaying over a calm meadow
+  15. a rose mandala glowing by a quiet pond
   16. the whole gentle mandala scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 1:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a simple six-petal flower mandala, thick lines, centered composition`
@@ -259,25 +278,25 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `an intricate four-elements mandala on a starry cosmic background`
 - **Cover-Prompt:** `coloring book style illustration of an intricate mandala split into earth water fire and air quarters, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→20):**
-  1. an earth mandala with roots and crystals
-  2. a stone and pebble mandala
-  3. a mountain-range mandala
-  4. a seed-and-sprout mandala
-  5. a forest canopy mandala
-  6. a water ripple mandala
-  7. an ocean wave mandala
-  8. a raindrop and cloud mandala
-  9. a river-current spiral mandala
-  10. a seashell and coral mandala
-  11. a flame mandala with curling fire
-  12. a sun-and-ember mandala
-  13. a candle and spark mandala
-  14. a phoenix-feather mandala
-  15. a lightning and heat mandala
-  16. a wind-swirl mandala
-  17. a feather and breeze mandala
-  18. a dandelion-seed mandala
-  19. a bird-in-flight mandala
+  1. an earth mandala glowing with roots and crystals
+  2. a stone and swirling pebble mandala
+  3. a mountain-range mandala blooming
+  4. a seed-and-sprout mandala radiating
+  5. a forest canopy drifting mandala
+  6. a water ripple blossoming mandala
+  7. an ocean wave floating mandala
+  8. a raindrop and rising cloud mandala
+  9. a river-current spiral sparkling mandala
+  10. a seashell and flowing coral mandala
+  11. a flame mandala weaving with curling fire
+  12. a sun-and-ember mandala twirling
+  13. a candle and shining spark mandala
+  14. a phoenix-feather mandala swaying
+  15. a lightning and glowing heat mandala
+  16. a wind-swirl mandala swirling
+  17. a feather and blooming breeze mandala
+  18. a dandelion-seed mandala radiating
+  19. a bird-drifting in-flight mandala
   20. a four-elements unity mandala combining all motifs, and finally everything comes back together
 - **Beispiel-Seitenprompts:**
   - *Seite 11:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a flame mandala with curling fire, surrounded by ornamental flourishes`
@@ -298,23 +317,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a lush victorian greenhouse interior with hanging plants and a glass dome`
 - **Cover-Prompt:** `coloring book style illustration of a lush victorian greenhouse interior with hanging plants and a glass dome, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. an ornate greenhouse entrance with iron arch and ferns
-  2. a cluster of potted ferns on a wooden bench
-  3. a hanging basket of trailing ivy
-  4. a tall monstera plant in a clay pot
-  5. a shelf of succulents and cacti
-  6. an orchid in full bloom on a table
+  1. an ornate greenhouse entrance glowing with iron arch and ferns
+  2. a cluster of potted ferns swirling on a wooden bench
+  3. a hanging basket blooming of trailing ivy
+  4. a tall monstera plant radiating in a clay pot
+  5. a shelf of drifting succulents and cacti
+  6. an orchid blossoming in full bloom on a table
   7. a watering can among flower pots
   8. a climbing rose on a trellis
-  9. a row of tulips in terracotta pots
-  10. a fig tree branch with broad leaves
+  9. a row of tulips floating in terracotta pots
+  10. a fig tree branch rising with broad leaves
   11. a butterfly resting on a fern frond
-  12. a vintage botanical workbench with tools
-  13. a stack of seed packets and a trowel
-  14. a glass terrarium with tiny plants
-  15. a lily pond under the glass dome
+  12. a vintage botanical workbench sparkling with tools
+  13. a stack of flowing seed packets and a trowel
+  14. a glass terrarium weaving with tiny plants
+  15. a lily pond twirling under the glass dome
   16. a water lily with floating pads
-  17. a dragonfly over the pond
+  17. a dragonfly shining over the pond
   18. the full greenhouse view with glass dome and plants, all coming back together as one
 - **Beispiel-Seitenprompts:**
   - *Seite 6:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, an orchid in full bloom on a table, close-up portrait`
@@ -329,21 +348,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a bold simple bouquet of wildflowers in a sunny meadow`
 - **Cover-Prompt:** `coloring book style illustration of a bold simple bouquet of wildflowers with thick outlines, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a poppy bloom over a flower meadow
-  2. a daisy cluster in a cottage garden
-  3. a cornflower stem by a lily pond
-  4. a buttercup patch across a wildflower field
-  5. a clover leaf along the hedgerow
-  6. a thistle head at the forest edge
-  7. a dandelion puff by a quiet stream
-  8. a foxglove spire in a sunny grove
-  9. a bluebell bunch over a flower meadow
-  10. a wild rose in a cottage garden
-  11. a fern frond by a lily pond
-  12. a grass tuft across a wildflower field
-  13. a ladybird on a petal along the hedgerow
-  14. a bee on a blossom at the forest edge
-  15. a snail on a stalk by a quiet stream
+  1. a poppy bloom glowing over a flower meadow
+  2. a daisy cluster swirling in a cottage garden
+  3. a cornflower stem blooming by a lily pond
+  4. a buttercup patch radiating across a wildflower field
+  5. a clover leaf drifting along the hedgerow
+  6. a thistle head blossoming at the forest edge
+  7. a dandelion puff floating by a quiet stream
+  8. a foxglove spire rising in a sunny grove
+  9. a bluebell bunch sparkling over a flower meadow
+  10. a wild rose flowing in a cottage garden
+  11. a fern frond weaving by a lily pond
+  12. a grass tuft twirling across a wildflower field
+  13. a ladybird shining on a petal along the hedgerow
+  14. a bee swaying on a blossom at the forest edge
+  15. a snail glowing on a stalk by a quiet stream
   16. the whole wildflower meadow scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 1:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a single bold poppy flower, thick outlines, centered composition`
@@ -358,23 +377,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a single flowering plant sprouting in a sunny garden bed`
 - **Cover-Prompt:** `coloring book style illustration of an intricate botanical illustration of a plant life cycle from seed to flower, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. a seed packet and scattered seeds on soil
-  2. a tiny sprout breaking through the ground
-  3. a seedling with first two leaves
-  4. a young plant with a forming bud
-  5. a tulip bud about to open
-  6. a half-opened rose
-  7. a fully bloomed peony
-  8. a flower bed in full summer bloom
-  9. a bee pollinating a blossom
-  10. a sunflower turning to the sun
-  11. a flower with a visiting butterfly
-  12. a wilting flower dropping petals
-  13. a seed head of a dandelion
-  14. a poppy seed pod
-  15. dried allium seed spheres
-  16. autumn leaves and fallen petals
-  17. seeds being carried by the wind
+  1. a seed packet and scattered seeds glowing on soil
+  2. a tiny sprout breaking swirling through the ground
+  3. a seedling blooming with first two leaves
+  4. a young plant radiating with a forming bud
+  5. a tulip bud drifting about to open
+  6. a half-opened rose blossoming
+  7. a fully bloomed floating peony
+  8. a flower bed rising in full summer bloom
+  9. a bee pollinating sparkling a blossom
+  10. a sunflower turning flowing to the sun
+  11. a flower weaving with a visiting butterfly
+  12. a wilting flower twirling dropping petals
+  13. a seed head shining of a dandelion
+  14. a poppy seed swaying pod
+  15. dried allium seed glowing spheres
+  16. autumn leaves and swirling fallen petals
+  17. seeds being carried blooming by the wind
   18. a full garden scene through all seasons, all coming back together as one
 - **Beispiel-Seitenprompts:**
   - *Seite 7:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a fully bloomed peony, close-up portrait`
@@ -395,23 +414,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cozy thatched cottage with a flower garden and smoking chimney`
 - **Cover-Prompt:** `coloring book style illustration of a cozy thatched cottage with a flower garden and smoking chimney, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. a cozy thatched cottage exterior with a garden gate
+  1. a cozy thatched cottage exterior playing with a garden gate
   2. a rustic kitchen with fresh bread and a rolling pin
-  3. a cast-iron stove with a steaming kettle
-  4. a windowsill with potted herbs and a cat
-  5. a basket of just-picked vegetables
-  6. a wooden table set for breakfast with jam jars
-  7. a cottage pantry with hanging dried herbs
+  3. a cast-iron stove leaping with a steaming kettle
+  4. a windowsill resting with potted herbs and a cat
+  5. a basket of gazing just-picked vegetables
+  6. a wooden table set for breakfast hopping with jam jars
+  7. a cottage pantry climbing with hanging dried herbs
   8. a knitting basket with yarn and needles
-  9. a rocking chair by a crackling fireplace
-  10. a flower garden with a picket fence
-  11. a wheelbarrow full of pumpkins
-  12. a clothesline with linen in the breeze
-  13. a picnic blanket under an apple tree
-  14. a teapot and scones on a tray
-  15. a bookshelf nook with a candle
-  16. a hedgehog visiting the garden at dusk
-  17. a starry night over the cottage roof
+  9. a rocking chair splashing by a crackling fireplace
+  10. a flower garden stretching with a picket fence
+  11. a wheelbarrow full peeking of pumpkins
+  12. a clothesline waving with linen in the breeze
+  13. a picnic blanket exploring under an apple tree
+  14. a teapot and scones perching on a tray
+  15. a bookshelf nook tumbling with a candle
+  16. a hedgehog visiting the garden munching at dusk
+  17. a starry night gliding over the cottage roof
   18. a cozy bed with a quilt and a sleeping cat, and finally everything comes back together
 - **Beispiel-Seitenprompts:**
   - *Seite 2:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a rustic kitchen with fresh bread and a rolling pin, in a small scene with surroundings`
@@ -426,21 +445,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a bold cute basket full of mushrooms and autumn leaves`
 - **Cover-Prompt:** `coloring book style illustration of a bold cute basket full of mushrooms and autumn leaves, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a toadstool cluster in a sunny meadow
-  2. a wicker basket of mushrooms deep in the forest
-  3. a chanterelle patch in a cottage garden
-  4. a morel mushroom by a little pond
-  5. a acorn pile on a green hill
-  6. a fern frond beside a stream
-  7. a wooden cottage in a forest clearing
-  8. a lantern on a stump in a flower grove
-  9. a hedgehog with a leaf in a sunny meadow
-  10. a squirrel with a nut deep in the forest
-  11. a owl on a branch in a cottage garden
-  12. a berry bramble by a little pond
-  13. a moss-covered log on a green hill
-  14. a tiny wildflower beside a stream
-  15. a woodland gate in a forest clearing
+  1. a toadstool cluster playing in a sunny meadow
+  2. a wicker basket of mushrooms deep leaping in the forest
+  3. a chanterelle patch resting in a cottage garden
+  4. a morel mushroom gazing by a little pond
+  5. a acorn pile hopping on a green hill
+  6. a fern frond climbing beside a stream
+  7. a wooden cottage splashing in a forest clearing
+  8. a lantern stretching on a stump in a flower grove
+  9. a hedgehog peeking with a leaf in a sunny meadow
+  10. a squirrel waving with a nut deep in the forest
+  11. a owl exploring on a branch in a cottage garden
+  12. a berry bramble perching by a little pond
+  13. a moss-covered log tumbling on a green hill
+  14. a tiny wildflower munching beside a stream
+  15. a woodland gate gliding in a forest clearing
   16. the whole mushroom forage scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 3:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a big fly agaric mushroom with a snail, centered composition`
@@ -456,24 +475,24 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of a cozy cottage surrounded by a wreath of seasonal flowers leaves and snow, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→20):**
   1. a spring cottage with blossoming cherry tree
-  2. a basket of spring tulips by the door
-  3. a nesting bird in the garden hedge
-  4. a wheelbarrow of seedlings
-  5. a spring picnic with lemonade
-  6. a summer cottage with full rose bushes
-  7. a vegetable garden in high summer
-  8. a sunny porch with a hammock
-  9. a jar of fresh-picked berries
-  10. a summer evening with fireflies
-  11. an autumn cottage with golden leaves
-  12. a pumpkin harvest by the fence
-  13. a steaming apple pie on the sill
-  14. a rake and pile of leaves
-  15. an autumn tea on the porch
-  16. a winter cottage under snow
-  17. a wreath on the cottage door
-  18. a fireplace with stockings and a cat
-  19. a snowman in the garden
+  2. a basket of spring tulips playing by the door
+  3. a nesting bird leaping in the garden hedge
+  4. a wheelbarrow of resting seedlings
+  5. a spring picnic gazing with lemonade
+  6. a summer cottage hopping with full rose bushes
+  7. a vegetable garden climbing in high summer
+  8. a sunny porch splashing with a hammock
+  9. a jar of stretching fresh-picked berries
+  10. a summer evening peeking with fireflies
+  11. an autumn cottage waving with golden leaves
+  12. a pumpkin harvest exploring by the fence
+  13. a steaming apple pie perching on the sill
+  14. a rake and tumbling pile of leaves
+  15. an autumn tea munching on the porch
+  16. a winter cottage gliding under snow
+  17. a wreath dancing on the cottage door
+  18. a fireplace playing with stockings and a cat
+  19. a snowman leaping in the garden
   20. a candlelit cottage window on a snowy night, and finally everything comes back together
 - **Beispiel-Seitenprompts:**
   - *Seite 6:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a summer cottage with full rose bushes, in a small scene with surroundings`
@@ -493,25 +512,25 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `an old gothic library with tall bookshelves a spiral staircase and a candle`
 - **Cover-Prompt:** `coloring book style illustration of an old gothic library with tall bookshelves a spiral staircase and a candle, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→20):**
-  1. a heavy carved wooden library door with an iron handle
-  2. an entrance hall with marble columns
+  1. a heavy carved wooden library door resting with an iron handle
+  2. an entrance hall glowing with marble columns
   3. towering bookshelves with a rolling ladder
-  4. a spiral staircase winding up between shelves
+  4. a spiral staircase sparkling winding up between shelves
   5. a reading desk with an open book and candle
-  6. a stack of ancient leather-bound tomes
-  7. an antique globe on a brass stand
-  8. an inkwell and quill with scattered papers
-  9. a vintage typewriter on a desk
-  10. an arched window with rain outside
-  11. a marble bust of a philosopher
-  12. a magnifying glass over an old map
-  13. a pocket watch and chain on a book
-  14. an anatomical skeleton model in a corner
-  15. a botanical chart pinned to the wall
-  16. a chandelier with dripping candles
-  17. a fireplace with two armchairs
-  18. a raven perched on a bookshelf
-  19. a hidden door behind a bookcase
+  6. a stack of standing ancient leather-bound tomes
+  7. an antique globe floating on a brass stand
+  8. an inkwell and quill smiling with scattered papers
+  9. a vintage typewriter drifting on a desk
+  10. an arched window rising with rain outside
+  11. a marble bust gathering of a philosopher
+  12. a magnifying glass shining over an old map
+  13. a pocket watch and chain balancing on a book
+  14. an anatomical skeleton model swaying in a corner
+  15. a botanical chart perching pinned to the wall
+  16. a chandelier stacking with dripping candles
+  17. a fireplace resting with two armchairs
+  18. a raven perched glowing on a bookshelf
+  19. a hidden door sparkling behind a bookcase
   20. the grand reading room by candlelight, all coming back together as one
 - **Beispiel-Seitenprompts:**
   - *Seite 3:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, towering bookshelves with a rolling ladder, in a small scene with surroundings`
@@ -526,23 +545,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a victorian alchemy desk with glass flasks pressed flowers and old books`
 - **Cover-Prompt:** `coloring book style illustration of a victorian alchemy desk with glass flasks pressed flowers and old books, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. a pressed flower herbarium page
-  2. a glass distillation flask with tubes
-  3. a shelf of labeled apothecary bottles
-  4. a botanical sketch of a fern with notes
-  5. an open notebook with diagrams and ink stains
-  6. a mortar and pestle with dried herbs
-  7. a framed display of moths and butterflies
-  8. a candlestick beside a stack of scrolls
-  9. a brass microscope on a workbench
-  10. a hanging bundle of drying lavender
-  11. a star chart with constellations
-  12. a crystal specimen on a wooden block
-  13. a feather quill and wax seal
-  14. an ornate hand mirror and comb
-  15. a terrarium with a tiny fern
-  16. a skull used as a candle holder with ivy
-  17. a moon-phase diagram on parchment
+  1. a pressed flower resting herbarium page
+  2. a glass distillation flask glowing with tubes
+  3. a shelf of sparkling labeled apothecary bottles
+  4. a botanical sketch of a fern standing with notes
+  5. an open notebook floating with diagrams and ink stains
+  6. a mortar and pestle smiling with dried herbs
+  7. a framed display drifting of moths and butterflies
+  8. a candlestick rising beside a stack of scrolls
+  9. a brass microscope gathering on a workbench
+  10. a hanging bundle shining of drying lavender
+  11. a star chart balancing with constellations
+  12. a crystal specimen swaying on a wooden block
+  13. a feather quill perching and wax seal
+  14. an ornate hand stacking mirror and comb
+  15. a terrarium resting with a tiny fern
+  16. a skull used as a candle holder glowing with ivy
+  17. a moon-phase diagram sparkling on parchment
   18. the full cluttered alchemist's desk, and finally everything comes back together
 - **Beispiel-Seitenprompts:**
   - *Seite 7:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a framed display of moths and butterflies, with a decorative patterned background`
@@ -557,23 +576,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a gothic cathedral facade with rose window and pointed arches`
 - **Cover-Prompt:** `coloring book style illustration of a gothic cathedral facade with rose window and pointed arches, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. a gothic campus gateway with an iron lantern
-  2. a stone archway leading to a courtyard
-  3. a covered cloister walkway with columns
-  4. an ornate rose window with tracery
-  5. a row of pointed arch windows
-  6. a carved stone gargoyle on a ledge
-  7. a weathered statue of a scholar
-  8. a vaulted ceiling seen from below
-  9. a winding cobblestone street with lamps
-  10. an old clock tower face
-  11. a heavy studded wooden door
-  12. a spiral stone staircase in a tower
-  13. an ivy-covered college wall
-  14. a fountain in a quiet courtyard
-  15. a stained glass window pattern
-  16. a bell hanging in the tower
-  17. rooftops and spires under the moon
+  1. a gothic campus gateway resting with an iron lantern
+  2. a stone archway glowing leading to a courtyard
+  3. a covered cloister walkway sparkling with columns
+  4. an ornate rose window standing with tracery
+  5. a row of floating pointed arch windows
+  6. a carved stone gargoyle smiling on a ledge
+  7. a weathered statue drifting of a scholar
+  8. a vaulted ceiling rising seen from below
+  9. a winding cobblestone street gathering with lamps
+  10. an old clock shining tower face
+  11. a heavy studded balancing wooden door
+  12. a spiral stone staircase swaying in a tower
+  13. an ivy-covered college perching wall
+  14. a fountain stacking in a quiet courtyard
+  15. a stained glass resting window pattern
+  16. a bell hanging glowing in the tower
+  17. rooftops and spires sparkling under the moon
   18. the full cathedral facade at night, all coming back together as one
 - **Beispiel-Seitenprompts:**
   - *Seite 4:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, an ornate rose window with tracery, centered composition`
@@ -594,25 +613,25 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `an ornate crescent moon with stars herbs and crystals`
 - **Cover-Prompt:** `coloring book style illustration of an ornate crescent moon with stars herbs and crystals, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→20):**
-  1. a new moon night with scattered stars
-  2. a thin waxing crescent moon with a face
-  3. a moon phase wheel diagram
+  1. a new moon night glowing with scattered stars
+  2. a thin waxing crescent moon swirling with a face
+  3. a moon phase blooming wheel diagram
   4. a hand holding a glowing crystal under the moon
-  5. a bundle of dried sage and herbs
-  6. an ornate first-quarter moon with patterns
-  7. a celestial sun and moon entwined
-  8. a tarot-style hand with a moth
-  9. a waxing gibbous moon over mountains
-  10. a cluster of crystals and geodes
-  11. a full moon with a detailed rabbit pattern
+  5. a bundle of radiating dried sage and herbs
+  6. an ornate first-quarter moon drifting with patterns
+  7. a celestial sun blossoming and moon entwined
+  8. a tarot-style hand floating with a moth
+  9. a waxing gibbous moon rising over mountains
+  10. a cluster of sparkling crystals and geodes
+  11. a full moon flowing with a detailed rabbit pattern
   12. an owl flying across the full moon
   13. a cauldron with rising star-smoke
-  14. a constellation map with a wolf
-  15. a waning gibbous moon and pine trees
-  16. a mystic eye surrounded by rays
-  17. a pressed-flower and crescent arrangement
-  18. a last-quarter moon with ornate border
-  19. a waning crescent over still water
+  14. a constellation map weaving with a wolf
+  15. a waning gibbous twirling moon and pine trees
+  16. a mystic eye surrounded shining by rays
+  17. a pressed-flower and swaying crescent arrangement
+  18. a last-quarter moon glowing with ornate border
+  19. a waning crescent swirling over still water
   20. a full moon-phase mandala combining all phases, and finally everything comes back together
 - **Beispiel-Seitenprompts:**
   - *Seite 11:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a full moon with a detailed rabbit pattern, centered composition`
@@ -627,23 +646,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a witch's apothecary shelf with potion bottles herbs and a black cat`
 - **Cover-Prompt:** `coloring book style illustration of a witch's apothecary shelf with potion bottles herbs and a black cat, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. a moonlit herb garden with a basket
+  1. a moonlit herb garden glowing with a basket
   2. a hand picking nightshade flowers
-  3. a shelf of labeled potion bottles
-  4. a bundle of hanging dried herbs
-  5. a cauldron bubbling over a fire
-  6. a mortar and pestle with crushed petals
-  7. an open grimoire with handwritten spells
-  8. a black cat curled on a spellbook
-  9. a row of candles in ornate holders
-  10. a crystal ball on a clawed stand
+  3. a shelf of swirling labeled potion bottles
+  4. a bundle of blooming hanging dried herbs
+  5. a cauldron bubbling radiating over a fire
+  6. a mortar and pestle drifting with crushed petals
+  7. an open grimoire blossoming with handwritten spells
+  8. a black cat curled floating on a spellbook
+  9. a row of candles rising in ornate holders
+  10. a crystal ball sparkling on a clawed stand
   11. a teapot brewing a magic infusion
-  12. a wooden spoon and recipe scroll
+  12. a wooden spoon flowing and recipe scroll
   13. a jar of glowing fireflies
-  14. a pentacle drawn with salt and herbs
-  15. a broom leaning by the door
-  16. a window with the full moon outside
-  17. a familiar owl on a perch
+  14. a pentacle drawn weaving with salt and herbs
+  15. a broom leaning twirling by the door
+  16. a window shining with the full moon outside
+  17. a familiar owl swaying on a perch
   18. the full magical kitchen scene, all coming back together as one
 - **Beispiel-Seitenprompts:**
   - *Seite 5:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a cauldron bubbling over a fire, in a small scene with surroundings`
@@ -659,22 +678,22 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of an ornate tarot-style card with a moth sun and moon symbols, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
   1. an ornate tarot frame with a rising sun
-  2. a crescent moon card with a howling wolf
-  3. a star card with a deer and constellations
-  4. a snake coiled around an ornamental key
-  5. an owl with spread wings in a decorative arch
+  2. a crescent moon card glowing with a howling wolf
+  3. a star card swirling with a deer and constellations
+  4. a snake coiled blooming around an ornamental key
+  5. an owl radiating with spread wings in a decorative arch
   6. a hand holding a glowing lantern
-  7. a raven perched on a skull and roses
-  8. a butterfly framed by celestial symbols
-  9. a fox surrounded by autumn ornaments
-  10. a pair of koi fish in a circular border
+  7. a raven perched drifting on a skull and roses
+  8. a butterfly framed blossoming by celestial symbols
+  9. a fox surrounded floating by autumn ornaments
+  10. a pair of koi fish rising in a circular border
   11. a phoenix rising within a sun motif
-  12. a stag with antlers full of stars
-  13. a spider and web mandala
-  14. a bee with a honeycomb pattern
+  12. a stag sparkling with antlers full of stars
+  13. a spider and flowing web mandala
+  14. a bee weaving with a honeycomb pattern
   15. a horse galloping through clouds
-  16. a serpent and chalice card
-  17. a moth with detailed wing patterns
+  16. a serpent and twirling chalice card
+  17. a moth shining with detailed wing patterns
   18. a sun-and-moon spirit animal card combining motifs, and finally everything comes back together
 - **Beispiel-Seitenprompts:**
   - *Seite 5:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, an owl with spread wings in a decorative arch, surrounded by ornamental flourishes`
@@ -695,25 +714,25 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `an ornate zodiac wheel with all twelve astrology symbols and stars`
 - **Cover-Prompt:** `coloring book style illustration of an ornate zodiac wheel with all twelve astrology symbols and stars, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→20):**
-  1. an ornate aries ram with constellation
-  2. a taurus bull surrounded by flowers
-  3. a gemini twins motif with mirrored ornaments
-  4. a cancer crab with moon and waves
-  5. a leo lion with a radiant sun mane
-  6. a virgo maiden with wheat and stars
-  7. a libra scales with balanced ornaments
-  8. a scorpio scorpion with celestial border
-  9. a sagittarius archer centaur with arrows
-  10. a capricorn sea-goat with mountains
+  1. an ornate aries ram glowing with constellation
+  2. a taurus bull surrounded swirling by flowers
+  3. a gemini twins motif blooming with mirrored ornaments
+  4. a cancer crab radiating with moon and waves
+  5. a leo lion drifting with a radiant sun mane
+  6. a virgo maiden blossoming with wheat and stars
+  7. a libra scales floating with balanced ornaments
+  8. a scorpio scorpion rising with celestial border
+  9. a sagittarius archer centaur sparkling with arrows
+  10. a capricorn sea-goat flowing with mountains
   11. an aquarius water bearer pouring stars
-  12. a pisces two fish in a circular frame
-  13. a radiant sun face with rays
-  14. a crescent moon with stars
-  15. a ringed planet with orbit lines
-  16. a comet streaking across the sky
-  17. a constellation map of the night sky
+  12. a pisces two fish weaving in a circular frame
+  13. a radiant sun face twirling with rays
+  14. a crescent moon shining with stars
+  15. a ringed planet swaying with orbit lines
+  16. a comet streaking glowing across the sky
+  17. a constellation map swirling of the night sky
   18. a celestial hand holding a star
-  19. an astrolabe instrument with dials
+  19. an astrolabe instrument blooming with dials
   20. the full zodiac wheel combining all signs, all coming back together as one
 - **Beispiel-Seitenprompts:**
   - *Seite 5:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a leo lion with a radiant sun mane, surrounded by ornamental flourishes`
@@ -728,23 +747,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `an intricate cosmic mandala with planets sun and stars`
 - **Cover-Prompt:** `coloring book style illustration of an intricate cosmic mandala with planets sun and stars, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. a sun mandala at the center of the cosmos
-  2. a mercury planet mandala
-  3. a venus planet mandala with swirls
-  4. an earth and moon mandala
-  5. a mars planet mandala
-  6. a jupiter mandala with banded patterns
-  7. a saturn mandala with detailed rings
-  8. a uranus and neptune mandala
+  1. a sun mandala glowing at the center of the cosmos
+  2. a mercury planet swirling mandala
+  3. a venus planet mandala blooming with swirls
+  4. an earth and radiating moon mandala
+  5. a mars planet drifting mandala
+  6. a jupiter mandala blossoming with banded patterns
+  7. a saturn mandala floating with detailed rings
+  8. a uranus and rising neptune mandala
   9. a comet mandala with a flowing tail
-  10. an asteroid belt ring mandala
-  11. a constellation mandala
-  12. a shooting star mandala
-  13. a nebula cloud mandala
-  14. a spiral galaxy mandala
-  15. a black hole spiral mandala
-  16. a star cluster mandala
-  17. an eclipse mandala with corona
+  10. an asteroid belt sparkling ring mandala
+  11. a constellation mandala flowing
+  12. a shooting star weaving mandala
+  13. a nebula cloud twirling mandala
+  14. a spiral galaxy shining mandala
+  15. a black hole swaying spiral mandala
+  16. a star cluster glowing mandala
+  17. an eclipse mandala swirling with corona
   18. a full universe mandala combining all motifs, and finally everything comes back together
 - **Beispiel-Seitenprompts:**
   - *Seite 7:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a saturn mandala with detailed rings, centered composition`
@@ -759,21 +778,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a bold simple smiling crescent moon with stars`
 - **Cover-Prompt:** `coloring book style illustration of a bold simple smiling crescent moon with stars, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a aries ram drifting in orbit
-  2. a taurus bull across a starfield
-  3. a gemini twins near a giant planet
-  4. a leo lion past the glowing moon
-  5. a virgo maiden in a swirling galaxy
-  6. a libra scales among distant stars
-  7. a scorpio scorpion beside a ringed planet
-  8. a sagittarius archer through a nebula cloud
-  9. a capricorn goat drifting in orbit
-  10. a aquarius waves across a starfield
-  11. a pisces fish near a giant planet
-  12. a crescent moon past the glowing moon
-  13. a shooting star in a swirling galaxy
-  14. a sun face among distant stars
-  15. a constellation map beside a ringed planet
+  1. an aries ram glowing in the night sky
+  2. a taurus bull swirling among the stars
+  3. gemini twins blooming across the cosmos
+  4. a leo lion radiating near a bright planet
+  5. a virgo maiden drifting over a moonlit horizon
+  6. libra scales blossoming in a starry field
+  7. a scorpio scorpion floating beside the moon
+  8. a sagittarius archer rising through the constellations
+  9. a capricorn goat sparkling in deep space
+  10. an aquarius water-bearer flowing among twinkling stars
+  11. a pisces fish weaving over a distant galaxy
+  12. a crescent moon twirling in the evening sky
+  13. a shooting star shining across the heavens
+  14. a sun face swaying near a passing comet
+  15. a constellation map soaring in the starlit dark
   16. the whole zodiac sky scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 2:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a simple crescent moon with a face, centered composition`
@@ -793,25 +812,25 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a japanese torii gate with cherry blossoms and a pagoda`
 - **Cover-Prompt:** `coloring book style illustration of a japanese torii gate with cherry blossoms and a pagoda, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→20):**
-  1. a torii gate in morning mist
-  2. a stone path with lanterns
-  3. a cherry blossom branch in bloom
-  4. a traditional tea house with sliding doors
-  5. a tea ceremony set on a tatami mat
-  6. a bamboo grove with tall stalks
-  7. a koi pond with a wooden bridge
+  1. a torii gate glowing in morning mist
+  2. a stone path swirling with lanterns
+  3. a cherry blossom branch blooming in bloom
+  4. a traditional tea house radiating with sliding doors
+  5. a tea ceremony set drifting on a tatami mat
+  6. a bamboo grove blossoming with tall stalks
+  7. a koi pond floating with a wooden bridge
   8. a pair of koi fish swimming
-  9. a bonsai tree in a ceramic pot
-  10. a zen rock garden with raked sand
-  11. a pagoda among pine trees
+  9. a bonsai tree rising in a ceramic pot
+  10. a zen rock garden sparkling with raked sand
+  11. a pagoda flowing among pine trees
   12. a crane standing in water
-  13. a geisha's folding fan with patterns
-  14. a wave in the style of hokusai
-  15. mount fuji behind the clouds
-  16. a paper lantern festival on the river
-  17. a maple branch with autumn leaves
-  18. a stone buddha statue with moss
-  19. an origami crane and flowers
+  13. a geisha's folding fan weaving with patterns
+  14. a wave twirling in the style of hokusai
+  15. mount fuji behind shining the clouds
+  16. a paper lantern festival swaying on the river
+  17. a maple branch glowing with autumn leaves
+  18. a stone buddha statue swirling with moss
+  19. an origami crane blooming and flowers
   20. the full kyoto temple scene at dusk, and finally everything comes back together
 - **Beispiel-Seitenprompts:**
   - *Seite 14:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a wave in the style of hokusai, centered composition`
@@ -826,23 +845,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `two ornate koi fish swimming among lotus flowers and waves`
 - **Cover-Prompt:** `coloring book style illustration of two ornate koi fish swimming among lotus flowers and waves, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. a mountain spring trickling over rocks
-  2. a single koi fish with patterned scales
-  3. two koi fish circling each other
-  4. a lotus flower on the water surface
-  5. a school of small koi
-  6. a wave pattern in seigaiha style
-  7. a water lily pad with a frog
-  8. a waterfall between rocks
+  1. a mountain spring trickling glowing over rocks
+  2. a single koi fish swirling with patterned scales
+  3. two koi fish blooming circling each other
+  4. a lotus flower radiating on the water surface
+  5. a school of drifting small koi
+  6. a wave pattern blossoming in seigaiha style
+  7. a water lily pad floating with a frog
+  8. a waterfall between rising rocks
   9. a koi leaping out of the water
-  10. ripples around a fallen leaf
+  10. ripples sparkling around a fallen leaf
   11. a dragon koi with flowing fins
   12. a pond with floating cherry petals
   13. a crane fishing in shallow water
-  14. a wooden water wheel by a stream
-  15. raindrops on a pond surface
+  14. a wooden water wheel flowing by a stream
+  15. raindrops weaving on a pond surface
   16. a turtle resting on a rock
-  17. an ornate wave and foam pattern
+  17. an ornate wave twirling and foam pattern
   18. a full koi pond garden scene, all coming back together as one
 - **Beispiel-Seitenprompts:**
   - *Seite 3:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, two koi fish circling each other, centered composition`
@@ -857,21 +876,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a bold simple bonsai tree in a raked zen garden`
 - **Cover-Prompt:** `coloring book style illustration of a bold simple bonsai tree with a stone lantern, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a raked sand pattern surrounded by soft clouds
-  2. a stone lantern framed by garden leaves
-  3. a bonsai tree beside still water
-  4. a koi in a pond under a crescent moon
-  5. a cherry blossom branch ringed by tiny stars
-  6. a bamboo grove over a calm meadow
-  7. a tea house by a quiet pond
-  8. a stepping stones in the morning sky
-  9. a wooden bridge surrounded by soft clouds
-  10. a lotus flower framed by garden leaves
-  11. a crane bird beside still water
-  12. a moss rock under a crescent moon
-  13. a wind chime ringed by tiny stars
-  14. a paper fan over a calm meadow
-  15. a pagoda by a quiet pond
+  1. a raked sand pattern surrounded glowing by soft clouds
+  2. a stone lantern framed swirling by garden leaves
+  3. a bonsai tree blooming beside still water
+  4. a koi radiating in a pond under a crescent moon
+  5. a cherry blossom branch ringed drifting by tiny stars
+  6. a bamboo grove blossoming over a calm meadow
+  7. a tea house floating by a quiet pond
+  8. a stepping stones rising in the morning sky
+  9. a wooden bridge surrounded sparkling by soft clouds
+  10. a lotus flower framed flowing by garden leaves
+  11. a crane bird weaving beside still water
+  12. a moss rock twirling under a crescent moon
+  13. a wind chime ringed shining by tiny stars
+  14. a paper fan swaying over a calm meadow
+  15. a pagoda glowing by a quiet pond
   16. the whole zen garden scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 3:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a simple bonsai tree in a pot, centered composition`
@@ -892,23 +911,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `an ornate sugar skull with marigolds against a starry night sky`
 - **Cover-Prompt:** `coloring book style illustration of an ornate decorated sugar skull with marigold flowers and candles, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. a ornate sugar skull in the old town
-  2. a marigold flower by the cathedral
-  3. a candle holder on a cobbled street
-  4. a papel picado banner at the market square
-  5. a guitar with roses below the clock tower
-  6. a lady catrina figure across a stone bridge
-  7. a decorated cross along a quiet alley
-  8. a rose garland in a courtyard
-  9. a butterfly with patterns in the old town
-  10. a skull with flowers by the cathedral
-  11. a candlelit altar on a cobbled street
-  12. a dove with a ribbon at the market square
-  13. a feathered headdress below the clock tower
-  14. a ornate frame across a stone bridge
-  15. a heart with vines along a quiet alley
-  16. a ornate sugar skull in a courtyard
-  17. a marigold flower in the old town
+  1. a ornate sugar skull glowing in the old town
+  2. a marigold flower swirling by the cathedral
+  3. a candle holder blooming on a cobbled street
+  4. a papel picado banner radiating at the market square
+  5. a guitar drifting with roses below the clock tower
+  6. a lady catrina figure blossoming across a stone bridge
+  7. a decorated cross floating along a quiet alley
+  8. a rose garland rising in a courtyard
+  9. a butterfly sparkling with patterns in the old town
+  10. a skull flowing with flowers by the cathedral
+  11. a candlelit altar weaving on a cobbled street
+  12. a dove twirling with a ribbon at the market square
+  13. a feathered headdress shining below the clock tower
+  14. a ornate frame swaying across a stone bridge
+  15. a heart glowing with vines along a quiet alley
+  16. a ornate sugar skull swirling in a courtyard
+  17. a marigold flower blooming in the old town
   18. the whole day of the dead scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 2:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a decorated sugar skull with roses, centered composition`
@@ -923,23 +942,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `an ornate gothic rose with thorns by a moonlit window`
 - **Cover-Prompt:** `coloring book style illustration of an ornate gothic rose with thorns a raven and a skull, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. a ornate rose in the old town
-  2. a raven on a branch by the cathedral
-  3. a gothic window on a cobbled street
-  4. a candelabra at the market square
-  5. a lace fan below the clock tower
-  6. a heart-shaped locket across a stone bridge
-  7. a thorned vine along a quiet alley
-  8. a moth with patterns in a courtyard
-  9. a old key in the old town
-  10. a velvet curtain by the cathedral
-  11. a ornate mirror on a cobbled street
-  12. a wilting bouquet at the market square
-  13. a stone archway below the clock tower
-  14. a feather quill across a stone bridge
-  15. a filigree heart along a quiet alley
-  16. a ornate rose in a courtyard
-  17. a raven on a branch in the old town
+  1. a ornate rose glowing in the old town
+  2. a raven swirling on a branch by the cathedral
+  3. a gothic window blooming on a cobbled street
+  4. a candelabra radiating at the market square
+  5. a lace fan drifting below the clock tower
+  6. a heart-shaped locket blossoming across a stone bridge
+  7. a thorned vine floating along a quiet alley
+  8. a moth rising with patterns in a courtyard
+  9. a old key sparkling in the old town
+  10. a velvet curtain flowing by the cathedral
+  11. a ornate mirror weaving on a cobbled street
+  12. a wilting bouquet twirling at the market square
+  13. a stone archway shining below the clock tower
+  14. a feather quill swaying across a stone bridge
+  15. a filigree heart glowing along a quiet alley
+  16. a ornate rose swirling in a courtyard
+  17. a raven blooming on a branch in the old town
   18. the whole gothic romance scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 6:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a death's-head moth with patterned wings, centered composition`
@@ -954,21 +973,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a bold sugar skull wrapped in roses against a night sky`
 - **Cover-Prompt:** `coloring book style illustration of a bold simple sugar skull with two big flowers, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a rose-crowned skull in the old town
-  2. a peony skull by the cathedral
-  3. a lily skull on a cobbled street
-  4. a sunflower skull at the market square
-  5. a vine-wrapped skull below the clock tower
-  6. a butterfly skull across a stone bridge
-  7. a dahlia skull along a quiet alley
-  8. a ornate skull mask in a courtyard
-  9. a blossom garland in the old town
-  10. a thorned wreath by the cathedral
-  11. a candle and skull on a cobbled street
-  12. a moth and skull at the market square
-  13. a feathered skull below the clock tower
-  14. a lotus skull across a stone bridge
-  15. a heart and skull along a quiet alley
+  1. a rose-crowned skull glowing in the old town
+  2. a peony skull swirling by the cathedral
+  3. a lily skull blooming on a cobbled street
+  4. a sunflower skull radiating at the market square
+  5. a vine-wrapped skull drifting below the clock tower
+  6. a butterfly skull blossoming across a stone bridge
+  7. a dahlia skull floating along a quiet alley
+  8. a ornate skull mask rising in a courtyard
+  9. a blossom garland sparkling in the old town
+  10. a thorned wreath flowing by the cathedral
+  11. a candle and skull weaving on a cobbled street
+  12. a moth and skull twirling at the market square
+  13. a feathered skull shining below the clock tower
+  14. a lotus skull swaying across a stone bridge
+  15. a heart and skull glowing along a quiet alley
   16. the whole skulls and flowers scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 1:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a bold simple skull with a flower crown, centered composition`
@@ -991,23 +1010,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a serene lotus flower with gentle waves and a calm sun`
 - **Cover-Prompt:** `coloring book style illustration of a serene lotus flower with gentle waves and a calm sun, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. a calm lotus flower opening
+  1. a calm lotus glowing flower opening
   2. a pair of open hands holding light
   3. a single feather floating
-  4. gentle concentric ripples on water
+  4. gentle concentric ripples swirling on water
   5. a soft rolling hill at sunrise
-  6. a meditating figure silhouette with patterns
-  7. a leaf with delicate veins
-  8. a calm wave curling slowly
-  9. a dandelion releasing seeds
-  10. a peaceful mountain horizon
+  6. a meditating figure silhouette blooming with patterns
+  7. a leaf radiating with delicate veins
+  8. a calm wave drifting curling slowly
+  9. a dandelion releasing blossoming seeds
+  10. a peaceful mountain floating horizon
   11. a bird gliding on the wind
-  12. a tree with deep roots and a calm canopy
-  13. a still pond reflecting the sky
-  14. a candle with a steady flame
-  15. a chain of smooth stones balanced
-  16. a crescent moon over quiet hills
-  17. a starlit sky with soft clouds
+  12. a tree rising with deep roots and a calm canopy
+  13. a still pond sparkling reflecting the sky
+  14. a candle flowing with a steady flame
+  15. a chain of weaving smooth stones balanced
+  16. a crescent moon twirling over quiet hills
+  17. a starlit sky shining with soft clouds
   18. a full serene landscape at dusk, and finally everything comes back together
 - **Beispiel-Seitenprompts:**
   - *Seite 6:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a meditating figure silhouette with patterns, centered composition`
@@ -1023,23 +1042,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `an ornate floral wreath in a peaceful sunlit garden`
 - **Cover-Prompt:** `coloring book style illustration of an ornate floral wreath around an empty decorative banner ribbon, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. a small flower bud with an empty banner below
-  2. a heart wreath with blank center
-  3. a sun with rays and a ribbon banner
+  1. a small flower bud glowing with an empty banner below
+  2. a heart wreath swirling with blank center
+  3. a sun blooming with rays and a ribbon banner
   4. an open hand with a growing sprout
-  5. a butterfly over a blank decorative frame
+  5. a butterfly radiating over a blank decorative frame
   6. a blooming flower with an empty scroll
-  7. a pair of leaves framing a blank tag
-  8. a rainbow arch over a banner
-  9. a potted plant with an ornate label
+  7. a pair of drifting leaves framing a blank tag
+  8. a rainbow arch blossoming over a banner
+  9. a potted plant floating with an ornate label
   10. a bird carrying a ribbon
-  11. a moon and stars around a blank circle
-  12. a wreath of wildflowers with center space
-  13. a cup of tea with a steam ribbon
-  14. a mountain with a banner across it
-  15. a bee and honeycomb with a label
+  11. a moon and stars rising around a blank circle
+  12. a wreath of wildflowers sparkling with center space
+  13. a cup of tea flowing with a steam ribbon
+  14. a mountain weaving with a banner across it
+  15. a bee and honeycomb twirling with a label
   16. a flowing vine with empty plaques
-  17. a heart in two hands with a banner
+  17. a heart shining in two hands with a banner
   18. a full flower garden framing a large blank banner, all coming back together as one
 - **Beispiel-Seitenprompts:**
   - *Seite 2:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a heart wreath with blank center, centered composition`
@@ -1054,21 +1073,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a bold simple smiling sun with a calm cloud and heart`
 - **Cover-Prompt:** `coloring book style illustration of a bold simple smiling sun with a calm cloud and heart, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a open hand with a heart surrounded by soft clouds
-  2. a breathing wave pattern framed by garden leaves
-  3. a lotus pose figure beside still water
-  4. a calm face with closed eyes under a crescent moon
-  5. a candle flame ringed by tiny stars
+  1. a open hand glowing with a heart surrounded by soft clouds
+  2. a breathing wave pattern framed swirling by garden leaves
+  3. a lotus pose figure blooming beside still water
+  4. a calm face radiating with closed eyes under a crescent moon
+  5. a candle flame ringed drifting by tiny stars
   6. a feather drifting over a calm meadow
-  7. a still teacup by a quiet pond
-  8. a balanced stones in the morning sky
-  9. a gentle rain pattern surrounded by soft clouds
-  10. a soft cloud framed by garden leaves
+  7. a still teacup blossoming by a quiet pond
+  8. a balanced stones floating in the morning sky
+  9. a gentle rain pattern surrounded rising by soft clouds
+  10. a soft cloud framed sparkling by garden leaves
   11. a blooming lotus beside still water
-  12. a quiet bird under a crescent moon
-  13. a warm sun ringed by tiny stars
-  14. a leaf on water over a calm meadow
-  15. a peaceful moon by a quiet pond
+  12. a quiet bird flowing under a crescent moon
+  13. a warm sun ringed weaving by tiny stars
+  14. a leaf twirling on water over a calm meadow
+  15. a peaceful moon shining by a quiet pond
   16. the whole calm mindfulness scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 4:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a chunky lotus flower, centered composition`
@@ -1088,23 +1107,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a steampunk pocket watch on an inventor's workshop desk`
 - **Cover-Prompt:** `coloring book style illustration of a steampunk pocket watch with gears wings and a key, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. a brass gear cluster in the old town
-  2. a pocket watch by the cathedral
-  3. a mechanical owl on a cobbled street
-  4. a copper pipework at the market square
-  5. a vintage telescope below the clock tower
-  6. a cog-driven clock across a stone bridge
-  7. a steam valve along a quiet alley
-  8. a tinker's goggles in a courtyard
-  9. a wind-up key in the old town
-  10. a airship model by the cathedral
-  11. a lever panel on a cobbled street
-  12. a robot arm at the market square
-  13. a pressure gauge below the clock tower
-  14. a lantern and tools across a stone bridge
-  15. a blueprint scroll along a quiet alley
-  16. a brass gear cluster in a courtyard
-  17. a pocket watch in the old town
+  1. a brass gear cluster resting in the old town
+  2. a pocket watch glowing by the cathedral
+  3. a mechanical owl sparkling on a cobbled street
+  4. a copper pipework standing at the market square
+  5. a vintage telescope floating below the clock tower
+  6. a cog-driven clock smiling across a stone bridge
+  7. a steam valve drifting along a quiet alley
+  8. a tinker's goggles rising in a courtyard
+  9. a wind-up key gathering in the old town
+  10. a airship model shining by the cathedral
+  11. a lever panel balancing on a cobbled street
+  12. a robot arm swaying at the market square
+  13. a pressure gauge perching below the clock tower
+  14. a lantern and tools stacking across a stone bridge
+  15. a blueprint scroll resting along a quiet alley
+  16. a brass gear cluster glowing in a courtyard
+  17. a pocket watch sparkling in the old town
   18. the whole inventor workshop scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 3:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a mechanical owl with gear feathers, centered composition`
@@ -1119,23 +1138,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a grand steampunk airship flying over a clockwork city`
 - **Cover-Prompt:** `coloring book style illustration of a grand steampunk airship flying over a clockwork city, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. an airship docked at a tower
-  2. a captain's wheel and controls
-  3. a brass telescope on the deck
-  4. a map with a plotted route and compass
+  1. an airship docked resting at a tower
+  2. a captain's wheel glowing and controls
+  3. a brass telescope sparkling on the deck
+  4. a map standing with a plotted route and compass
   5. the airship rising above rooftops
-  6. a sea of clouds below the hull
-  7. a flock of mechanical birds alongside
+  6. a sea of floating clouds below the hull
+  7. a flock of smiling mechanical birds alongside
   8. a floating island with gears
-  9. a steampunk lighthouse on a cliff
-  10. a hot-air balloon caravan
-  11. a storm with lightning and propellers
-  12. a sky-port with many airships
-  13. an engine room with pistons
+  9. a steampunk lighthouse drifting on a cliff
+  10. a hot-air balloon rising caravan
+  11. a storm gathering with lightning and propellers
+  12. a sky-port shining with many airships
+  13. an engine room balancing with pistons
   14. a crew member with goggles waving
-  15. a distant clockwork mountain city
-  16. an anchor dropping toward a platform
-  17. a celebration with banners on deck
+  15. a distant clockwork swaying mountain city
+  16. an anchor dropping perching toward a platform
+  17. a celebration stacking with banners on deck
   18. the full brass metropolis at arrival, and finally everything comes back together
 - **Beispiel-Seitenprompts:**
   - *Seite 8:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a floating island with gears, in a small scene with surroundings`
@@ -1150,21 +1169,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a vintage gramophone on a shelf in a steampunk study`
 - **Cover-Prompt:** `coloring book style illustration of a bold simple vintage gramophone and pocket watch, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a antique typewriter in the old town
-  2. a stack of old books by the cathedral
-  3. a brass compass on a cobbled street
-  4. a ink bottle and quill at the market square
-  5. a vintage camera below the clock tower
-  6. a ornate teapot across a stone bridge
-  7. a pocket watch chain along a quiet alley
-  8. a candlestick in a courtyard
-  9. a rolled map in the old town
-  10. a magnifying glass by the cathedral
-  11. a feathered hat on a cobbled street
-  12. a wine bottle at the market square
-  13. a gramophone below the clock tower
-  14. a spectacles across a stone bridge
-  15. a key ring along a quiet alley
+  1. a antique typewriter resting in the old town
+  2. a stack of old books glowing by the cathedral
+  3. a brass compass sparkling on a cobbled street
+  4. a ink bottle and quill standing at the market square
+  5. a vintage camera floating below the clock tower
+  6. a ornate teapot smiling across a stone bridge
+  7. a pocket watch chain drifting along a quiet alley
+  8. a candlestick rising in a courtyard
+  9. a rolled map gathering in the old town
+  10. a magnifying glass shining by the cathedral
+  11. a feathered hat balancing on a cobbled street
+  12. a wine bottle swaying at the market square
+  13. a gramophone below perching the clock tower
+  14. a spectacles stacking across a stone bridge
+  15. a key ring resting along a quiet alley
   16. the whole vintage still life scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 5:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a bold gramophone with horn, centered composition`
@@ -1186,24 +1205,24 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of an intricate coral reef with a sea turtle and tropical fish, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→20):**
   1. a sea turtle swimming up toward the sunlit water surface
-  2. a school of fish near the surface
+  2. a school of fish swimming near the surface
   3. a sea turtle gliding down
-  4. an ornate jellyfish with trailing tentacles
-  5. a seahorse among seagrass
-  6. a branching coral formation
-  7. a clownfish in an anemone
-  8. a manta ray with patterned wings
-  9. a starfish on a rock
-  10. an octopus with curling arms
-  11. a pufferfish with spines
-  12. a giant clam with a pearl
+  4. an ornate jellyfish gliding with trailing tentacles
+  5. a seahorse floating among seagrass
+  6. a branching coral diving formation
+  7. a clownfish splashing in an anemone
+  8. a manta ray drifting with patterned wings
+  9. a starfish snorkeling on a rock
+  10. an octopus playing with curling arms
+  11. a pufferfish exploring with spines
+  12. a giant clam peeking with a pearl
   13. a moray eel peeking from coral
-  14. a swirl of tropical fish
-  15. a detailed seashell collection
-  16. a dolphin spiraling upward
-  17. a forest of kelp
-  18. a sunken treasure chest with bubbles
-  19. an anglerfish in the deep
+  14. a swirl of chasing tropical fish
+  15. a detailed seashell waving collection
+  16. a dolphin spiraling resting upward
+  17. a forest of hovering kelp
+  18. a sunken treasure chest swimming with bubbles
+  19. an anglerfish gliding in the deep
   20. the full coral reef panorama, and finally everything comes back together
 - **Beispiel-Seitenprompts:**
   - *Seite 4:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, an ornate jellyfish with trailing tentacles, full body view`
@@ -1218,22 +1237,22 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `an ornate bioluminescent deep sea jellyfish and anglerfish`
 - **Cover-Prompt:** `coloring book style illustration of an ornate bioluminescent deep sea jellyfish and anglerfish, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. a whale silhouette in dim water
-  2. a bioluminescent jellyfish with patterns
+  1. a whale silhouette swimming in dim water
+  2. a bioluminescent jellyfish gliding with patterns
   3. a school of lanternfish with glowing dots
-  4. a giant squid with long tentacles
+  4. a giant squid floating with long tentacles
   5. an anglerfish with a glowing lure
-  6. a nautilus shell spiral
-  7. a deep-sea coral with delicate branches
+  6. a nautilus shell diving spiral
+  7. a deep-sea coral splashing with delicate branches
   8. a ray gliding over the seabed
   9. a cluster of glowing sea anemones
-  10. a hatchetfish with reflective scales
-  11. a hydrothermal vent with bubbles
-  12. an ornate seahorse of the deep
-  13. a viperfish with sharp patterns
-  14. a basket star with branching arms
-  15. a sunken ship covered in coral
-  16. a sperm whale and squid encounter
+  10. a hatchetfish drifting with reflective scales
+  11. a hydrothermal vent snorkeling with bubbles
+  12. an ornate seahorse playing of the deep
+  13. a viperfish exploring with sharp patterns
+  14. a basket star peeking with branching arms
+  15. a sunken ship covered chasing in coral
+  16. a sperm whale waving and squid encounter
   17. a swarm of glowing plankton
   18. the full deep-sea panorama, all coming back together as one
 - **Beispiel-Seitenprompts:**
@@ -1250,20 +1269,20 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of a bold simple smiling whale with a starfish, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a smiling sea turtle over the coral reef
-  2. a playful dolphin in the open sea
-  3. a curious clownfish on the sandy seabed
-  4. a gentle whale in a kelp forest
-  5. a tiny seahorse near a bright lagoon
-  6. a friendly octopus along the ocean current
-  7. a spotted ray by a rocky reef
-  8. a starfish above the seabed
-  9. a jellyfish with frills over the coral reef
-  10. a puffer fish in the open sea
-  11. a crab with bubbles on the sandy seabed
-  12. a school of fish in a kelp forest
-  13. a sea snail near a bright lagoon
-  14. a anemone along the ocean current
-  15. a baby seal by a rocky reef
+  2. a playful dolphin swimming in the open sea
+  3. a curious clownfish gliding on the sandy seabed
+  4. a gentle whale floating in a kelp forest
+  5. a tiny seahorse diving near a bright lagoon
+  6. a friendly octopus splashing along the ocean current
+  7. a spotted ray drifting by a rocky reef
+  8. a starfish snorkeling above the seabed
+  9. a jellyfish playing with frills over the coral reef
+  10. a puffer fish exploring in the open sea
+  11. a crab peeking with bubbles on the sandy seabed
+  12. a school of fish chasing in a kelp forest
+  13. a sea snail waving near a bright lagoon
+  14. a anemone resting along the ocean current
+  15. a baby seal hovering by a rocky reef
   16. the whole gentle sea friends scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 1:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a bold simple smiling whale, centered composition`
@@ -1284,23 +1303,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `an ornate butterfly over a sunny flower meadow`
 - **Cover-Prompt:** `coloring book style illustration of an ornate butterfly with intricate patterned wings on flowers, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. a monarch butterfly over a flower meadow
-  2. a swallowtail butterfly in a cottage garden
-  3. a blue morpho by a lily pond
-  4. a moth with eyespots across a wildflower field
+  1. a monarch butterfly playing over a flower meadow
+  2. a swallowtail butterfly leaping in a cottage garden
+  3. a blue morpho resting by a lily pond
+  4. a moth gazing with eyespots across a wildflower field
   5. a pair of fluttering wings along the hedgerow
-  6. a butterfly on a daisy at the forest edge
-  7. a chrysalis on a stem by a quiet stream
-  8. a swirl of butterflies in a sunny grove
-  9. a painted lady over a flower meadow
-  10. a dragonfly in a cottage garden
-  11. a ladybird by a lily pond
-  12. a bee among petals across a wildflower field
-  13. a rose with a butterfly along the hedgerow
-  14. a lavender sprig at the forest edge
-  15. a fern with wings by a quiet stream
-  16. a poppy and a moth in a sunny grove
-  17. a thistle bloom over a flower meadow
+  6. a butterfly hopping on a daisy at the forest edge
+  7. a chrysalis climbing on a stem by a quiet stream
+  8. a swirl of butterflies splashing in a sunny grove
+  9. a painted lady stretching over a flower meadow
+  10. a dragonfly peeking in a cottage garden
+  11. a ladybird waving by a lily pond
+  12. a bee exploring among petals across a wildflower field
+  13. a rose perching with a butterfly along the hedgerow
+  14. a lavender sprig tumbling at the forest edge
+  15. a fern munching with wings by a quiet stream
+  16. a poppy and a moth gliding in a sunny grove
+  17. a thistle bloom dancing over a flower meadow
   18. the whole butterfly dance scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 3:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a single ornate butterfly opening its wings, centered composition`
@@ -1315,23 +1334,23 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `an ornate dragonfly with detailed wings over a lily pond`
 - **Cover-Prompt:** `coloring book style illustration of an ornate dragonfly with detailed wings over a lily pond, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
-  1. a darting dragonfly over a flower meadow
-  2. a damselfly on a reed in a cottage garden
-  3. a lily pad with a frog by a lily pond
-  4. a water lily bloom across a wildflower field
-  5. a cattail stem along the hedgerow
-  6. a pond skater at the forest edge
-  7. a fish below the surface by a quiet stream
-  8. a dragonfly nymph in a sunny grove
-  9. a reed cluster over a flower meadow
-  10. a ripple ring in a cottage garden
-  11. a duck weed patch by a lily pond
-  12. a frog on a stone across a wildflower field
-  13. a iris flower along the hedgerow
-  14. a willow branch at the forest edge
-  15. a snail on a leaf by a quiet stream
-  16. a moth at dusk in a sunny grove
-  17. a bullrush over a flower meadow
+  1. a darting dragonfly playing over a flower meadow
+  2. a damselfly leaping on a reed in a cottage garden
+  3. a lily pad resting with a frog by a lily pond
+  4. a water lily bloom gazing across a wildflower field
+  5. a cattail stem hopping along the hedgerow
+  6. a pond skater climbing at the forest edge
+  7. a fish below the surface splashing by a quiet stream
+  8. a dragonfly nymph stretching in a sunny grove
+  9. a reed cluster peeking over a flower meadow
+  10. a ripple ring waving in a cottage garden
+  11. a duck weed patch exploring by a lily pond
+  12. a frog perching on a stone across a wildflower field
+  13. a iris flower tumbling along the hedgerow
+  14. a willow branch munching at the forest edge
+  15. a snail gliding on a leaf by a quiet stream
+  16. a moth dancing at dusk in a sunny grove
+  17. a bullrush playing over a flower meadow
   18. the whole dragonfly pond scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 2:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, intricate and highly detailed, ornate decorative patterns, fine delicate linework, zentangle style, a dragonfly with detailed transparent wings, centered composition`
@@ -1346,21 +1365,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a big patterned butterfly in a blooming garden`
 - **Cover-Prompt:** `coloring book style illustration of a bold simple butterfly with big patterned wings on a flower, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a giant ornate butterfly over a flower meadow
-  2. a atlas moth in a cottage garden
-  3. a peacock butterfly by a lily pond
-  4. a luna moth across a wildflower field
-  5. a tiger swallowtail along the hedgerow
-  6. a emperor butterfly at the forest edge
-  7. a wings with mandala patterns by a quiet stream
-  8. a symmetrical wing study in a sunny grove
-  9. a butterfly with paisley wings over a flower meadow
-  10. a moth with lace wings in a cottage garden
-  11. a spread wings close-up by a lily pond
-  12. a wing tip detail across a wildflower field
-  13. a patterned wing pair along the hedgerow
-  14. a blossom with a butterfly at the forest edge
-  15. a vine with a moth by a quiet stream
+  1. a giant ornate butterfly playing over a flower meadow
+  2. a atlas moth leaping in a cottage garden
+  3. a peacock butterfly resting by a lily pond
+  4. a luna moth gazing across a wildflower field
+  5. a tiger swallowtail hopping along the hedgerow
+  6. a emperor butterfly climbing at the forest edge
+  7. a wings splashing with mandala patterns by a quiet stream
+  8. a symmetrical wing study stretching in a sunny grove
+  9. a butterfly peeking with paisley wings over a flower meadow
+  10. a moth waving with lace wings in a cottage garden
+  11. a spread wings close-up exploring by a lily pond
+  12. a wing tip detail perching across a wildflower field
+  13. a patterned wing pair tumbling along the hedgerow
+  14. a blossom munching with a butterfly at the forest edge
+  15. a vine gliding with a moth by a quiet stream
   16. the whole great wings scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 7:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a big butterfly with swirl patterns, centered composition`
@@ -1384,21 +1403,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute happy fox and rabbit sitting in a meadow`
 - **Cover-Prompt:** `coloring book style illustration of a cute happy fox and rabbit sitting in a meadow, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a happy rabbit in a sunny meadow
-  2. a playful fox deep in the jungle
-  3. a wise owl by the wide river
-  4. a little hedgehog across the savanna
-  5. a busy squirrel at the waterhole
-  6. a spotted deer in the forest
-  7. a buzzing bee on a grassy hill
+  1. a happy rabbit playing in a sunny meadow
+  2. a playful fox deep leaping in the jungle
+  3. a wise owl resting by the wide river
+  4. a little hedgehog gazing across the savanna
+  5. a busy squirrel hopping at the waterhole
+  6. a spotted deer climbing in the forest
+  7. a buzzing bee splashing on a grassy hill
   8. a singing bird near a jungle stream
-  9. a fuzzy caterpillar in a sunny meadow
+  9. a fuzzy caterpillar stretching in a sunny meadow
   10. a hopping frog deep in the jungle
-  11. a field mouse by the wide river
-  12. a ladybird across the savanna
-  13. a butterfly at the waterhole
+  11. a field mouse peeking by the wide river
+  12. a ladybird waving across the savanna
+  13. a butterfly exploring at the waterhole
   14. a mole peeking out in the forest
-  15. a duck family on a grassy hill
+  15. a duck family perching on a grassy hill
   16. the whole meadow animals scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 2:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a happy fox with a bushy tail, full body view`
@@ -1414,20 +1433,20 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of cute animals at a birthday party with balloons and cake, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a dancing bear in a sunny meadow
-  2. a lion with a party hat deep in the jungle
-  3. a elephant with balloons by the wide river
-  4. a monkey on a swing across the savanna
-  5. a giraffe with streamers at the waterhole
-  6. a zebra with a drum in the forest
-  7. a hippo with cake on a grassy hill
-  8. a parrot with confetti near a jungle stream
-  9. a fox with a gift in a sunny meadow
-  10. a rabbit with a ribbon deep in the jungle
-  11. a owl with a lantern by the wide river
-  12. a deer with flowers across the savanna
-  13. a raccoon with snacks at the waterhole
-  14. a penguin with a horn in the forest
-  15. a tiger with a banner on a grassy hill
+  2. a lion playing with a party hat deep in the jungle
+  3. a elephant leaping with balloons by the wide river
+  4. a monkey resting on a swing across the savanna
+  5. a giraffe gazing with streamers at the waterhole
+  6. a zebra hopping with a drum in the forest
+  7. a hippo climbing with cake on a grassy hill
+  8. a parrot splashing with confetti near a jungle stream
+  9. a fox stretching with a gift in a sunny meadow
+  10. a rabbit peeking with a ribbon deep in the jungle
+  11. a owl waving with a lantern by the wide river
+  12. a deer exploring with flowers across the savanna
+  13. a raccoon perching with snacks at the waterhole
+  14. a penguin tumbling with a horn in the forest
+  15. a tiger munching with a banner on a grassy hill
   16. the whole animal party scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 3:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a fox carrying a birthday cake, full body view`
@@ -1442,21 +1461,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute kitten and puppy playing in a flower meadow`
 - **Cover-Prompt:** `coloring book style illustration of a cute baby kitten and puppy together, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a fluffy lion cub in a sunny meadow
-  2. a baby elephant deep in the jungle
-  3. a fox kit by the wide river
-  4. a fawn in the grass across the savanna
-  5. a duckling at the waterhole
-  6. a kitten in the forest
-  7. a puppy on a grassy hill
-  8. a bunny near a jungle stream
-  9. a baby owl in a sunny meadow
-  10. a piglet deep in the jungle
-  11. a lamb by the wide river
-  12. a chick across the savanna
-  13. a bear cub at the waterhole
-  14. a baby penguin in the forest
-  15. a joey in a pouch on a grassy hill
+  1. a fluffy lion cub playing in a sunny meadow
+  2. a baby elephant deep leaping in the jungle
+  3. a fox kit resting by the wide river
+  4. a fawn gazing in the grass across the savanna
+  5. a duckling hopping at the waterhole
+  6. a kitten climbing in the forest
+  7. a puppy splashing on a grassy hill
+  8. a bunny stretching near a jungle stream
+  9. a baby owl peeking in a sunny meadow
+  10. a piglet deep waving in the jungle
+  11. a lamb exploring by the wide river
+  12. a chick perching across the savanna
+  13. a bear cub tumbling at the waterhole
+  14. a baby penguin munching in the forest
+  15. a joey gliding in a pouch on a grassy hill
   16. the whole baby animals scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 2:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a fluffy kitten playing with yarn, full body view`
@@ -1572,20 +1591,20 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of a cute friendly t-rex and triceratops in a valley, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a baby dinosaur hatching from an egg
-  2. a friendly long-neck brontosaurus eating leaves
-  3. a happy triceratops
+  2. a friendly long-neck playing brontosaurus eating leaves
+  3. a happy triceratops leaping
   4. a smiling t-rex with tiny arms
-  5. a stegosaurus with back plates
+  5. a stegosaurus resting with back plates
   6. a flying pterodactyl
   7. a baby dino chasing a dragonfly
   8. two dinos splashing in a lake
-  9. a parasaurolophus by the trees
+  9. a parasaurolophus gazing by the trees
   10. a dino family walking together
-  11. an ankylosaurus with a club tail
+  11. an ankylosaurus hopping with a club tail
   12. a dino peeking from behind a fern
-  13. a volcano in the distance with dinos
+  13. a volcano climbing in the distance with dinos
   14. a velociraptor running
-  15. a dino nest with eggs
+  15. a dino nest splashing with eggs
   16. all the dinosaurs together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 4:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a smiling t-rex with tiny arms, full body view`
@@ -1600,21 +1619,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute baby dinosaur hatching from an egg in a fern jungle`
 - **Cover-Prompt:** `coloring book style illustration of a cute baby dinosaur hatching from an egg, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a t-rex hatchling in the deep jungle
-  2. a triceratops calf by a rocky cave
-  3. a stegosaurus baby across the wide river
-  4. a baby brontosaurus in the green valley
-  5. a pterodactyl chick below the volcano
-  6. a egg cracking open in a fern grove
-  7. a two playful hatchlings on a rocky hill
-  8. a sleepy little dino near a jungle lake
-  9. a curious baby dino in the deep jungle
-  10. a raptor chick by a rocky cave
-  11. a ankylosaurus baby across the wide river
-  12. a duckbill hatchling in the green valley
-  13. a baby dino with a bug below the volcano
-  14. a nest of eggs in a fern grove
-  15. a hatchling on a leaf on a rocky hill
+  1. a t-rex hatchling playing in the deep jungle
+  2. a triceratops calf leaping by a rocky cave
+  3. a stegosaurus baby resting across the wide river
+  4. a baby brontosaurus gazing in the green valley
+  5. a pterodactyl chick hopping below the volcano
+  6. a egg cracking open climbing in a fern grove
+  7. a two playful hatchlings splashing on a rocky hill
+  8. a sleepy little dino stretching near a jungle lake
+  9. a curious baby dino peeking in the deep jungle
+  10. a raptor chick waving by a rocky cave
+  11. a ankylosaurus baby exploring across the wide river
+  12. a duckbill hatchling perching in the green valley
+  13. a baby dino tumbling with a bug below the volcano
+  14. a nest of eggs munching in a fern grove
+  15. a hatchling gliding on a leaf on a rocky hill
   16. the whole baby dinos scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 2:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a tiny t-rex taking first steps, full body view`
@@ -1629,21 +1648,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a friendly t-rex roaring near a smoking volcano`
 - **Cover-Prompt:** `coloring book style illustration of a friendly t-rex roaring near a smoking volcano, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a smoking volcano in the deep jungle
-  2. a t-rex explorer by a rocky cave
-  3. a triceratops on a trail across the wide river
-  4. a brontosaurus by a tree in the green valley
-  5. a pterodactyl overhead below the volcano
-  6. a stegosaurus near rocks in a fern grove
-  7. a raptor pack on a rocky hill
+  1. a smoking volcano playing in the deep jungle
+  2. a t-rex explorer leaping by a rocky cave
+  3. a triceratops resting on a trail across the wide river
+  4. a brontosaurus gazing by a tree in the green valley
+  5. a pterodactyl overhead hopping below the volcano
+  6. a stegosaurus climbing near rocks in a fern grove
+  7. a raptor pack splashing on a rocky hill
   8. a river crossing on stones near a jungle lake
   9. a glowing lava flow in the deep jungle
-  10. a ferns and footprints by a rocky cave
+  10. a ferns and footprints stretching by a rocky cave
   11. a dino drinking water across the wide river
-  12. a rocky cave mouth in the green valley
-  13. a ash cloud below the volcano
-  14. a dino lookout in a fern grove
-  15. a herd on the move on a rocky hill
+  12. a rocky cave mouth peeking in the green valley
+  13. a ash cloud waving below the volcano
+  14. a dino lookout exploring in a fern grove
+  15. a herd perching on the move on a rocky hill
   16. the whole volcano adventure scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 1:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a smoking volcano with dinosaurs below, in a small scene with surroundings`
@@ -1663,21 +1682,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute excavator and dump truck at a construction site`
 - **Cover-Prompt:** `coloring book style illustration of a cute excavator and dump truck at a construction site, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a yellow excavator in the old town
-  2. a dump truck by the cathedral
-  3. a tower crane on a cobbled street
-  4. a cement mixer at the market square
-  5. a bulldozer below the clock tower
-  6. a road roller across a stone bridge
-  7. a front loader along a quiet alley
-  8. a scaffolding frame in a courtyard
-  9. a wheelbarrow in the old town
-  10. a traffic cone row by the cathedral
-  11. a digger bucket on a cobbled street
-  12. a pile of bricks at the market square
-  13. a crane hook below the clock tower
-  14. a concrete pipe across a stone bridge
-  15. a site office along a quiet alley
+  1. a yellow excavator racing in the old town
+  2. a dump truck zooming by the cathedral
+  3. a tower crane driving on a cobbled street
+  4. a cement mixer lifting at the market square
+  5. a bulldozer below hauling the clock tower
+  6. a road roller rolling across a stone bridge
+  7. a front loader building along a quiet alley
+  8. a scaffolding frame digging in a courtyard
+  9. a wheelbarrow parading in the old town
+  10. a traffic cone row waving by the cathedral
+  11. a digger bucket racing on a cobbled street
+  12. a pile of bricks carrying at the market square
+  13. a crane hook marching below the clock tower
+  14. a concrete pipe climbing across a stone bridge
+  15. a site office racing along a quiet alley
   16. the whole construction site scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 1:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, an excavator digging a hole, full body view`
@@ -1692,21 +1711,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute race car speeding along a sunny racetrack`
 - **Cover-Prompt:** `coloring book style illustration of a cute race car zooming with a checkered flag, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a speedy race car in the old town
-  2. a checkered flag by the cathedral
-  3. a motorbike racer on a cobbled street
-  4. a go-kart at the market square
-  5. a pit stop crew below the clock tower
-  6. a trophy on a stand across a stone bridge
-  7. a starting grid along a quiet alley
-  8. a fast formula car in a courtyard
+  1. a speedy race car racing in the old town
+  2. a checkered flag zooming by the cathedral
+  3. a motorbike racer driving on a cobbled street
+  4. a go-kart lifting at the market square
+  5. a pit stop hauling crew below the clock tower
+  6. a trophy rolling on a stand across a stone bridge
+  7. a starting grid building along a quiet alley
+  8. a fast formula car digging in a courtyard
   9. a racing helmet in the old town
-  10. a tire stack by the cathedral
-  11. a finish line banner on a cobbled street
-  12. a fuel can at the market square
-  13. a spectator stand below the clock tower
-  14. a winner's podium across a stone bridge
-  15. a speed sign along a quiet alley
+  10. a tire stack parading by the cathedral
+  11. a finish line banner waving on a cobbled street
+  12. a fuel can racing at the market square
+  13. a spectator stand carrying below the clock tower
+  14. a winner's podium marching across a stone bridge
+  15. a speed sign climbing along a quiet alley
   16. the whole the big race scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 4:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a monster truck with big wheels, full body view`
@@ -1721,22 +1740,22 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute fire truck and ambulance in a town`
 - **Cover-Prompt:** `coloring book style illustration of a cute fire truck and ambulance in a town, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a fire truck with a ladder
-  2. an ambulance with a siren
-  3. a police car
+  1. a fire truck racing with a ladder
+  2. an ambulance zooming with a siren
+  3. a police car driving
   4. a garbage truck lifting a bin
-  5. a tractor with a trailer
-  6. a school bus full of kids
-  7. a mail delivery van
-  8. a tow truck
-  9. a street sweeper
-  10. a snow plow clearing snow
-  11. a helicopter landing
-  12. a rescue boat
-  13. a delivery truck with boxes
-  14. a crane truck helping
-  15. a fire truck spraying water
-  16. all the helper vehicles in the town
+  5. a tractor lifting with a trailer
+  6. a school bus hauling full of kids
+  7. a mail delivery rolling van
+  8. a tow truck building
+  9. a street sweeper digging
+  10. a snow plow parading clearing snow
+  11. a helicopter landing waving
+  12. a rescue boat racing
+  13. a delivery truck carrying with boxes
+  14. a crane truck marching helping
+  15. a fire truck climbing spraying water
+  16. all the helper vehicles in the town, all together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 1:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a fire truck with a ladder, full body view`
   - *Seite 16:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, all the helper vehicles in the town, in a small scene with surroundings`
@@ -1756,22 +1775,22 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute astronaut floating with a rocket and planets`
 - **Cover-Prompt:** `coloring book style illustration of a cute astronaut floating with a rocket and planets, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a rocket on the launch pad with countdown
-  2. a rocket blasting off
+  1. a rocket floating on the launch pad with countdown
+  2. a rocket blasting drifting off
   3. a cute astronaut floating in space
-  4. the earth seen from space
+  4. the earth seen orbiting from space
   5. a smiling moon with craters
-  6. a planet with a big ring
-  7. an astronaut planting a flag on the moon
+  6. a planet zooming with a big ring
+  7. an astronaut planting a flag soaring on the moon
   8. a friendly alien waving
-  9. a UFO with lights
-  10. a shooting star and comet
-  11. an astronaut having a moon picnic
+  9. a UFO gliding with lights
+  10. a shooting star waving and comet
+  11. an astronaut having hovering a moon picnic
   12. a space rover driving
-  13. a constellation of stars
+  13. a constellation of gazing stars
   14. a satellite orbiting
   15. an astronaut collecting stars in a jar
-  16. the rocket flying home past the planets
+  16. the rocket flying home past the planets, all together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 3:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a cute astronaut floating in space, full body view`
   - *Seite 16:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, the rocket flying home past the planets, in a small scene with surroundings`
@@ -1785,21 +1804,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute alien and robot waving in space`
 - **Cover-Prompt:** `coloring book style illustration of a cute alien and robot waving in space, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a friendly one-eyed alien
-  2. a cute robot with antennae
+  1. a friendly one-eyed floating alien
+  2. a cute robot drifting with antennae
   3. a smiling planet with a face
-  4. an alien spaceship with friends inside
-  5. a star with a happy face
-  6. an astronaut shaking hands with an alien
+  4. an alien spaceship orbiting with friends inside
+  5. a star zooming with a happy face
+  6. an astronaut shaking hands soaring with an alien
   7. a three-eyed alien holding a balloon
   8. a robot dog floating
-  9. a moon wearing a nightcap
+  9. a moon wearing gliding a nightcap
   10. aliens playing with a ball
   11. a comet with a smiling face
-  12. a tiny alien on a small planet
-  13. a robot and astronaut high-fiving
+  12. a tiny alien waving on a small planet
+  13. a robot and hovering astronaut high-fiving
   14. a group of aliens dancing
-  15. a star party with planets
+  15. a star party gazing with planets
   16. all the space friends together
 - **Beispiel-Seitenprompts:**
   - *Seite 6:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, an astronaut shaking hands with an alien, in a small scene with surroundings`
@@ -1815,19 +1834,19 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of cute smiling planets of the solar system in a row, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→15):**
   1. a fiery mercury drifting in orbit
-  2. a cloudy venus across a starfield
-  3. a blue earth near a giant planet
+  2. a cloudy venus floating across a starfield
+  3. a blue earth drifting near a giant planet
   4. a red mars past the glowing moon
   5. a giant jupiter in a swirling galaxy
-  6. a ringed saturn among distant stars
-  7. a tilted uranus beside a ringed planet
-  8. a deep-blue neptune through a nebula cloud
+  6. a ringed saturn orbiting among distant stars
+  7. a tilted uranus zooming beside a ringed planet
+  8. a deep-blue neptune soaring through a nebula cloud
   9. a bright sun drifting in orbit
   10. a zooming comet across a starfield
-  11. a asteroid belt near a giant planet
+  11. a asteroid belt gliding near a giant planet
   12. a crescent moon past the glowing moon
   13. a rocket ship in a swirling galaxy
-  14. a shooting star among distant stars
+  14. a shooting star waving among distant stars
   15. the whole the planets scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 7:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, saturn with big rings, centered composition`
@@ -1849,19 +1868,19 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of a cute unicorn with a flowing mane and a rainbow, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a prancing unicorn in the enchanted forest
-  2. a rainbow arch across a rainbow meadow
-  3. a crystal castle by a crystal cave
-  4. a winged pegasus in a starlit clearing
-  5. a flower meadow foal in a flower garden
-  6. a star-maned unicorn over a misty hill
+  2. a rainbow arch playing across a rainbow meadow
+  3. a crystal castle leaping by a crystal cave
+  4. a winged pegasus resting in a starlit clearing
+  5. a flower meadow foal gazing in a flower garden
+  6. a star-maned unicorn hopping over a misty hill
   7. a magic fountain by a sparkling pond
-  8. a cloud bridge deep in the woods
-  9. a gem-studded crown in the enchanted forest
-  10. a fairy companion across a rainbow meadow
-  11. a heart-shaped tree by a crystal cave
-  12. a sparkle pond in a starlit clearing
-  13. a candy hill in a flower garden
-  14. a shooting star over a misty hill
+  8. a cloud bridge deep climbing in the woods
+  9. a gem-studded crown splashing in the enchanted forest
+  10. a fairy companion stretching across a rainbow meadow
+  11. a heart-shaped tree peeking by a crystal cave
+  12. a sparkle pond waving in a starlit clearing
+  13. a candy hill exploring in a flower garden
+  14. a shooting star perching over a misty hill
   15. a ribbon banner by a sparkling pond
   16. the whole unicorn land scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
@@ -1906,21 +1925,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute unicorn and baby dragon in an enchanted rainbow valley`
 - **Cover-Prompt:** `coloring book style illustration of a cute unicorn pegasus and baby dragon together, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a cute unicorn with a star
+  1. a cute unicorn playing with a star
   2. a winged pegasus flying
-  3. a friendly baby dragon
-  4. a little fairy with a wand
+  3. a friendly baby leaping dragon
+  4. a little fairy resting with a wand
   5. a mermaid waving
-  6. a phoenix with bright feathers
-  7. a magic castle on a hill
-  8. a tiny pixie on a flower
+  6. a phoenix gazing with bright feathers
+  7. a magic castle hopping on a hill
+  8. a tiny pixie climbing on a flower
   9. a unicorn and a dragon playing
   10. a fairy riding a butterfly
-  11. a friendly forest gnome
+  11. a friendly forest splashing gnome
   12. a magic crystal glowing
-  13. a pegasus and a rainbow
-  14. a fairy ring of mushrooms
-  15. magical creatures at a festival
+  13. a pegasus and stretching a rainbow
+  14. a fairy ring peeking of mushrooms
+  15. magical creatures waving at a festival
   16. all the magical creatures together
 - **Beispiel-Seitenprompts:**
   - *Seite 3:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a friendly baby dragon, full body view`
@@ -1941,19 +1960,19 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of a magical mushroom house with a fairy in an enchanted forest, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a forest path with glowing mushrooms
-  2. a little mushroom house with a door
-  3. a tree with a friendly face
-  4. a fairy sitting on a flower
-  5. a toadstool village
-  6. a gnome with a lantern
+  2. a little mushroom house playing with a door
+  3. a tree leaping with a friendly face
+  4. a fairy sitting resting on a flower
+  5. a toadstool village gazing
+  6. a gnome hopping with a lantern
   7. fireflies dancing over a stream
-  8. a fairy with delicate wings
-  9. a hidden door in a tree trunk
-  10. a snail on a mushroom
-  11. a fairy ring of flowers
+  8. a fairy climbing with delicate wings
+  9. a hidden door splashing in a tree trunk
+  10. a snail stretching on a mushroom
+  11. a fairy ring peeking of flowers
   12. an owl watching from a branch
-  13. a tiny bridge over a brook
-  14. a deer in a moonlit clearing
+  13. a tiny bridge waving over a brook
+  14. a deer exploring in a moonlit clearing
   15. fairies dancing in a circle
   16. the full enchanted forest clearing at night, and finally everything comes back together
 - **Beispiel-Seitenprompts:**
@@ -1999,21 +2018,21 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of a cute fox and squirrel in a cozy forest tree house, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a fox peeking from its cozy den
-  2. a squirrel in a tree nest with acorns
-  3. a hedgehog house under tree roots
-  4. an owl in a tree hollow
-  5. a rabbit in a burrow with carrots
-  6. a beaver lodge by the stream
-  7. a mouse in a tiny acorn house
-  8. a bird family in a nest
-  9. a badger at its tunnel door
-  10. a frog on a lily pad home
-  11. a bee in a honeycomb hive
+  2. a squirrel playing in a tree nest with acorns
+  3. a hedgehog house leaping under tree roots
+  4. an owl resting in a tree hollow
+  5. a rabbit gazing in a burrow with carrots
+  6. a beaver lodge hopping by the stream
+  7. a mouse climbing in a tiny acorn house
+  8. a bird family splashing in a nest
+  9. a badger stretching at its tunnel door
+  10. a frog peeking on a lily pad home
+  11. a bee waving in a honeycomb hive
   12. a deer resting in tall grass
   13. a chipmunk gathering seeds
-  14. a turtle in a log
-  15. all the animal homes in one tree
-  16. the whole forest village of animal homes
+  14. a turtle exploring in a log
+  15. all the animal homes perching in one tree
+  16. the whole forest village of animal homes, all together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 1:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a fox peeking from its cozy den, in a small scene with surroundings`
   - *Seite 16:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, the whole forest village of animal homes, in a small scene with surroundings`
@@ -2034,21 +2053,21 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of a cute mermaid with a seashell crown and a seahorse, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a cute mermaid swimming
-  2. a coral castle in the sea
-  3. a mermaid with a seashell crown
-  4. a friendly seahorse
+  2. a coral castle swimming in the sea
+  3. a mermaid gliding with a seashell crown
+  4. a friendly seahorse floating
   5. a mermaid riding a dolphin
-  6. a treasure chest with pearls
-  7. a mermaid combing her hair with a shell
-  8. a baby mermaid with a fish friend
-  9. a pearl market with shells
-  10. a mermaid and a sea turtle
-  11. a starfish and bubbles
+  6. a treasure chest diving with pearls
+  7. a mermaid combing her hair splashing with a shell
+  8. a baby mermaid drifting with a fish friend
+  9. a pearl market snorkeling with shells
+  10. a mermaid and playing a sea turtle
+  11. a starfish and exploring bubbles
   12. a mermaid singing on a rock
-  13. a clam with a big pearl
+  13. a clam peeking with a big pearl
   14. mermaids playing with fish
-  15. a grand shell palace ballroom
-  16. all the mermaids at the underwater festival
+  15. a grand shell chasing palace ballroom
+  16. all the mermaids at the underwater festival, all together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 1:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a cute mermaid swimming, full body view`
   - *Seite 16:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, all the mermaids at the underwater festival, in a small scene with surroundings`
@@ -2091,21 +2110,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute mermaid swimming with a dolphin over a coral reef`
 - **Cover-Prompt:** `coloring book style illustration of a cute mermaid hugging a dolphin friend, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a mermaid with a turtle over the coral reef
-  2. a playful dolphin pod in the open sea
-  3. a seahorse herd on the sandy seabed
-  4. a clownfish school in a kelp forest
-  5. a gentle whale near a bright lagoon
-  6. a octopus juggling shells along the ocean current
-  7. a crab band by a rocky reef
-  8. a sea otter above the seabed
-  9. a puffer fish over the coral reef
-  10. a manta ray in the open sea
-  11. a starfish cluster on the sandy seabed
-  12. a jellyfish drift in a kelp forest
-  13. a baby seal near a bright lagoon
-  14. a angelfish pair along the ocean current
-  15. a narwhal by a rocky reef
+  1. a mermaid swimming with a turtle over the coral reef
+  2. a playful dolphin pod gliding in the open sea
+  3. a seahorse herd floating on the sandy seabed
+  4. a clownfish school diving in a kelp forest
+  5. a gentle whale splashing near a bright lagoon
+  6. a octopus juggling shells drifting along the ocean current
+  7. a crab band snorkeling by a rocky reef
+  8. a sea otter playing above the seabed
+  9. a puffer fish exploring over the coral reef
+  10. a manta ray peeking in the open sea
+  11. a starfish cluster chasing on the sandy seabed
+  12. a jellyfish drift waving in a kelp forest
+  13. a baby seal resting near a bright lagoon
+  14. a angelfish pair hovering along the ocean current
+  15. a narwhal swimming by a rocky reef
   16. the whole mermaid sea friends scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 4:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a mermaid riding a seahorse, full body view`
@@ -2126,21 +2145,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute cow pig and chicken in front of a barn`
 - **Cover-Prompt:** `coloring book style illustration of a cute cow pig and chicken in front of a barn, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a rooster crowing on a fence
-  2. a big red barn with a sun
-  3. a friendly cow with a bell
-  4. a happy pig in the mud
-  5. a hen with little chicks
-  6. a fluffy sheep
-  7. a horse in the stable
-  8. a farmer feeding the animals
-  9. a goat on a hay bale
-  10. a duck pond with ducklings
-  11. a tractor in the field
-  12. a basket of fresh eggs
+  1. a rooster crowing playing on a fence
+  2. a big red barn leaping with a sun
+  3. a friendly cow resting with a bell
+  4. a happy pig gazing in the mud
+  5. a hen hopping with little chicks
+  6. a fluffy sheep climbing
+  7. a horse splashing in the stable
+  8. a farmer feeding stretching the animals
+  9. a goat peeking on a hay bale
+  10. a duck pond waving with ducklings
+  11. a tractor exploring in the field
+  12. a basket of perching fresh eggs
   13. a cat chasing a mouse in the barn
-  14. a scarecrow in the corn
-  15. a wheelbarrow of vegetables
+  14. a scarecrow tumbling in the corn
+  15. a wheelbarrow of munching vegetables
   16. all the farm animals at sunset by the barn
 - **Beispiel-Seitenprompts:**
   - *Seite 3:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a friendly cow with a bell, full body view`
@@ -2155,20 +2174,20 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute chick piglet and lamb in front of a red barn`
 - **Cover-Prompt:** `coloring book style illustration of a cute baby chick piglet and lamb together, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→15):**
-  1. a fluffy chick by the red barn
-  2. a wobbly lamb in a green meadow
-  3. a piglet across the farm field
-  4. a calf in the orchard
-  5. a foal on the pasture
-  6. a duckling near the duck pond
-  7. a kitten in hay by the chicken coop
-  8. a puppy by the gate beside the stable
-  9. a goat kid by the red barn
-  10. a bunny in a green meadow
-  11. a gosling across the farm field
-  12. a donkey foal in the orchard
-  13. a turkey poult on the pasture
-  14. a baby goose near the duck pond
+  1. a fluffy chick playing by the red barn
+  2. a wobbly lamb leaping in a green meadow
+  3. a piglet resting across the farm field
+  4. a calf gazing in the orchard
+  5. a foal hopping on the pasture
+  6. a duckling climbing near the duck pond
+  7. a kitten splashing in hay by the chicken coop
+  8. a puppy stretching by the gate beside the stable
+  9. a goat kid peeking by the red barn
+  10. a bunny waving in a green meadow
+  11. a gosling exploring across the farm field
+  12. a donkey foal perching in the orchard
+  13. a turkey poult tumbling on the pasture
+  14. a baby goose munching near the duck pond
   15. the whole farm babies scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 2:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a baby piglet, full body view`
@@ -2183,21 +2202,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute rabbit with a basket of garden vegetables`
 - **Cover-Prompt:** `coloring book style illustration of a cute rabbit with a basket of garden vegetables, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a ripe tomato vine by the red barn
-  2. a row of carrots in a green meadow
-  3. a leafy lettuce head across the farm field
-  4. a pumpkin on the ground in the orchard
-  5. a corn stalk on the pasture
-  6. a pea pods on a trellis near the duck pond
-  7. a potato patch by the chicken coop
-  8. a scarecrow beside the stable
+  1. a ripe tomato vine playing by the red barn
+  2. a row of carrots leaping in a green meadow
+  3. a leafy lettuce head resting across the farm field
+  4. a pumpkin gazing on the ground in the orchard
+  5. a corn stalk hopping on the pasture
+  6. a pea pods climbing on a trellis near the duck pond
+  7. a potato patch splashing by the chicken coop
+  8. a scarecrow stretching beside the stable
   9. a watering can by the red barn
-  10. a bee on a blossom in a green meadow
-  11. a ladybird on a leaf across the farm field
-  12. a wheelbarrow of veg in the orchard
-  13. a garden snail on the pasture
-  14. a sunflower near the duck pond
-  15. a basket of harvest by the chicken coop
+  10. a bee peeking on a blossom in a green meadow
+  11. a ladybird waving on a leaf across the farm field
+  12. a wheelbarrow of veg exploring in the orchard
+  13. a garden snail perching on the pasture
+  14. a sunflower tumbling near the duck pond
+  15. a basket of harvest munching by the chicken coop
   16. the whole vegetable garden scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 4:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a big pumpkin with a snail, centered composition`
@@ -2218,19 +2237,19 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of a cute kawaii cupcake and donut with happy faces, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a smiling cupcake on a kitchen shelf
-  2. a happy croissant by a sunny window
-  3. a cheerful donut in a cozy cafe room
-  4. a blushing macaron on a garden table
-  5. a winking cookie at a market stall
-  6. a cream cake slice in a warm kitchen
-  7. a pretzel with a face by the bakery window
-  8. a bread loaf buddy in a snug room
-  9. a cinnamon roll on a kitchen shelf
-  10. a strawberry tart by a sunny window
-  11. a muffin pal in a cozy cafe room
-  12. a gingerbread friend on a garden table
-  13. a cake pop at a market stall
-  14. a jam jar in a warm kitchen
+  2. a happy croissant resting by a sunny window
+  3. a cheerful donut glowing in a cozy cafe room
+  4. a blushing macaron sparkling on a garden table
+  5. a winking cookie standing at a market stall
+  6. a cream cake slice floating in a warm kitchen
+  7. a pretzel smiling with a face by the bakery window
+  8. a bread loaf buddy drifting in a snug room
+  9. a cinnamon roll rising on a kitchen shelf
+  10. a strawberry tart gathering by a sunny window
+  11. a muffin pal shining in a cozy cafe room
+  12. a gingerbread friend balancing on a garden table
+  13. a cake pop swaying at a market stall
+  14. a jam jar perching in a warm kitchen
   15. a rolling pin by the bakery window
   16. the whole kawaii bakery scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
@@ -2247,20 +2266,20 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of a cute kawaii ice cream cone and milkshake with faces, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a smiling ice cream cone on a kitchen shelf
-  2. a happy popsicle by a sunny window
-  3. a sundae with a face in a cozy cafe room
-  4. a cheerful milkshake on a garden table
-  5. a bubble tea buddy at a market stall
-  6. a frozen yogurt swirl in a warm kitchen
-  7. a snow cone by the bakery window
-  8. a banana split in a snug room
-  9. a gelato scoop on a kitchen shelf
-  10. a waffle cone pal by a sunny window
-  11. a sprinkle jar in a cozy cafe room
-  12. a cherry on top on a garden table
-  13. a soft-serve swirl at a market stall
-  14. a ice pop trio in a warm kitchen
-  15. a parfait glass by the bakery window
+  2. a happy popsicle resting by a sunny window
+  3. a sundae glowing with a face in a cozy cafe room
+  4. a cheerful milkshake sparkling on a garden table
+  5. a bubble tea buddy standing at a market stall
+  6. a frozen yogurt swirl floating in a warm kitchen
+  7. a snow cone smiling by the bakery window
+  8. a banana split drifting in a snug room
+  9. a gelato scoop rising on a kitchen shelf
+  10. a waffle cone pal gathering by a sunny window
+  11. a sprinkle jar shining in a cozy cafe room
+  12. a cherry balancing on top on a garden table
+  13. a soft-serve swirl swaying at a market stall
+  14. a ice pop trio perching in a warm kitchen
+  15. a parfait glass stacking by the bakery window
   16. the whole kawaii ice cream scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 3:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a smiling milkshake with a straw, centered composition`
@@ -2275,21 +2294,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute kawaii cat-shaped sushi on a kitchen plate`
 - **Cover-Prompt:** `coloring book style illustration of a cute kawaii cat holding sushi with a happy face, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a cat-shaped cookie on a kitchen shelf
-  2. a bunny rice ball by a sunny window
-  3. a bear pancake in a cozy cafe room
-  4. a panda cupcake on a garden table
-  5. a frog matcha cup at a market stall
-  6. a duck custard bun in a warm kitchen
-  7. a hedgehog bread by the bakery window
-  8. a penguin onigiri in a snug room
-  9. a fox tart on a kitchen shelf
-  10. a owl muffin by a sunny window
-  11. a piglet pudding in a cozy cafe room
-  12. a chick egg cup on a garden table
-  13. a puppy donut at a market stall
-  14. a kitten macaron in a warm kitchen
-  15. a lamb marshmallow by the bakery window
+  1. a cat-shaped cookie resting on a kitchen shelf
+  2. a bunny rice ball glowing by a sunny window
+  3. a bear pancake sparkling in a cozy cafe room
+  4. a panda cupcake standing on a garden table
+  5. a frog matcha cup floating at a market stall
+  6. a duck custard bun smiling in a warm kitchen
+  7. a hedgehog bread drifting by the bakery window
+  8. a penguin onigiri rising in a snug room
+  9. a fox tart gathering on a kitchen shelf
+  10. a owl muffin shining by a sunny window
+  11. a piglet pudding balancing in a cozy cafe room
+  12. a chick egg cup swaying on a garden table
+  13. a puppy donut perching at a market stall
+  14. a kitten macaron stacking in a warm kitchen
+  15. a lamb marshmallow resting by the bakery window
   16. the whole kawaii animal snacks scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 2:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a happy panda with bubble tea, centered composition`
@@ -2311,19 +2330,19 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of a cute lion elephant and giraffe on a safari, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a safari jeep driving into the savanna
-  2. a friendly lion with a big mane
-  3. an elephant spraying water
-  4. a tall giraffe eating leaves
-  5. a striped zebra
-  6. a rhino with a small bird
-  7. a hippo in a water hole
+  2. a friendly lion playing with a big mane
+  3. an elephant spraying leaping water
+  4. a tall giraffe resting eating leaves
+  5. a striped zebra gazing
+  6. a rhino hopping with a small bird
+  7. a hippo climbing in a water hole
   8. a cheetah resting on a rock
-  9. a family of meerkats
+  9. a family of splashing meerkats
   10. a warthog trotting
-  11. a flock of flamingos
-  12. a baby elephant with its mom
-  13. an acacia tree at sunset
-  14. a crocodile by the river
+  11. a flock of stretching flamingos
+  12. a baby elephant peeking with its mom
+  13. an acacia tree waving at sunset
+  14. a crocodile exploring by the river
   15. animals gathering at the water hole
   16. all the safari animals at sunset
 - **Beispiel-Seitenprompts:**
@@ -2339,21 +2358,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute monkey and parrot in a jungle with big leaves`
 - **Cover-Prompt:** `coloring book style illustration of a cute monkey and parrot in a jungle with big leaves, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. big jungle leaves and vines
+  1. big jungle leaves playing and vines
   2. a monkey swinging on a vine
-  3. a colorful parrot on a branch
+  3. a colorful parrot leaping on a branch
   4. a friendly tiger peeking through leaves
-  5. a tree frog on a leaf
-  6. a curled-up snake on a branch
-  7. a toucan with a big beak
-  8. a sloth hanging upside down
-  9. a chameleon on a twig
+  5. a tree frog resting on a leaf
+  6. a curled-up snake gazing on a branch
+  7. a toucan hopping with a big beak
+  8. a sloth hanging climbing upside down
+  9. a chameleon splashing on a twig
   10. a jaguar resting
-  11. a hidden waterfall
-  12. a butterfly over a jungle flower
-  13. a family of monkeys
-  14. a gorilla sitting calmly
-  15. an ancient temple ruin with vines
+  11. a hidden waterfall stretching
+  12. a butterfly peeking over a jungle flower
+  13. a family of waving monkeys
+  14. a gorilla sitting exploring calmly
+  15. an ancient temple ruin perching with vines
   16. all the jungle animals together
 - **Beispiel-Seitenprompts:**
   - *Seite 2:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a monkey swinging on a vine, full body view`
@@ -2368,20 +2387,20 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute baby lion and baby elephant on a sunny savanna`
 - **Cover-Prompt:** `coloring book style illustration of a cute baby lion and baby elephant together, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→15):**
-  1. a lion cub in a sunny meadow
-  2. a baby elephant deep in the jungle
-  3. a giraffe calf by the wide river
-  4. a zebra foal across the savanna
-  5. a hippo calf at the waterhole
-  6. a rhino baby in the forest
-  7. a cheetah cub on a grassy hill
-  8. a baby monkey near a jungle stream
-  9. a warthog piglet in a sunny meadow
-  10. a meerkat pup deep in the jungle
-  11. a crocodile hatchling by the wide river
-  12. a ostrich chick across the savanna
-  13. a buffalo calf at the waterhole
-  14. a leopard cub in the forest
+  1. a lion cub playing in a sunny meadow
+  2. a baby elephant deep leaping in the jungle
+  3. a giraffe calf resting by the wide river
+  4. a zebra foal gazing across the savanna
+  5. a hippo calf hopping at the waterhole
+  6. a rhino baby climbing in the forest
+  7. a cheetah cub splashing on a grassy hill
+  8. a baby monkey stretching near a jungle stream
+  9. a warthog piglet peeking in a sunny meadow
+  10. a meerkat pup deep waving in the jungle
+  11. a crocodile hatchling exploring by the wide river
+  12. a ostrich chick perching across the savanna
+  13. a buffalo calf tumbling at the waterhole
+  14. a leopard cub munching in the forest
   15. the whole safari babies scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 1:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a baby lion yawning, full body view`
@@ -2402,21 +2421,21 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute snowman with a christmas tree and gifts`
 - **Cover-Prompt:** `coloring book style illustration of a cute snowman with a christmas tree and gifts, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a single big snowflake
-  2. a happy snowman with a scarf
-  3. children on a sled
-  4. a decorated christmas tree
-  5. a stack of wrapped gifts
-  6. a gingerbread house
-  7. a cup of cocoa with marshmallows
-  8. a wreath with a bow
-  9. a reindeer with a bell
-  10. a stocking by the fireplace
-  11. a plate of christmas cookies
-  12. a cute robin on a snowy branch
-  13. candles and ornaments
-  14. carolers under a lantern
-  15. a winter village in the snow
+  1. a single big playing snowflake
+  2. a happy snowman leaping with a scarf
+  3. children resting on a sled
+  4. a decorated christmas gazing tree
+  5. a stack of hopping wrapped gifts
+  6. a gingerbread house climbing
+  7. a cup of cocoa splashing with marshmallows
+  8. a wreath stretching with a bow
+  9. a reindeer peeking with a bell
+  10. a stocking waving by the fireplace
+  11. a plate of exploring christmas cookies
+  12. a cute robin perching on a snowy branch
+  13. candles and ornaments tumbling
+  14. carolers munching under a lantern
+  15. a winter village gliding in the snow
   16. the full festive christmas scene, all coming back together as one
 - **Beispiel-Seitenprompts:**
   - *Seite 2:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a happy snowman with a scarf, full body view`
@@ -2432,20 +2451,20 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of a cute jack-o-lantern with a friendly ghost and bat, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a smiling jack-o-lantern in a snowy village
-  2. a friendly ghost through the autumn forest
-  3. a little witch in a spring garden
-  4. a black cat at the festive town square
-  5. a candy bucket across the pumpkin field
-  6. a bat trio by a cozy home
-  7. a spooky house along the village street
-  8. a spider on a web in a frosty meadow
-  9. a scarecrow in a snowy village
-  10. a owl on a branch through the autumn forest
-  11. a monster pal in a spring garden
+  2. a friendly ghost playing through the autumn forest
+  3. a little witch leaping in a spring garden
+  4. a black cat resting at the festive town square
+  5. a candy bucket gazing across the pumpkin field
+  6. a bat trio hopping by a cozy home
+  7. a spooky house climbing along the village street
+  8. a spider splashing on a web in a frosty meadow
+  9. a scarecrow stretching in a snowy village
+  10. a owl peeking on a branch through the autumn forest
+  11. a monster pal waving in a spring garden
   12. a skeleton waving at the festive town square
-  13. a broomstick across the pumpkin field
-  14. a candy corn pile by a cozy home
-  15. a full moon along the village street
+  13. a broomstick exploring across the pumpkin field
+  14. a candy corn pile perching by a cozy home
+  15. a full moon tumbling along the village street
   16. the whole friendly halloween scene coming back together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 1:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a smiling carved pumpkin, centered composition`
@@ -2461,20 +2480,20 @@ durch die recherchierten Trend-Kategorien.
 - **Cover-Prompt:** `coloring book style illustration of a cute easter bunny with a basket of decorated eggs, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a cute easter bunny waving
-  2. a basket of decorated eggs
+  2. a basket of playing decorated eggs
   3. a chick hatching in spring
-  4. a single patterned easter egg
+  4. a single patterned leaping easter egg
   5. a bunny painting an egg
   6. tulips and daffodils blooming
-  7. a lamb in a spring meadow
-  8. an egg hunt in the garden
-  9. a butterfly over flowers
+  7. a lamb resting in a spring meadow
+  8. an egg hunt gazing in the garden
+  9. a butterfly hopping over flowers
   10. a bird building a nest
-  11. a bunny family picnic
+  11. a bunny family climbing picnic
   12. a watering can and sprouts
-  13. a rainbow over a meadow
-  14. a basket of spring flowers
-  15. animals at a spring festival
+  13. a rainbow splashing over a meadow
+  14. a basket of stretching spring flowers
+  15. animals peeking at a spring festival
   16. the full spring celebration scene, all coming back together as one
 - **Beispiel-Seitenprompts:**
   - *Seite 1:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a cute easter bunny waving, full body view`
