@@ -56,10 +56,13 @@ export async function makePin(frame: Frame, colored: Buffer, meta: PinMeta): Pro
   const cat = esc(meta.category.toUpperCase());
   const title = esc(meta.title);
   const sub = esc(SOCIAL_I18N[meta.locale ?? "de"].pinSub);
+  const disc = esc(SOCIAL_I18N[meta.locale ?? "de"].disclosure); // sichtbare KI-Kennzeichnung
   const overlay = Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
       <rect x="0" y="0" width="${W}" height="${HEADER}" fill="rgba(28,24,21,0.92)"/>
       ${wordmarkSvg(W / 2, 62, 44, "#FAF7F0")}
+      <rect x="${W - 196}" y="26" width="172" height="42" rx="21" fill="#00000073"/>
+      <text x="${W - 110}" y="54" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="23" fill="#FAF7F0">${disc}</text>
       <rect x="0" y="${H - FOOTER}" width="${W}" height="${FOOTER}" fill="#FF5A4D"/>
       <text x="${W / 2}" y="${H - FOOTER + 58}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="44" font-weight="700" fill="#ffffff">${title}</text>
       <text x="${W / 2}" y="${H - FOOTER + 100}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="24" fill="#ffffffcc">${cat} · ${sub}</text>

@@ -76,8 +76,11 @@ async function endcardScene(): Promise<Buffer> {
 }
 
 /** Fixes UI-Overlay (1080×1920, transparent): Kopf-Wortmarke, optional Fortschritt + Titel-Band. */
-function overlay(opts: { title?: string; subtitle?: string; progress?: number; scrim?: boolean }): Buffer {
+function overlay(opts: { title?: string; subtitle?: string; progress?: number; scrim?: boolean; disclosure?: string }): Buffer {
   const HEADER = 104, FOOTER = opts.title ? 200 : 0;
+  const disc = opts.disclosure
+    ? `<rect x="${TW - 268}" y="36" width="240" height="56" rx="28" fill="#00000085"/><text x="${TW - 148}" y="72" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="30" fill="#FAF7F0">${esc(opts.disclosure)}</text>`
+    : "";
   const scrim = opts.scrim ? `<linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0.42"/><stop offset="0.25" stop-color="#000" stop-opacity="0"/><stop offset="0.7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.5"/></linearGradient><rect width="${TW}" height="${TH}" fill="url(#g)"/>` : "";
   const prog = opts.progress != null
     ? `<rect x="60" y="${TH - FOOTER - 30}" width="${TW - 120}" height="12" rx="6" fill="#ffffff66"/><rect x="60" y="${TH - FOOTER - 30}" width="${Math.max(12, Math.round((TW - 120) * opts.progress))}" height="12" rx="6" fill="#FF5A4D"/>`
@@ -88,16 +91,19 @@ function overlay(opts: { title?: string; subtitle?: string; progress?: number; s
       (opts.subtitle ? `<text x="${TW / 2}" y="${TH - FOOTER + 144}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="33" fill="#ffffffd9">${esc(opts.subtitle)}</text>` : "")
     : "";
   return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${TW}" height="${TH}">${scrim}` +
-    `<rect x="0" y="0" width="${TW}" height="${HEADER}" fill="rgba(28,24,21,0.5)"/>${wordmark(TW / 2, 70, 50, "#FAF7F0")}${prog}${title}</svg>`);
+    `<rect x="0" y="0" width="${TW}" height="${HEADER}" fill="rgba(28,24,21,0.5)"/>${wordmark(TW / 2, 70, 50, "#FAF7F0")}${disc}${prog}${title}</svg>`);
 }
 
-function endcardOverlay(cta: string): Buffer {
+function endcardOverlay(cta: string, disclosure?: string): Buffer {
+  const disc = disclosure
+    ? `<text x="${TW / 2}" y="${TH - 70}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="30" fill="#6f675c">${esc(disclosure)}</text>`
+    : "";
   return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${TW}" height="${TH}">` +
     `<rect width="${TW}" height="${TH}" fill="#FAF7F0" fill-opacity="0.82"/>` +
     wordmark(TW / 2, TH / 2 - 50, 150, "#221E1B") +
     `<text x="${TW / 2}" y="${TH / 2 + 36}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="46" font-weight="600" fill="#6f675c">${DOMAIN}</text>` +
     `<rect x="${TW / 2 - 320}" y="${TH / 2 + 120}" width="640" height="98" rx="49" fill="#FF5A4D"/>` +
-    `<text x="${TW / 2}" y="${TH / 2 + 184}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="38" font-weight="700" fill="#fff">${cta}</text></svg>`);
+    `<text x="${TW / 2}" y="${TH / 2 + 184}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="38" font-weight="700" fill="#fff">${cta}</text>${disc}</svg>`);
 }
 
 /** Ken-Burns-Frame: zoomt langsam in die Szene und legt das Overlay darüber. */
@@ -135,14 +141,14 @@ export async function renderFlipThrough(book: { title: string; subtitle?: string
 
     // Hook (fotorealistisch)
     if (existsSync(heroFile)) {
-      segs.push({ scene: await photoScene(heroFile), ov: overlay({ title: book.title, subtitle: book.subtitle ?? S.hookSub, scrim: true }), frames: Math.round(FPS * 1.8) });
+      segs.push({ scene: await photoScene(heroFile), ov: overlay({ title: book.title, subtitle: book.subtitle ?? S.hookSub, scrim: true, disclosure: S.disclosure }), frames: Math.round(FPS * 1.8) });
     }
     // Seiten
     for (let i = 0; i < pages.length; i++) {
-      segs.push({ scene: await pageScene(pages[i].colored), ov: overlay({ progress: (i + 1) / pages.length, scrim: true }), frames: Math.round(FPS * 0.5) });
+      segs.push({ scene: await pageScene(pages[i].colored), ov: overlay({ progress: (i + 1) / pages.length, scrim: true, disclosure: S.disclosure }), frames: Math.round(FPS * 0.5) });
     }
     // Endcard
-    segs.push({ scene: await endcardScene(), ov: endcardOverlay(S.ctaEndcard), frames: Math.round(FPS * 2.2) });
+    segs.push({ scene: await endcardScene(), ov: endcardOverlay(S.ctaEndcard, S.disclosure), frames: Math.round(FPS * 2.2) });
 
     let prevLast: Buffer | null = null;
     for (const seg of segs) {
@@ -164,7 +170,7 @@ export async function renderReveal(book: { title: string }, page: ColoredPage, o
   let n = 0;
   const put = (b: Buffer) => writeFileSync(join(tmp, `f${String(n++).padStart(5, "0")}.png`), b);
   try {
-    const ov = overlay({ title: book.title, subtitle: S.revealSub, scrim: true });
+    const ov = overlay({ title: book.title, subtitle: S.revealSub, scrim: true, disclosure: S.disclosure });
     const lineScene = await pageScene(await sharp(page.frame.png).flatten({ background: "#ffffff" }).png().toBuffer());
     const colScene = await pageScene(page.colored);
 

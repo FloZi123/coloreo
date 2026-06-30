@@ -31,11 +31,24 @@ export function initAnalytics() {
   started = true;
 }
 
+// ── UTM-Attribution (Video/Social → Freebie) ──────────────────────────────
+/** Reine UTM-Extraktion aus einem Query-String (testbar, ohne Browser-Abhängigkeit). */
+export function parseUtm(search: string): Record<string, string> {
+  const p = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  const out: Record<string, string> = {};
+  for (const k of ["utm_source", "utm_medium", "utm_campaign"]) { const v = p.get(k); if (v) out[k] = v; }
+  return out;
+}
+function currentUtm(): Record<string, string> {
+  return typeof window !== "undefined" ? parseUtm(window.location.search) : {};
+}
+
 export function capture(event: string, props?: Record<string, unknown>) {
   if (!started || !hasConsent()) return;
-  posthog.capture(event, props);
+  // UTM an JEDES Event hängen (insb. freebie_signup) → Video/Social→Freebie attribuierbar.
+  posthog.capture(event, { ...currentUtm(), ...props });
 }
 export function capturePageview(path: string) {
   if (!started) return;
-  posthog.capture("$pageview", { $current_url: path });
+  posthog.capture("$pageview", { $current_url: path, ...currentUtm() });
 }

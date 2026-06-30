@@ -15,6 +15,7 @@ import sharp from "sharp";
 import { pdfToFrames, pickSpread, type Frame } from "../src/lib/social/frames";
 import { makePin } from "../src/lib/social/pins";
 import { renderFlipThrough } from "../src/lib/social/video";
+import { SOCIAL_I18N } from "../src/lib/social/strings";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 for (const l of readFileSync(join(root, ".env.local"), "utf8").split("\n")) {
@@ -102,6 +103,9 @@ async function processBook(slug: string) {
 
     const manifest = {
       slug, locale: loc, title, category,
+      // KI-Kennzeichnung (EU-AI-Act Art. 50 / Plattform-Pflicht) – sichtbar in Pins+Video eingebrannt.
+      aiDisclosure: true,
+      disclosureText: SOCIAL_I18N[loc as Loc].disclosure,
       links: { tiktok: linkFor(slug, "tiktok", loc), instagram: linkFor(slug, "instagram", loc), pinterest: linkFor(slug, "pinterest", loc) },
       pins, videos: [`public/social/${slug}/${loc}/video-flip.mp4`],
       bucket: UPLOAD ? BUCKET : null,
