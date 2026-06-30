@@ -35,6 +35,19 @@ const CAT_EMOJI: Record<string, string> = {
   "kawaii-food": "🍰", "dschungel-safari": "🦁", "jahreszeiten-feste": "🍂",
 };
 
+// Charakter-Bücher: fester, detaillierter Figuren-Anker → in JEDEN Seiten-Prompt (+Cover),
+// damit der Darsteller über alle Seiten gleich/wiedererkennbar gezeichnet wird.
+const CHARACTER: Record<string, string> = {
+  "einhorn-stella-regenbogenzauber": "always the exact same character Stella: a small chibi unicorn with a short spiral horn, a long flowing mane and tail, a little star mark on the cheek, big round sparkly eyes and slender legs, identical cute design on every page",
+  "zauberwald-fee-lumi": "always the exact same character Lumi: a tiny round fairy with short bobbed hair, a flower-petal dress, small rounded wings, big round eyes and a little wand, identical cute design on every page",
+  "meerjungfrau-perla-perle": "always the exact same character Perla: a young mermaid with long wavy hair, a seashell top, a scaled tail with a rounded fin, a small starfish hair clip and big round eyes, identical cute design on every page",
+  "cozy-bruno-gemuetlicher-tag": "always the exact same character Bruno: a chubby round teddy bear with small rounded ears, a little knitted scarf, short arms and legs and a friendly smile, identical cozy design on every page",
+  "cozy-lotta-cafe": "always the exact same character Lotta: a small round bunny with long floppy ears, a little apron and bow, round cheeks and big eyes, identical cute design on every page",
+  "cozy-mio-am-meer": "always the exact same character Mio: a small round cat with striped fur, pointy ears, a little tail, round eyes and a tiny sailor hat, identical cute design on every page",
+};
+// Stabiler Seed je Buch (für Charakter-Konsistenz über die Seiten).
+const bookSeed = (slug: string) => [...slug].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7) % 1_000_000;
+
 // Kategorie → Welt (slug). A* in thematische Welten, K* in die Kinderwelt.
 const CAT_WORLD: Record<string, string> = {
   "mandala-meditation": "anti-stress", "japan-zen": "anti-stress", "achtsamkeit-affirmationen": "anti-stress",
@@ -255,8 +268,10 @@ Antworte NUR als JSON: {"de":"...","en":"..."}` }],
     const desc = await genDescriptions(b);
     console.log("  ✓ Beschreibungen");
 
-    // Cover
-    const cover = await generateCoverImage(provider, { title: b.titleDe, categoryName: b.catName, heroMotif: b.heroMotif, pages: b.pages });
+    // Cover (heroMotif bei Charakter-Büchern um den Figuren-Anker ergänzt → Cover matcht die Seiten)
+    const anchor = CHARACTER[b.slug];
+    const coverHero = anchor ? `${b.heroMotif}, ${anchor}` : b.heroMotif;
+    const cover = await generateCoverImage(provider, { title: b.titleDe, categoryName: b.catName, heroMotif: coverHero, pages: b.pages });
     await sb.storage.from("covers").upload(`${b.slug}.png`, cover, { contentType: "image/png", upsert: true });
     const ver = Date.now(); // Cache-Busting → CDN/Browser laden die NEUEN Cover/Vorschauen
     const coverUrl = `${SUPA}/storage/v1/object/public/covers/${b.slug}.png?v=${ver}`;
@@ -267,7 +282,7 @@ Antworte NUR als JSON: {"de":"...","en":"..."}` }],
     console.log(`  ✓ Szenen (${sceneMotifs.length})`);
 
     // Master-PDF
-    const pdf = await generateMasterFromMotifs(provider, { slug: b.slug, titleDe: b.titleDe, audience: b.audience }, sceneMotifs, b.pages, { concurrency: 4 });
+    const pdf = await generateMasterFromMotifs(provider, { slug: b.slug, titleDe: b.titleDe, audience: b.audience }, sceneMotifs, b.pages, { concurrency: 4, characterAnchor: anchor, seed: bookSeed(b.slug) });
     await sb.storage.from("books").upload(`${b.slug}.pdf`, pdf, { contentType: "application/pdf", upsert: true });
     console.log(`  ✓ ${b.pages} Seiten`);
 

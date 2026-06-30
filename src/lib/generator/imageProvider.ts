@@ -6,8 +6,9 @@ import Replicate from "replicate";
  * lassen sich durch dieselbe `ImageProvider`-Schnittstelle ergänzen.
  */
 export interface ImageProvider {
-  /** Erzeugt ein PNG (Linienkunst) zum Prompt und liefert die Bytes. */
-  generate(prompt: string): Promise<Uint8Array>;
+  /** Erzeugt ein PNG (Linienkunst) zum Prompt und liefert die Bytes.
+   *  opts.seed: fester Seed → reproduzierbar; für Charakter-Konsistenz über die Buchseiten. */
+  generate(prompt: string, opts?: { seed?: number }): Promise<Uint8Array>;
 }
 
 export function imageProviderConfigured(): boolean {
@@ -26,10 +27,11 @@ class ReplicateProvider implements ImageProvider {
   }
 
   /** Führt die Generierung aus und wiederholt bei Rate-Limit (429)/Netzwerkfehlern mit Backoff. */
-  private async runWithRetry(prompt: string, maxRetries = 8): Promise<unknown> {
+  private async runWithRetry(prompt: string, maxRetries = 8, seed?: number): Promise<unknown> {
     const isFlux = this.model.includes("flux");
     const isDev = this.model.includes("flux-dev");
     const input: Record<string, unknown> = { prompt, aspect_ratio: "3:4", output_format: "png" };
+    if (seed !== undefined) input.seed = seed;
     if (isFlux) {
       input.num_outputs = 1;
       input.megapixels = "1";
@@ -53,8 +55,8 @@ class ReplicateProvider implements ImageProvider {
     }
   }
 
-  async generate(prompt: string): Promise<Uint8Array> {
-    const output = await this.runWithRetry(prompt);
+  async generate(prompt: string, opts?: { seed?: number }): Promise<Uint8Array> {
+    const output = await this.runWithRetry(prompt, 8, opts?.seed);
 
     // Replicate-SDK liefert je nach Version: FileOutput[], FileOutput, URL-String[] oder URL-String.
     const first = Array.isArray(output) ? output[0] : output;

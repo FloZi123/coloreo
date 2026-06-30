@@ -1459,22 +1459,22 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute cozy bear in a sweater holding a cup of cocoa`
 - **Cover-Prompt:** `coloring book style illustration of a cute cozy bear in a sweater holding a cup of cocoa, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a steaming teapot on a kitchen shelf
-  2. a stack of pancakes by a sunny window
-  3. a open storybook in a cozy cafe room
-  4. a knitted blanket on a garden table
-  5. a warm fireplace at a market stall
-  6. a mug of cocoa in a warm kitchen
-  7. a basket of muffins by the bakery window
-  8. a sleepy bear bruno in a snug room
-  9. a potted plant on a kitchen shelf
-  10. a rocking chair by a sunny window
-  11. a slice of pie in a cozy cafe room
-  12. a candle and book on a garden table
-  13. a honey jar at a market stall
-  14. a soft cushion in a warm kitchen
-  15. a window with rain by the bakery window
-  16. the whole cozy bear day scene coming back together at sunset
+  1. sipping cocoa by the window, Bruno the bear
+  2. reading a storybook in a cozy room, Bruno the bear
+  3. baking muffins in the kitchen, Bruno the bear
+  4. napping by the warm fireplace in the room, Bruno the bear
+  5. watering plants on the windowsill, Bruno the bear
+  6. stacking pancakes at the kitchen table, Bruno the bear
+  7. knitting a scarf in the cozy room, Bruno the bear
+  8. watching rain at the window, Bruno the bear
+  9. picking apples in the garden, Bruno the bear
+  10. arranging books on a shelf in the room, Bruno the bear
+  11. brewing tea in the kitchen, Bruno the bear
+  12. relaxing in a rocking chair by the window, Bruno the bear
+  13. sharing pie at the kitchen table, Bruno the bear
+  14. lighting a candle in the cozy room, Bruno the bear
+  15. strolling through the garden, Bruno the bear
+  16. the whole cozy home warm and calm as Bruno the bear settles back home together at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 3:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a bear making pancakes in the kitchen, in a small scene with surroundings`
   - *Seite 10:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a bear wrapped in a blanket with cocoa, in a small scene with surroundings`
@@ -1488,22 +1488,22 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute bunny baker holding a tray of cupcakes in a cozy cafe`
 - **Cover-Prompt:** `coloring book style illustration of a cute bunny baker holding a tray of cupcakes in a cozy cafe, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a frothy latte cup on a kitchen shelf
-  2. a tray of cupcakes by a sunny window
-  3. a tea pot and cups in a cozy cafe room
-  4. a slice of layer cake on a garden table
-  5. a bunny lotta serving at a market stall
-  6. a cookie jar in a warm kitchen
-  7. a menu board by the bakery window
-  8. a vase of daisies in a snug room
-  9. a croissant basket on a kitchen shelf
-  10. a sugar bowl by a sunny window
-  11. a cafe window seat in a cozy cafe room
-  12. a lemonade jug on a garden table
-  13. a macaron stack at a market stall
-  14. a cream tart in a warm kitchen
-  15. a checkered tablecloth by the bakery window
-  16. the whole bunny cafe scene coming back together at sunset
+  1. serving lattes by the window, Lotta the bunny
+  2. arranging cupcakes in the kitchen, Lotta the bunny
+  3. pouring tea at a garden table, Lotta the bunny
+  4. greeting guests in the cozy room, Lotta the bunny
+  5. stacking macarons on a shelf in the kitchen, Lotta the bunny
+  6. frosting a cake in the kitchen, Lotta the bunny
+  7. carrying a tray past the window, Lotta the bunny
+  8. picking flowers for the garden table, Lotta the bunny
+  9. writing the menu board in the room, Lotta the bunny
+  10. brewing coffee by the window, Lotta the bunny
+  11. sharing cookies with a guest in the room, Lotta the bunny
+  12. watering daisies in the garden, Lotta the bunny
+  13. setting cups at a market stall, Lotta the bunny
+  14. waving from the kitchen door, Lotta the bunny
+  15. tidying up the cozy room, Lotta the bunny
+  16. the whole little cafe cozy and warm as Lotta the bunny closes up back home at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 4:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a bunny pulling cupcakes from the oven, in a small scene with surroundings`
   - *Seite 11:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, two animal friends at a cafe table, in a small scene with surroundings`
@@ -1517,22 +1517,22 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute cat in a sun hat sitting on a beach with a bucket`
 - **Cover-Prompt:** `coloring book style illustration of a cute cat in a sun hat sitting on a beach with a bucket, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a cat mio with a bucket over the coral reef
-  2. a sandcastle in the open sea
-  3. a striped beach umbrella on the sandy seabed
-  4. a seashell pile in a kelp forest
-  5. a little sailboat near a bright lagoon
-  6. a crab on the sand along the ocean current
-  7. a starfish by a rocky reef
-  8. a beach ball above the seabed
-  9. a message in a bottle over the coral reef
-  10. a picnic basket in the open sea
-  11. a kite in the wind on the sandy seabed
-  12. a deck chair in a kelp forest
-  13. a seagull near a bright lagoon
-  14. a ice cream cone along the ocean current
-  15. a lighthouse by a rocky reef
-  16. the whole cat at the sea scene coming back together at sunset
+  1. building a sandcastle on the beach, Mio the cat
+  2. chasing waves along the shore, Mio the cat
+  3. collecting shells by the sea, Mio the cat
+  4. paddling a little boat near the shore, Mio the cat
+  5. napping under a beach umbrella, Mio the cat
+  6. digging in the sand on the beach, Mio the cat
+  7. flying a kite over the beach, Mio the cat
+  8. watching a crab by the shore, Mio the cat
+  9. splashing in a shallow lagoon, Mio the cat
+  10. fishing from a rock by the sea, Mio the cat
+  11. picnicking on the sandy beach, Mio the cat
+  12. sailing past a lighthouse, Mio the cat
+  13. waving at a seagull on the shore, Mio the cat
+  14. resting in a deck chair on the beach, Mio the cat
+  15. finding a message in a bottle by the sea, Mio the cat
+  16. the whole sunny beach calm as Mio the cat strolls back home at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 6:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a cat building a sandcastle, in a small scene with surroundings`
   - *Seite 15:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a cat watching the sunset on the sand, in a small scene with surroundings`
@@ -1858,22 +1858,22 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute unicorn named stella with a rainbow horn and gems`
 - **Cover-Prompt:** `coloring book style illustration of a cute unicorn with a rainbow horn surrounded by gems and stars, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a unicorn stella prancing in the enchanted forest
-  2. a rainbow ribbon across a rainbow meadow
-  3. a glowing horn by a crystal cave
-  4. a sparkle trail in a starlit clearing
-  5. a flower crown in a flower garden
-  6. a cloud castle over a misty hill
-  7. a star wand by a sparkling pond
-  8. a butterfly friend deep in the woods
-  9. a crystal pond in the enchanted forest
-  10. a magic gem across a rainbow meadow
-  11. a heart balloon by a crystal cave
-  12. a fairy light in a starlit clearing
-  13. a candy tree in a flower garden
-  14. a moonbeam over a misty hill
-  15. a wish fountain by a sparkling pond
-  16. the whole stella's rainbow magic scene coming back together at sunset
+  1. prancing across a rainbow meadow, Stella the unicorn
+  2. resting by a crystal cave, Stella the unicorn
+  3. drinking from a sparkling pond, Stella the unicorn
+  4. leaping over a forest stream, Stella the unicorn
+  5. nuzzling a butterfly in a flower garden, Stella the unicorn
+  6. galloping along a misty hill, Stella the unicorn
+  7. gazing at a waterfall, Stella the unicorn
+  8. trotting through the enchanted forest, Stella the unicorn
+  9. dancing under a rainbow arch in the meadow, Stella the unicorn
+  10. splashing in a shallow lake, Stella the unicorn
+  11. peeking from behind a giant flower in the garden, Stella the unicorn
+  12. standing on a flowery hilltop, Stella the unicorn
+  13. wading through a meadow brook, Stella the unicorn
+  14. playing among garden flowers, Stella the unicorn
+  15. climbing a grassy hill, Stella the unicorn
+  16. the whole rainbow land glowing as Stella the unicorn heads back home at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 2:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a unicorn finding a red gem, in a small scene with surroundings`
   - *Seite 14:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, the rainbow glowing bright again, in a small scene with surroundings`
@@ -1950,22 +1950,22 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute fairy holding a glowing lantern among flowers`
 - **Cover-Prompt:** `coloring book style illustration of a cute fairy holding a glowing lantern among flowers, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a fairy lumi flying in the enchanted forest
-  2. a glowing lantern flower across a rainbow meadow
-  3. a mushroom house by a crystal cave
-  4. a firefly swarm in a starlit clearing
-  5. a wise old owl in a flower garden
-  6. a acorn cottage over a misty hill
-  7. a star-shaped leaf by a sparkling pond
-  8. a dewdrop on a web deep in the woods
-  9. a tiny gnome in the enchanted forest
-  10. a moonflower bloom across a rainbow meadow
-  11. a sparkling stream by a crystal cave
-  12. a toadstool ring in a starlit clearing
-  13. a hedgehog friend in a flower garden
-  14. a crystal pebble over a misty hill
-  15. a willow with lights by a sparkling pond
-  16. the whole fairy lumi's starlight scene coming back together at sunset
+  1. fluttering past a mushroom house, Lumi the fairy
+  2. resting on a glowing flower, Lumi the fairy
+  3. dancing among fireflies in the forest, Lumi the fairy
+  4. peeking from a toadstool ring, Lumi the fairy
+  5. gliding over a sparkling stream, Lumi the fairy
+  6. watering a moonflower in the garden, Lumi the fairy
+  7. riding a leaf boat on a pond, Lumi the fairy
+  8. chatting with an owl in the woods, Lumi the fairy
+  9. collecting dewdrops in a clearing, Lumi the fairy
+  10. lighting a tiny lantern on a hill, Lumi the fairy
+  11. hugging a hedgehog by a log in the forest, Lumi the fairy
+  12. swinging on a vine over the stream, Lumi the fairy
+  13. painting a flower in the garden, Lumi the fairy
+  14. napping in an acorn cap by the pond, Lumi the fairy
+  15. waving a sparkling wand in the meadow, Lumi the fairy
+  16. the whole enchanted forest glowing as Lumi the fairy flies back home at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 3:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, a fairy catching a falling star, in a small scene with surroundings`
   - *Seite 16:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, clean detailed outlines, balanced level of detail, friendly, the whole forest sparkling with starlight, in a small scene with surroundings`
@@ -2043,22 +2043,22 @@ durch die recherchierten Trend-Kategorien.
 - **heroMotif (Cover):** `a cute mermaid holding a glowing pearl near a shipwreck`
 - **Cover-Prompt:** `coloring book style illustration of a cute mermaid holding a glowing pearl near a shipwreck, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
-  1. a mermaid perla swimming over the coral reef
-  2. a giant glowing pearl in the open sea
-  3. a open treasure clam on the sandy seabed
-  4. a seahorse guide in a kelp forest
-  5. a coral archway near a bright lagoon
-  6. a dolphin friend along the ocean current
-  7. a sunken ship by a rocky reef
-  8. a jellyfish lantern above the seabed
-  9. a starfish marker over the coral reef
-  10. a octopus in a cave in the open sea
-  11. a kelp curtain on the sandy seabed
-  12. a pearl oyster bed in a kelp forest
-  13. a ray gliding by near a bright lagoon
-  14. a bubble trail along the ocean current
-  15. a shell crown by a rocky reef
-  16. the whole perla's lost pearl scene coming back together at sunset
+  1. swimming over a coral reef, Perla the mermaid
+  2. exploring a sunken ship on the seabed, Perla the mermaid
+  3. floating above a sandy seabed, Perla the mermaid
+  4. playing with a dolphin in the open sea, Perla the mermaid
+  5. peeking into an open clam by the reef, Perla the mermaid
+  6. gliding through a kelp forest, Perla the mermaid
+  7. collecting shells near a lagoon, Perla the mermaid
+  8. riding a sea turtle over the reef, Perla the mermaid
+  9. waving to a seahorse by the coral, Perla the mermaid
+  10. chasing bubbles above the seabed, Perla the mermaid
+  11. discovering a glowing pearl in a cave, Perla the mermaid
+  12. dancing with jellyfish in the sea, Perla the mermaid
+  13. resting in an anemone garden, Perla the mermaid
+  14. singing by a coral archway, Perla the mermaid
+  15. waking up in a shell bed near the reef, Perla the mermaid
+  16. the whole coral reef sparkling as Perla the mermaid swims back home at sunset
 - **Beispiel-Seitenprompts:**
   - *Seite 6:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, a mermaid exploring a sunken ship, in a small scene with surroundings`
   - *Seite 14:* `coloring book page, black and white line art, clean bold black outlines, line art only, no shading, no grayscale, no color, pure white background, full page illustration, very simple, minimal detail, thick bold clean outlines, large simple shapes, cute and friendly, for young children, the pearl shining on its stand again, in a small scene with surroundings`

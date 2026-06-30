@@ -103,18 +103,21 @@ export async function generateMasterFromMotifs(
   book: { slug: string; titleDe: string; audience: Audience },
   motifs: string[],
   pageCount: number,
-  opts: { concurrency?: number } = {}
+  opts: { concurrency?: number; characterAnchor?: string; seed?: number } = {}
 ): Promise<Uint8Array> {
   const pool = motifs.length ? motifs : ["a decorative pattern"];
   const concurrency = Math.max(1, Math.min(opts.concurrency ?? 4, 8));
+  // Charakter-Konsistenz: fester Anker (gleiches Figuren-Design) + fester Seed je Buch in jeden
+  // Seiten-Prompt → der Darsteller wird über alle Seiten klar wiedererkennbar.
+  const anchor = opts.characterAnchor?.trim();
   const images: Uint8Array[] = new Array(pageCount);
   const pages = Array.from({ length: pageCount }, (_, i) => i);
   for (let i = 0; i < pages.length; i += concurrency) {
     const batch = pages.slice(i, i + concurrency);
     const results = await Promise.all(
       batch.map(async (p) => {
-        const motif = pool[p % pool.length];
-        const raw = await provider.generate(buildMotifPrompt(book.audience, motif, p));
+        const motif = anchor ? `${pool[p % pool.length]}, ${anchor}` : pool[p % pool.length];
+        const raw = await provider.generate(buildMotifPrompt(book.audience, motif, p), { seed: opts.seed });
         return { p, bytes: await vectorizeHiRes(await binarize(raw)) };
       })
     );
@@ -256,47 +259,73 @@ export async function colorizeWithinLines(
 }
 
 /** Cover (Stil B – linke Hälfte ausgemalt, rechte Linienkunst) + Branding-Overlay (600×800). */
+/** Qualitäts-Metriken eines Cover-Versuchs: genug Linien-Tinte? linke Hälfte wirklich koloriert? */
+async function coverMetrics(lineBin: Uint8Array, coloredRaw: Buffer, W: number, H: number, MID: number) {
+  const lg = await sharp(lineBin).resize(160).grayscale().raw().toBuffer();
+  let dark = 0;
+  for (let i = 0; i < lg.length; i++) if (lg[i] < 128) dark++;
+  const lineInk = dark / lg.length; // Anteil schwarzer Linien (zu wenig = blass/gebrochen)
+  let filled = 0, tot = 0;
+  for (let y = 0; y < H; y++) for (let x = 0; x < MID; x++) {
+    const j = (y * W + x) * 3; tot++;
+    if (coloredRaw[j] < 245 || coloredRaw[j + 1] < 245 || coloredRaw[j + 2] < 245) filled++;
+  }
+  const colorFill = filled / tot; // Anteil kolorierter Pixel in der linken Hälfte
+  const ok = lineInk >= 0.012 && lineInk <= 0.32 && colorFill >= 0.12;
+  const score = (ok ? 10 : 0) + Math.min(colorFill, 0.5) + (lineInk >= 0.012 && lineInk <= 0.32 ? 0.5 : 0);
+  return { ok, score, lineInk, colorFill };
+}
+
+/** Cover (Stil B – linke Hälfte ausgemalt, rechte Linienkunst) + Branding-Overlay (600×800).
+ *  Auto-Qualitäts-Guard: bis zu 3 Versuche; verwirft blasse/gebrochene oder unkolorierte Cover. */
 export async function generateCoverImage(
   provider: ImageProvider,
   opts: { title: string; categoryName: string; heroMotif: string; pages: number }
 ): Promise<Uint8Array> {
   const W = 600, H = 800, MID = Math.round(W / 2);
-
-  // Linienkunst des Hauptmotivs (weißer Grund per Konstruktion → für JEDES Motiv saubere
-  // Konturen). Beide Hälften stammen daraus → Konturen am Split deckungsgleich.
-  const lineRaw = await provider.generate(buildMotifPrompt("all", opts.heroMotif, 0));
-  const lineBin = await binarize(lineRaw);
-  const lineFull = await sharp(lineBin).resize(W, H, { fit: "cover" }).toColourspace("srgb").png().toBuffer();
-
-  // Farbquelle: dasselbe Motiv FARBIG & REALISTISCH gerendert. Daraus bekommt jede Fläche
-  // ihren echten Farbton (Mittelwert), platziert aber sauber innerhalb der Linien.
-  let colorSrc: { data: Buffer; ch: number } | undefined;
-  try {
-    const colorRaw = await provider.generate(
-      `a colored illustration of ${opts.heroMotif}, natural realistic muted colors, soft and believable real-world colors, simple, centered, white background, no text`,
-    );
-    const { data, info } = await sharp(colorRaw).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).toColourspace("srgb").raw().toBuffer({ resolveWithObject: true });
-    colorSrc = { data, ch: info.channels };
-  } catch {
-    /* ohne Farbquelle → Palette-Fallback */
-  }
-
-  // Linke Hälfte: dieselbe Zeichnung, Flächen INNERHALB der Linien ausgemalt (Flood-Fill).
-  const coloredRaw = await colorizeWithinLines(lineBin, W, H, colorSrc, 70, false, 1.1);
-  const coloredFull = await sharp(coloredRaw, { raw: { width: W, height: H, channels: 3 } }).png().toBuffer();
-
-  const leftColored = await sharp(coloredFull).extract({ left: 0, top: 0, width: MID, height: H }).toBuffer();
-  const rightLines = await sharp(lineFull).extract({ left: MID, top: 0, width: W - MID, height: H }).toBuffer();
   const divider = Buffer.from(`<svg width="${W}" height="${H}"><rect x="${MID - 1}" y="0" width="2" height="${H}" fill="#1a1a1a"/></svg>`);
   const overlay = Buffer.from(brandingOverlay(W, H));
+  let best: { bytes: Uint8Array; score: number } | null = null;
 
-  return new Uint8Array(await sharp({ create: { width: W, height: H, channels: 3, background: { r: 255, g: 255, b: 255 } } })
-    .composite([
-      { input: leftColored, left: 0, top: 0 },
-      { input: rightLines, left: MID, top: 0 },
-      { input: divider, left: 0, top: 0 },
-      { input: overlay, left: 0, top: 0 },
-    ])
-    .png()
-    .toBuffer());
+  for (let attempt = 0; attempt < 3; attempt++) {
+    // Linienkunst des Hauptmotivs (weißer Grund per Konstruktion → saubere Konturen).
+    // Kein fester Seed → jeder Versuch variiert (sonst würde ein schlechtes Ergebnis nur wiederholt).
+    const lineRaw = await provider.generate(buildMotifPrompt("all", opts.heroMotif, attempt));
+    const lineBin = await binarize(lineRaw);
+    const lineFull = await sharp(lineBin).resize(W, H, { fit: "cover" }).toColourspace("srgb").png().toBuffer();
+
+    // Farbquelle: dasselbe Motiv FARBIG & REALISTISCH gerendert.
+    let colorSrc: { data: Buffer; ch: number } | undefined;
+    try {
+      const colorRaw = await provider.generate(
+        `a colored illustration of ${opts.heroMotif}, natural realistic muted colors, soft and believable real-world colors, simple, centered, white background, no text`,
+      );
+      const { data, info } = await sharp(colorRaw).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).toColourspace("srgb").raw().toBuffer({ resolveWithObject: true });
+      colorSrc = { data, ch: info.channels };
+    } catch {
+      /* ohne Farbquelle → Palette-Fallback */
+    }
+
+    // Linke Hälfte: Flächen INNERHALB der Linien ausgemalt (Flood-Fill).
+    const coloredRaw = await colorizeWithinLines(lineBin, W, H, colorSrc, 70, false, 1.1);
+    const { ok, score, lineInk, colorFill } = await coverMetrics(lineBin, coloredRaw, W, H, MID);
+
+    const coloredFull = await sharp(coloredRaw, { raw: { width: W, height: H, channels: 3 } }).png().toBuffer();
+    const leftColored = await sharp(coloredFull).extract({ left: 0, top: 0, width: MID, height: H }).toBuffer();
+    const rightLines = await sharp(lineFull).extract({ left: MID, top: 0, width: W - MID, height: H }).toBuffer();
+    const cover = new Uint8Array(await sharp({ create: { width: W, height: H, channels: 3, background: { r: 255, g: 255, b: 255 } } })
+      .composite([
+        { input: leftColored, left: 0, top: 0 },
+        { input: rightLines, left: MID, top: 0 },
+        { input: divider, left: 0, top: 0 },
+        { input: overlay, left: 0, top: 0 },
+      ])
+      .png()
+      .toBuffer());
+
+    if (!best || score > best.score) best = { bytes: cover, score };
+    if (ok) break;
+    console.warn(`  ⚠ Cover-Versuch ${attempt + 1} schwach (lineInk=${lineInk.toFixed(3)}, colorFill=${colorFill.toFixed(3)}) – wiederhole`);
+  }
+  return best!.bytes;
 }
