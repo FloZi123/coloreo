@@ -6,6 +6,8 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { getBookBySlug, getBooks, getCategoryBySlug, getBookRating, getReviews, tTitle, tDesc, tName } from "@/lib/data";
 import { createPublicClient } from "@/lib/supabase/public";
 import { formatPrice } from "@/lib/pricing";
+import { priceFor } from "@/lib/currency";
+import { getActiveCurrency } from "@/lib/currency-server";
 import { showRating } from "@/lib/reviews";
 import ProductBuyBox from "@/components/ProductBuyBox";
 import BookCard from "@/components/BookCard";
@@ -49,6 +51,7 @@ export default async function BookPage({
   const { locale: raw, slug } = await params;
   const locale: Locale = isLocale(raw) ? raw : "de";
   const dict = getDictionary(locale);
+  const currency = await getActiveCurrency();
   const book = await getBookBySlug(slug);
   if (!book) notFound();
   const category = await categoryOf(book.category_id);
@@ -128,7 +131,7 @@ export default async function BookPage({
               <span className="text-muted">({rating.count})</span>
             </div>
           )}
-          <div className="mt-3 font-display text-3xl font-bold">{formatPrice(book.price_cents, locale)}</div>
+          <div className="mt-3 font-display text-3xl font-bold">{formatPrice(priceFor(book.price_cents, currency), locale, currency)}</div>
           <p className="mt-4 max-w-[46ch] text-ink-soft">{tDesc(book, locale)}</p>
 
           <div className="mt-6 grid grid-cols-3 gap-3">

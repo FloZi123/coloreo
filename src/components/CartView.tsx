@@ -4,7 +4,9 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/cart/store";
 import { capture } from "@/lib/analytics";
-import { computeCart, formatPrice, type CouponInput, type PricingTier } from "@/lib/pricing";
+import { computeCart, formatPrice, linesInCurrency, couponInCurrency, type CouponInput, type PricingTier } from "@/lib/pricing";
+import { priceFor } from "@/lib/currency";
+import { useCurrency } from "@/components/CurrencyProvider";
 import PaymentMarks from "@/components/PaymentMarks";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
@@ -19,12 +21,17 @@ export default function CartView({
   dict: Dictionary;
 }) {
   const { lines, setQuantity, remove, couponCode, setCoupon } = useCart();
+  const { currency } = useCurrency();
   const [coupon, setCouponInput] = useState<CouponInput | null>(null);
   const [code, setCode] = useState(couponCode ?? "");
   const [couponMsg, setCouponMsg] = useState<string>("");
   const [checkingOut, setCheckingOut] = useState(false);
 
-  const breakdown = useMemo(() => computeCart(lines, tiers, coupon), [lines, tiers, coupon]);
+  // In aktive Währung umrechnen (gleiche Logik wie der Checkout-Server → konsistente Summen).
+  const breakdown = useMemo(
+    () => computeCart(linesInCurrency(lines, currency), tiers, couponInCurrency(coupon, currency)),
+    [lines, tiers, coupon, currency]
+  );
 
   async function applyCoupon() {
     if (!code.trim()) return;
@@ -47,7 +54,7 @@ export default function CartView({
 
   async function checkout() {
     setCheckingOut(true);
-    capture("checkout_started", { value: breakdown.totalCents / 100, items: lines.length });
+    capture("checkout_started", { value: breakdown.totalCents / 100, currency, items: lines.length });
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
@@ -88,7 +95,7 @@ export default function CartView({
             <div className="flex-1">
               <p className="font-display text-sm font-semibold">{l.title}</p>
               <p className="text-xs text-muted">
-                {formatPrice(l.unitPriceCents, locale)}
+                {formatPrice(priceFor(l.unitPriceCents, currency), locale, currency)}
                 {l.kind === "bundle" ? "" : ` · ${dict.common.book}`}
               </p>
             </div>
@@ -101,7 +108,7 @@ export default function CartView({
             ) : (
               <span className="text-xs text-muted">×1</span>
             )}
-            <div className="w-20 text-right font-semibold">{formatPrice(l.unitPriceCents * l.quantity, locale)}</div>
+            <div className="w-20 text-right font-semibold">{formatPrice(priceFor(l.unitPriceCents, currency) * l.quantity, locale, currency)}</div>
             <button onClick={() => remove(l.id)} className="text-muted hover:text-accent" aria-label={dict.common.remove}>✕</button>
           </div>
         ))}
@@ -120,18 +127,18 @@ export default function CartView({
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted">{dict.common.subtotal}</span>
-            <span>{formatPrice(breakdown.subtotalCents, locale)}</span>
+            <span>{formatPrice(breakdown.subtotalCents, locale, currency)}</span>
           </div>
           {breakdown.quantityDiscountCents > 0 && (
             <div className="flex justify-between text-success">
               <span>{dict.cart.quantityDiscount} (−{breakdown.quantityDiscountPercent}%)</span>
-              <span>−{formatPrice(breakdown.quantityDiscountCents, locale)}</span>
+              <span>−{formatPrice(breakdown.quantityDiscountCents, locale, currency)}</span>
             </div>
           )}
           {breakdown.couponDiscountCents > 0 && (
             <div className="flex justify-between text-success">
               <span>{dict.common.discount} ({coupon?.code})</span>
-              <span>−{formatPrice(breakdown.couponDiscountCents, locale)}</span>
+              <span>−{formatPrice(breakdown.couponDiscountCents, locale, currency)}</span>
             </div>
           )}
         </div>
@@ -151,11 +158,11 @@ export default function CartView({
 
         <div className="flex items-center justify-between border-t pt-4">
           <span className="font-display font-bold">{dict.common.total}</span>
-          <span className="font-display text-xl font-bold text-primary">{formatPrice(breakdown.totalCents, locale)}</span>
+          <span className="font-display text-xl font-bold text-primary">{formatPrice(breakdown.totalCents, locale, currency)}</span>
         </div>
         {breakdown.totalDiscountCents > 0 && (
           <p className="text-center text-sm font-semibold text-success">
-            {dict.cart.youSave} {formatPrice(breakdown.totalDiscountCents, locale)}
+            {dict.cart.youSave} {formatPrice(breakdown.totalDiscountCents, locale, currency)}
           </p>
         )}
 

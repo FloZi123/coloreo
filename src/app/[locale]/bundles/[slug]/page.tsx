@@ -4,6 +4,8 @@ import { isLocale, locales, defaultLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getBundleWithBooks, tTitle, tDesc } from "@/lib/data";
 import { formatPrice } from "@/lib/pricing";
+import { priceFor } from "@/lib/currency";
+import { getActiveCurrency } from "@/lib/currency-server";
 import AddBundleButton from "@/components/AddBundleButton";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
@@ -31,8 +33,10 @@ export default async function BundleDetailPage({
   const result = await getBundleWithBooks(slug);
   if (!result) notFound();
   const { bundle, books } = result;
-  const regular = books.reduce((s, b) => s + b.price_cents, 0);
-  const price = bundle.price_cents ?? regular;
+  const currency = await getActiveCurrency();
+  // In aktive Währung pro Position umrechnen (konsistent mit Cart/Checkout).
+  const regular = books.reduce((s, b) => s + priceFor(b.price_cents, currency), 0);
+  const price = bundle.price_cents != null ? priceFor(bundle.price_cents, currency) : regular;
   const saved = Math.max(0, regular - price);
 
   return (
@@ -56,12 +60,12 @@ export default async function BundleDetailPage({
           <p className="mt-3 text-ink-soft">{tDesc(bundle, locale)}</p>
           <div className="card mt-6 p-6">
             <div className="flex items-baseline gap-3">
-              <span className="font-display text-3xl font-bold text-primary">{formatPrice(price, locale)}</span>
-              {saved > 0 && <span className="text-sm text-muted line-through">{formatPrice(regular, locale)}</span>}
+              <span className="font-display text-3xl font-bold text-primary">{formatPrice(price, locale, currency)}</span>
+              {saved > 0 && <span className="text-sm text-muted line-through">{formatPrice(regular, locale, currency)}</span>}
             </div>
             {saved > 0 && (
               <p className="mt-1 text-sm font-semibold text-success">
-                {dict.cart.youSave} {formatPrice(saved, locale)}
+                {dict.cart.youSave} {formatPrice(saved, locale, currency)}
               </p>
             )}
             <div className="mt-4">

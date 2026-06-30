@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart/store";
 import { resolveTier, formatPrice, type PricingTier } from "@/lib/pricing";
+import { priceFor } from "@/lib/currency";
+import { useCurrency } from "@/components/CurrencyProvider";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { Emoji } from "@/components/Emoji";
@@ -29,6 +31,7 @@ export default function BundleBuilder({
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const { addMany } = useCart();
+  const { currency } = useCurrency();
   const router = useRouter();
 
   const toggle = (id: string) =>
@@ -41,7 +44,7 @@ export default function BundleBuilder({
 
   const chosen = books.filter((b) => selected.has(b.id));
   const count = chosen.length;
-  const gross = chosen.reduce((s, b) => s + b.priceCents, 0);
+  const gross = chosen.reduce((s, b) => s + priceFor(b.priceCents, currency), 0);
   const { applied, next } = useMemo(() => resolveTier(count, tiers), [count, tiers]);
   const discountPct = applied?.discount_percent ?? 0;
   const total = Math.round(gross * (1 - discountPct / 100));
@@ -70,7 +73,7 @@ export default function BundleBuilder({
               {isSel && <span className="absolute right-2 top-2 text-primary">✓</span>}
               <span className="text-3xl"><Emoji emoji={b.emoji} label={b.title} /></span>
               <span className="line-clamp-2 text-[11px] font-semibold text-ink-soft">{b.title}</span>
-              <span className="text-xs font-bold text-primary">{formatPrice(b.priceCents, locale)}</span>
+              <span className="text-xs font-bold text-primary">{formatPrice(priceFor(b.priceCents, currency), locale, currency)}</span>
             </button>
           );
         })}
@@ -96,17 +99,17 @@ export default function BundleBuilder({
         <div className="space-y-2 border-t pt-4 text-sm">
           <div className="flex justify-between">
             <span className="text-muted">{dict.common.subtotal}</span>
-            <span>{formatPrice(gross, locale)}</span>
+            <span>{formatPrice(gross, locale, currency)}</span>
           </div>
           {discountPct > 0 && (
             <div className="flex justify-between text-success">
               <span>{dict.cart.quantityDiscount} (−{discountPct}%)</span>
-              <span>−{formatPrice(saved, locale)}</span>
+              <span>−{formatPrice(saved, locale, currency)}</span>
             </div>
           )}
           <div className="flex justify-between border-t pt-2 font-display font-bold">
             <span>{dict.bundleBuilder.yourPrice}</span>
-            <span className="text-xl text-primary">{formatPrice(total, locale)}</span>
+            <span className="text-xl text-primary">{formatPrice(total, locale, currency)}</span>
           </div>
         </div>
 

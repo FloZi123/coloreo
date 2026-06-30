@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useCart } from "@/lib/cart/store";
 import { formatPrice } from "@/lib/pricing";
+import { priceFor } from "@/lib/currency";
+import { useCurrency } from "@/components/CurrencyProvider";
 import PaymentMarks from "@/components/PaymentMarks";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
@@ -25,6 +27,7 @@ export default function ProductBuyBox({
   dict: Dictionary;
 }) {
   const { addBook, has } = useCart();
+  const { currency } = useCurrency();
   const inCart = has(id);
 
   return (
@@ -33,7 +36,7 @@ export default function ProductBuyBox({
         onClick={() => addBook({ id, slug, title, coverUrl, unitPriceCents: priceCents })}
         className={`w-full rounded-full py-4 text-lg font-extrabold ${inCart ? "bg-success text-white" : "btn-primary"}`}
       >
-        {inCart ? "✓ " + dict.common.inCart : `${dict.common.addToCart} · ${formatPrice(priceCents, locale)}`}
+        {inCart ? "✓ " + dict.common.inCart : `${dict.common.addToCart} · ${formatPrice(priceFor(priceCents, currency), locale, currency)}`}
       </button>
       <Link href={`/${locale}/warenkorb`} className="mt-2 block text-center text-sm font-extrabold text-ink hover:text-primary">
         {dict.cart.proceed} →

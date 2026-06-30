@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useCart } from "@/lib/cart/store";
 import Logo from "@/components/Logo";
+import CurrencySwitcher from "@/components/CurrencySwitcher";
 import { locales, localeMeta, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 
@@ -54,6 +55,7 @@ export default function Header({
           <Link href={p("/suche")} aria-label={searchLabel} className="rounded-full px-2 py-2 text-ink-soft hover:text-primary" title={searchLabel}>
             🔍
           </Link>
+          <CurrencySwitcher className="hidden sm:block" />
           <div className="group relative">
             <button
               type="button"

@@ -1,6 +1,7 @@
 import { createPublicClient } from "@/lib/supabase/public";
-import { computeCart, type CartLine, type CouponInput, type PricingTier } from "@/lib/pricing";
+import { computeCart, linesInCurrency, couponInCurrency, type CartLine, type CouponInput, type PricingTier } from "@/lib/pricing";
 import { tTitle } from "@/lib/data";
+import { DEFAULT_CURRENCY, type Currency } from "@/lib/currency";
 import type { Locale } from "@/i18n/config";
 
 export interface RawLine {
@@ -10,19 +11,23 @@ export interface RawLine {
 }
 
 export interface BuiltOrder {
-  lines: CartLine[];
+  lines: CartLine[]; // Zeilen in der AKTIVEN Währung (kleinste Einheit)
   breakdown: ReturnType<typeof computeCart>;
   coupon: CouponInput | null;
+  currency: Currency;
 }
 
 /**
  * Baut eine vertrauenswürdige Bestellung aus rohen Warenkorb-Zeilen:
  * Preise/Titel kommen ausschließlich aus der DB, nie vom Client.
+ * Preise werden serverseitig in die AKTIVE Währung umgerechnet (Schön-Preis-Tabelle),
+ * exakt wie in der Anzeige → Anzeige und Checkout sind konsistent.
  */
 export async function buildOrderFromCart(
   rawLines: RawLine[],
   couponCode: string | null,
-  locale: Locale
+  locale: Locale,
+  currency: Currency = DEFAULT_CURRENCY
 ): Promise<BuiltOrder> {
   const sb = createPublicClient();
 
@@ -71,8 +76,11 @@ export async function buildOrderFromCart(
   }
 
   const tiers: PricingTier[] = tierRows ?? [];
-  const breakdown = computeCart(lines, tiers, coupon);
-  return { lines, breakdown, coupon: breakdown.couponError ? null : coupon };
+  // Zeilen + Coupon serverseitig in die aktive Währung umrechnen → Betrag = exakt die Anzeige.
+  const curLines = linesInCurrency(lines, currency);
+  const curCoupon = couponInCurrency(coupon, currency);
+  const breakdown = computeCart(curLines, tiers, curCoupon);
+  return { lines: curLines, breakdown, coupon: breakdown.couponError ? null : coupon, currency };
 }
 
 export function generateOrderNumber(): string {

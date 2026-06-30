@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useCart } from "@/lib/cart/store";
 import { formatPrice } from "@/lib/pricing";
+import { priceFor } from "@/lib/currency";
+import { useCurrency } from "@/components/CurrencyProvider";
 import { showRating } from "@/lib/reviews";
 import Stars from "@/components/Stars";
 import { Emoji } from "@/components/Emoji";
@@ -31,6 +33,7 @@ export default function BookCard({
   dict: Dictionary;
 }) {
   const { addBook, has } = useCart();
+  const { currency } = useCurrency();
   const inCart = has(book.id);
   const href = `/${locale}/buch/${book.slug}`;
 
@@ -64,7 +67,7 @@ export default function BookCard({
               {book.title}
             </h3>
           </Link>
-          <span className="whitespace-nowrap font-display text-lg font-bold">{formatPrice(book.priceCents, locale)}</span>
+          <span className="whitespace-nowrap font-display text-lg font-bold">{formatPrice(priceFor(book.priceCents, currency), locale, currency)}</span>
         </div>
         {book.rating && showRating(book.rating.count) && (
           <div className="mt-1 flex items-center gap-1 text-xs text-muted">

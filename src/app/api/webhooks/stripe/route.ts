@@ -32,13 +32,15 @@ export async function POST(req: Request) {
   try {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as {
-        metadata?: { order_id?: string };
+        metadata?: { order_id?: string; currency?: string };
         customer_details?: { email?: string } | null;
         customer_email?: string | null;
         amount_total?: number | null;
+        currency?: string | null;
         total_details?: { amount_tax?: number | null } | null;
       };
       const orderId = session.metadata?.order_id;
+      const currency = (session.currency ?? session.metadata?.currency ?? "eur").toUpperCase();
       const email = session.customer_details?.email ?? session.customer_email ?? "";
       if (orderId && email) {
         await fulfillOrder(orderId, email);
@@ -50,7 +52,7 @@ export async function POST(req: Request) {
           }).eq("id", orderId);
         }
         // Analytics serverseitig (verlässlich, anonyme distinctId = order_id)
-        await captureServer(orderId, "purchase_completed", { order_id: orderId, value: (session.amount_total ?? 0) / 100 });
+        await captureServer(orderId, "purchase_completed", { order_id: orderId, value: (session.amount_total ?? 0) / 100, currency });
       }
     } else if (event.type === "checkout.session.expired") {
       // Warenkorbabbruch: nur wenn E-Mail vorliegt; DOI wird beim Versand geprüft

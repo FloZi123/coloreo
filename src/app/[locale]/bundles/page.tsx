@@ -4,6 +4,8 @@ import { isLocale, locales, defaultLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getBundles, tTitle, tDesc } from "@/lib/data";
 import { formatPrice } from "@/lib/pricing";
+import { priceFor } from "@/lib/currency";
+import { getActiveCurrency } from "@/lib/currency-server";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale: raw } = await params;
@@ -20,6 +22,7 @@ export default async function BundlesPage({ params }: { params: Promise<{ locale
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : "de";
   const dict = getDictionary(locale);
+  const currency = await getActiveCurrency();
   const bundles = await getBundles();
 
   return (
@@ -39,7 +42,7 @@ export default async function BundlesPage({ params }: { params: Promise<{ locale
               <h3 className="font-display text-lg font-bold">{tTitle(b, locale)}</h3>
               <p className="mt-1 line-clamp-2 text-sm text-muted">{tDesc(b, locale)}</p>
               <div className="mt-3 font-display text-xl font-bold text-primary">
-                {b.price_cents != null ? formatPrice(b.price_cents, locale) : ""}
+                {b.price_cents != null ? formatPrice(priceFor(b.price_cents, currency), locale, currency) : ""}
               </div>
             </div>
           </Link>

@@ -42,7 +42,7 @@ export async function listOrders(limit = 100) {
   const admin = createAdminClient();
   const { data } = await admin
     .from("orders")
-    .select("id, order_number, customer_email, status, subtotal_cents, discount_cents, total_cents, coupon_code, created_at, paid_at")
+    .select("id, order_number, customer_email, status, subtotal_cents, discount_cents, total_cents, currency, coupon_code, created_at, paid_at")
     .order("created_at", { ascending: false })
     .limit(limit);
   return data ?? [];

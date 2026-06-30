@@ -5,6 +5,8 @@ import { isLocale, locales, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getBrand } from "@/lib/data";
 import { CartProvider } from "@/lib/cart/store";
+import { CurrencyProvider } from "@/components/CurrencyProvider";
+import { getActiveCurrency } from "@/lib/currency-server";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
@@ -44,19 +46,22 @@ export default async function LocaleLayout({
   const l: Locale = locale;
   const dict = getDictionary(l);
   const brand = await getBrand();
+  const currency = await getActiveCurrency();
 
   return (
     <html lang={l} className={`${body.variable} ${display.variable} h-full`}>
       <body className="min-h-full flex flex-col">
         <PostHogProvider />
-        <CartProvider>
-          <Header locale={l} dict={dict} brand={brand.name} />
-          <main className="flex-1">{children}</main>
-          <Footer locale={l} dict={dict} />
-          <ChatWidget locale={l} dict={dict} />
-          <CartToast locale={l} dict={dict} />
-          <FirstOrderPopup locale={l} />
-        </CartProvider>
+        <CurrencyProvider initial={currency}>
+          <CartProvider>
+            <Header locale={l} dict={dict} brand={brand.name} />
+            <main className="flex-1">{children}</main>
+            <Footer locale={l} dict={dict} />
+            <ChatWidget locale={l} dict={dict} />
+            <CartToast locale={l} dict={dict} />
+            <FirstOrderPopup locale={l} />
+          </CartProvider>
+        </CurrencyProvider>
         <ConsentBanner locale={l} />
       </body>
     </html>

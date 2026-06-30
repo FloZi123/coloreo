@@ -1,6 +1,7 @@
 import AdminShell from "@/components/admin/AdminShell";
 import { listOrders } from "@/lib/admin-data";
 import { formatPrice } from "@/lib/pricing";
+import { isCurrency, type Currency } from "@/lib/currency";
 import RefundButton from "@/components/admin/RefundButton";
 
 export const dynamic = "force-dynamic";
@@ -43,8 +44,8 @@ export default async function AdminOrders() {
                 <td className="p-3">
                   <span className={`rounded-full px-2 py-0.5 text-[11px] ${o.status === "paid" ? "bg-success/15 text-success" : o.status === "refunded" ? "bg-accent-soft text-accent" : "bg-muted/15 text-muted"}`}>{o.status}</span>
                 </td>
-                <td className="p-3 text-muted">{o.discount_cents > 0 ? "−" + formatPrice(o.discount_cents) : "–"}</td>
-                <td className="p-3 font-semibold">{formatPrice(o.total_cents)}</td>
+                <td className="p-3 text-muted">{(() => { const c = (o.currency ?? "eur").toUpperCase(); const cur: Currency = isCurrency(c) ? c : "EUR"; return o.discount_cents > 0 ? "−" + formatPrice(o.discount_cents, "de", cur) : "–"; })()}</td>
+                <td className="p-3 font-semibold">{formatPrice(o.total_cents, "de", (() => { const c = (o.currency ?? "eur").toUpperCase(); return isCurrency(c) ? (c as Currency) : "EUR"; })())}</td>
                 <td className="p-3 text-muted">{new Date(o.created_at).toLocaleString("de-DE")}</td>
                 <td className="p-3">{o.status === "paid" && <RefundButton orderId={o.id} />}</td>
               </tr>

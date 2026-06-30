@@ -1,4 +1,5 @@
 import type { Locale } from "@/i18n/config";
+import { priceFor, convertFx, CURRENCY_CONFIG, type Currency } from "@/lib/currency";
 
 export type PricingTier = { min_quantity: number; discount_percent: number };
 
@@ -107,12 +108,30 @@ export function computeCart(
   };
 }
 
-const PRICE_LOCALE: Record<Locale, string> = {
-  de: "de-DE", en: "en-IE", fr: "fr-FR", es: "es-ES", it: "it-IT", nl: "nl-NL",
-};
-export function formatPrice(cents: number, locale: Locale = "de"): string {
-  return new Intl.NumberFormat(PRICE_LOCALE[locale] ?? "de-DE", {
-    style: "currency",
-    currency: "EUR",
-  }).format(cents / 100);
+/**
+ * Formatiert einen Betrag (in kleinster Einheit) in der angegebenen Währung.
+ * Das Intl-Format folgt der WÄHRUNG (korrektes Symbol/Trennzeichen je Currency), nicht der UI-Sprache.
+ * `currency` default EUR (Referenz) – Storefront übergibt die AKTIVE Währung.
+ */
+export function formatPrice(cents: number, _locale: Locale = "de", currency: Currency = "EUR"): string {
+  const cfg = CURRENCY_CONFIG[currency];
+  return new Intl.NumberFormat(cfg.intlLocale, { style: "currency", currency }).format(cents / 100);
+}
+
+/** EUR-Cent-Zeilen → Zielwährung (gleiche Umrechnung in Anzeige UND Checkout → konsistente Summen). */
+export function linesInCurrency(lines: CartLine[], currency: Currency): CartLine[] {
+  return lines.map((l) => ({ ...l, unitPriceCents: priceFor(l.unitPriceCents, currency) }));
+}
+
+/**
+ * Coupon in die Zielwährung umrechnen: fixer Betrag + Mindestbestellwert via FX;
+ * Prozent-Coupons bleiben währungsunabhängig (nur Schwelle wird umgerechnet).
+ */
+export function couponInCurrency(coupon: CouponInput | null, currency: Currency): CouponInput | null {
+  if (!coupon) return null;
+  return {
+    ...coupon,
+    value: coupon.type === "fixed" ? convertFx(Math.round(coupon.value * 100), currency) / 100 : coupon.value,
+    min_order_cents: convertFx(coupon.min_order_cents, currency),
+  };
 }

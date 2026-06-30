@@ -3,6 +3,7 @@ import { buildOrderFromCart, generateOrderNumber, type RawLine } from "@/lib/che
 import { getStripe, stripeConfigured } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isLocale } from "@/i18n/config";
+import { getActiveCurrency } from "@/lib/currency-server";
 import { limited } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
@@ -13,6 +14,9 @@ export async function POST(req: Request) {
     const rawLines: RawLine[] = (body.lines ?? []).map((l: RawLine) => ({ kind: l.kind, id: l.id, quantity: l.quantity }));
     const couponCode: string | null = body.couponCode ?? null;
     const locale = isLocale(body.locale) ? body.locale : "de";
+    // Aktive Währung autoritativ aus dem Cookie (Geo-Fallback) – nicht aus dem Client-Body.
+    const currency = await getActiveCurrency();
+    const stripeCur = currency.toLowerCase();
 
     if (!Array.isArray(rawLines) || rawLines.length === 0) {
       return NextResponse.json({ error: "empty_cart" }, { status: 400 });
@@ -21,7 +25,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "stripe_not_configured" }, { status: 503 });
     }
 
-    const { lines, breakdown } = await buildOrderFromCart(rawLines, couponCode, locale);
+    const { lines, breakdown } = await buildOrderFromCart(rawLines, couponCode, locale, currency);
     if (lines.length === 0) {
       return NextResponse.json({ error: "no_valid_items" }, { status: 400 });
     }
@@ -38,7 +42,7 @@ export async function POST(req: Request) {
         subtotal_cents: breakdown.subtotalCents,
         discount_cents: breakdown.totalDiscountCents,
         total_cents: breakdown.totalCents,
-        currency: "eur",
+        currency: stripeCur,
         coupon_code: couponCode,
         locale,
       })
@@ -65,7 +69,7 @@ export async function POST(req: Request) {
 
     const lineItems = lines.map((l) => ({
       price_data: {
-        currency: "eur",
+        currency: stripeCur,
         // Bruttopreise (EU-B2C): Steuer ist im Preis enthalten, Stripe weist sie aus
         ...(TAX ? { tax_behavior: "inclusive" as const } : {}),
         // Tax-Code für E-Books/digitale Güter
@@ -80,7 +84,7 @@ export async function POST(req: Request) {
     if (breakdown.totalDiscountCents > 0) {
       const coupon = await stripe.coupons.create({
         amount_off: breakdown.totalDiscountCents,
-        currency: "eur",
+        currency: stripeCur,
         duration: "once",
         name: "Rabatt",
       });
@@ -100,7 +104,7 @@ export async function POST(req: Request) {
       // Läuft nach 2 h ab → löst checkout.session.expired (Warenkorbabbruch-Flow) aus
       expires_at: Math.floor(Date.now() / 1000) + 2 * 60 * 60,
       // app-Tag → trennt Coloreo-Events von anderen Apps am selben Stripe-Konto
-      metadata: { order_id: order.id, order_number: orderNumber, locale, app: "coloreo" },
+      metadata: { order_id: order.id, order_number: orderNumber, locale, currency: stripeCur, app: "coloreo" },
       // Stripe Checkout unterstützt de/en/fr/es/it/nl direkt
       locale: (["de", "en", "fr", "es", "it", "nl"].includes(locale) ? locale : "auto") as "de" | "en" | "fr" | "es" | "it" | "nl" | "auto",
     });
