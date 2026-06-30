@@ -12,9 +12,12 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createClient } from "@supabase/supabase-js";
 import sharp from "sharp";
-import { pdfToFrames, pickSpread, type Frame } from "../src/lib/social/frames";
+import Replicate from "replicate";
+import { pdfToFrames, type Frame } from "../src/lib/social/frames";
 import { makePin } from "../src/lib/social/pins";
-import { renderFlipThrough } from "../src/lib/social/video";
+import { renderFlipThrough, renderReveal } from "../src/lib/social/video";
+import { realisticColored, type Audience } from "../src/lib/social/colorize";
+import { colorizeWithinLines } from "../src/lib/generator/thematic";
 import { SOCIAL_I18N } from "../src/lib/social/strings";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -29,8 +32,26 @@ const PIN_COUNT = 6;
 const DOMAIN = "https://coloreo.shop";
 const BUCKET = "social-assets";
 const UPLOAD = process.argv.includes("--upload");
-const FLAT = process.argv.includes("--flat"); // flache Markenfüllung statt realistischer AI-Farben
+const FLAT = process.argv.includes("--flat"); // NUR Notbehelf – in Produktion verboten (siehe main()).
 const FORCE = process.argv.includes("--force"); // Vorhandenes neu erzeugen
+
+// AI-Kolorierung ist PFLICHT → REPLICATE_API_TOKEN vorab prüfen, sonst klar abbrechen.
+if (!process.env.REPLICATE_API_TOKEN) {
+  console.error("✗ REPLICATE_API_TOKEN fehlt in .env.local – Abbruch (AI-Kolorierung ist Pflicht).");
+  process.exit(1);
+}
+const rep = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
+
+// heroMotif + audience je Buch aus MALBUCH-KONZEPT.md (für Lead-Pin & audience-gerechten Detailgrad).
+const CONCEPT = readFileSync(join(root, "MALBUCH-KONZEPT.md"), "utf8");
+function conceptMeta(slug: string): { heroMotif: string; audience: Audience } {
+  const idx = CONCEPT.indexOf(`**Slug:** \`${slug}\``);
+  if (idx < 0) return { heroMotif: "", audience: "all" };
+  const after = CONCEPT.slice(idx, idx + 4000);
+  const audM = after.match(/\*\*Audience:\*\*\s*(kids|all|adult)/);
+  const heroM = after.match(/\*\*heroMotif \(Cover\):\*\*\s*`([^`]+)`/);
+  return { heroMotif: heroM?.[1] ?? "", audience: (audM?.[1] as Audience) ?? "all" };
+}
 
 // --locale de,en  → Sprachen für die Assets (Default: de). Die KI-Kolorierung läuft trotzdem nur EINMAL.
 const li = process.argv.indexOf("--locale");
@@ -55,7 +76,7 @@ async function processBook(slug: string) {
     cat = (c as Record<string, unknown>) ?? {};
   }
   const dir = join(root, "public", "social", slug);
-  const done = (l: string) => existsSync(join(dir, l, "social.json")) && existsSync(join(dir, l, "video-flip.mp4"));
+  const done = (l: string) => existsSync(join(dir, l, "social.json")) && existsSync(join(dir, l, "video-flip.mp4")) && existsSync(join(dir, l, "video-reveal.mp4"));
   if (!FORCE && LOCALES.every(done)) {
     console.log(`⏭  ${slug}: bereits vorhanden (--force zum Neu-Erzeugen)`);
     return;
@@ -68,9 +89,8 @@ async function processBook(slug: string) {
   console.log(`▶ ${slug} – Frames extrahieren …`);
   const frames = await pdfToFrames(pdfBytes, { scale: 2 });
 
-  // Option A: Linienkunst-Durchblättern – KEINE KI-Kolorierung (flux trifft reale Farben nicht
-  // zuverlässig; zeigt stattdessen die echten Seiten, die der Kunde bekommt).
   const lineBuf = (f: Frame) => sharp(f.png).flatten({ background: "#ffffff" }).png().toBuffer();
+  const { heroMotif, audience } = conceptMeta(slug);
 
   // Cover für Hook (optional)
   let coverBytes: Buffer | null = null;
@@ -78,8 +98,34 @@ async function processBook(slug: string) {
   const { data: covBlob } = await sb.storage.from("covers").download(coverFile);
   if (covBlob) coverBytes = Buffer.from(await covBlob.arrayBuffer());
 
-  const pinFrames = pickSpread(frames, PIN_COUNT);
-  // Flip zeigt ALLE Seiten des Buches (schneller Durchlauf)
+  // Pin-Auswahl: Hero-Seite (frames[0]) als Lead-Pin + die Seiten mit der GRÖSSTEN tatsächlich
+  // kolorierbaren (eingeschlossenen) Fläche – randberührende Flächen (Himmel) bleiben weiß, also
+  // bestimmt die eingeschlossene Fläche, wie farbintensiv die „ausgemalt"-Hälfte wird.
+  const colorableFrac = async (f: Frame): Promise<number> => {
+    const w = 200, h = Math.max(1, Math.round((w * f.height) / f.width));
+    const raw = await colorizeWithinLines(f.png, w, h); // flache Probefüllung (kein AI) – nur zur Auswahl
+    let col = 0;
+    for (let i = 0; i < raw.length; i += 3) {
+      const r = raw[i], g = raw[i + 1], b = raw[i + 2];
+      if (!(r > 250 && g > 250 && b > 250) && !(r < 40 && g < 40 && b < 40)) col++; // weder weiß noch Kontur
+    }
+    return col / (w * h);
+  };
+  const hero = frames[0];
+  const ranked = (await Promise.all(frames.map(async (f) => ({ f, d: await colorableFrac(f) }))))
+    .sort((a, b) => b.d - a.d).map((x) => x.f);
+  const others = ranked.filter((f) => f !== hero).slice(0, PIN_COUNT - 1);
+  const pinFrames = [hero, ...others];
+  // PFLICHT: jede Pin-„ausgemalt"-Hälfte realistisch (img2img) kolorieren – EINMAL, sprachunabhängig.
+  console.log(`  ▸ ${slug}: ${pinFrames.length} Seiten realistisch kolorieren (img2img, audience=${audience}) …`);
+  const pinColored: Buffer[] = [];
+  for (let i = 0; i < pinFrames.length; i++) {
+    pinColored.push(await realisticColored(rep, pinFrames[i], pinFrames[i].width, pinFrames[i].height, audience));
+    console.log(`     · Seite ${i + 1}/${pinFrames.length} koloriert`);
+  }
+  // Reveal nutzt die kolorierte Hero-Seite (Wiederverwendung – kein Extra-Call).
+  const revealPage = { frame: pinFrames[0], colored: pinColored[0] };
+  // Flip zeigt ALLE echten Linienkunst-Seiten (schneller Durchlauf).
   const flipPages = await Promise.all(frames.map(async (f) => ({ frame: f, colored: await lineBuf(f) })));
 
   // Pro Sprache: nur die (billigen) Text-Overlays neu rendern
@@ -93,21 +139,29 @@ async function processBook(slug: string) {
 
     const pins: string[] = [];
     for (let i = 0; i < pinFrames.length; i++) {
-      const webp = await makePin(pinFrames[i], await lineBuf(pinFrames[i]), { title, category, locale: loc as Loc });
+      const webp = await makePin(pinFrames[i], pinColored[i], { title, category, locale: loc as Loc });
       const fp = join(lDir, `pin-${i + 1}.webp`); writeFileSync(fp, webp);
       pins.push(`public/social/${slug}/${loc}/pin-${i + 1}.webp`); localPaths.push(fp);
     }
     const flipOut = join(lDir, "video-flip.mp4");
     await renderFlipThrough({ title }, coverBytes ?? frames[0].png, flipPages, flipOut, loc as Loc);
     localPaths.push(flipOut);
+    // Echter „Linie→Farbe"-Reveal-Clip (Pflicht).
+    const revealOut = join(lDir, "video-reveal.mp4");
+    await renderReveal({ title }, revealPage, revealOut, loc as Loc);
+    localPaths.push(revealOut);
 
     const manifest = {
       slug, locale: loc, title, category,
       // KI-Kennzeichnung (EU-AI-Act Art. 50 / Plattform-Pflicht) – sichtbar in Pins+Video eingebrannt.
       aiDisclosure: true,
       disclosureText: SOCIAL_I18N[loc as Loc].disclosure,
+      colorization: "realistic", // img2img (flux-dev), NICHT flat
+      leadPin: { index: 1, heroMotif }, // Lead-/Hero-Pin zeigt den heroMotif des Buchs
       links: { tiktok: linkFor(slug, "tiktok", loc), instagram: linkFor(slug, "instagram", loc), pinterest: linkFor(slug, "pinterest", loc) },
-      pins, videos: [`public/social/${slug}/${loc}/video-flip.mp4`],
+      pins,
+      videos: [`public/social/${slug}/${loc}/video-flip.mp4`, `public/social/${slug}/${loc}/video-reveal.mp4`],
+      reveal: `public/social/${slug}/${loc}/video-reveal.mp4`,
       bucket: UPLOAD ? BUCKET : null,
     };
     const mPath = join(lDir, "social.json"); writeFileSync(mPath, JSON.stringify(manifest, null, 2)); localPaths.push(mPath);
@@ -143,6 +197,7 @@ async function main() {
     slugs = args.filter((a, i) => !a.startsWith("--") && args[i - 1] !== "--locale");
   }
   if (!slugs.length) { console.error("Kein Slug. Nutzung: generate-social.ts <slug> | --all"); process.exit(1); }
+  if (FLAT) { console.error("✗ --flat ist in Produktion verboten (flache Markenfüllung). AI-Kolorierung ist Pflicht."); process.exit(1); }
   console.log(`Social-Assets für ${slugs.length} Buch/Bücher${FLAT ? " [flach]" : ""}${UPLOAD ? " [upload]" : ""}${FORCE ? " [force]" : ""}:`);
   let ok = 0; const failed: string[] = [];
   for (const s of slugs) {
