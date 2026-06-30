@@ -15,6 +15,8 @@ function difficulty(audience: Audience): string {
   return "clean clear outlines, balanced detail with open areas to color, friendly, ";
 }
 
+// ≥6 Kompositions-Varianten; rotierend über (hashSeed(motif)+page) → aufeinanderfolgende
+// Seiten werden unterschiedlich komponiert (kein Seriencharakter).
 const VARIATIONS = [
   "the subject large and prominent with a full background scene behind it",
   "a large close-up of the subject in its detailed natural habitat",
@@ -22,6 +24,8 @@ const VARIATIONS = [
   "the subject large and central with smaller related elements behind it across the page",
   "a complete full-page scene with the large subject and its surroundings",
   "the subject filling most of the page within its natural environment",
+  "a wide scene with the subject off to one side and scenery sweeping across the page",
+  "the subject seen from a gentle low angle with the setting rising behind it",
 ];
 
 export function buildMotifPrompt(audience: Audience, motif: string, page: number): string {
