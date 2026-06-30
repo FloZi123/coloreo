@@ -276,6 +276,11 @@ async function coverMetrics(lineBin: Uint8Array, coloredRaw: Buffer, W: number, 
   return { ok, score, lineInk, colorFill };
 }
 
+// Zentrale Kompositions-/Lesbarkeits-Steuerung für JEDES Cover (Linien- UND Farb-Prompt).
+// Hebt Thema-Lesbarkeit + Komposition über alle Bücher an; der reine-Linienkunst-Charakter
+// der rechten Hälfte bleibt durch das LINEART-Präfix in buildMotifPrompt erhalten.
+const COVER_STEER = "single clear focal subject, centered, large in frame, recognizable setting, simple uncluttered background, no empty corners";
+
 /** Cover (Stil B – linke Hälfte ausgemalt, rechte Linienkunst) + Branding-Overlay (600×800).
  *  Auto-Qualitäts-Guard: bis zu 3 Versuche; verwirft blasse/gebrochene oder unkolorierte Cover. */
 export async function generateCoverImage(
@@ -290,7 +295,7 @@ export async function generateCoverImage(
   for (let attempt = 0; attempt < 3; attempt++) {
     // Linienkunst des Hauptmotivs (weißer Grund per Konstruktion → saubere Konturen).
     // Kein fester Seed → jeder Versuch variiert (sonst würde ein schlechtes Ergebnis nur wiederholt).
-    const lineRaw = await provider.generate(buildMotifPrompt("all", opts.heroMotif, attempt));
+    const lineRaw = await provider.generate(buildMotifPrompt("all", `${opts.heroMotif}, ${COVER_STEER}`, attempt));
     const lineBin = await binarize(lineRaw);
     const lineFull = await sharp(lineBin).resize(W, H, { fit: "cover" }).toColourspace("srgb").png().toBuffer();
 
@@ -298,7 +303,7 @@ export async function generateCoverImage(
     let colorSrc: { data: Buffer; ch: number } | undefined;
     try {
       const colorRaw = await provider.generate(
-        `a colored illustration of ${opts.heroMotif}, natural realistic muted colors, soft and believable real-world colors, simple, centered, white background, no text`,
+        `a colored illustration of ${opts.heroMotif}, ${COVER_STEER}, natural realistic muted colors, soft and believable real-world colors, simple, white background, no text`,
       );
       const { data, info } = await sharp(colorRaw).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).toColourspace("srgb").raw().toBuffer({ resolveWithObject: true });
       colorSrc = { data, ch: info.channels };

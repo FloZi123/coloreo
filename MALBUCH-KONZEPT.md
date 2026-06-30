@@ -30,6 +30,25 @@ Neue oder auto-generierte Bücher müssen diese Regeln erfüllen, bevor sie in d
 
 ---
 
+## Cover-QA-Regel
+
+**Verbindlicher Standard für jeden `heroMotif (Cover)`** — auch für künftige/auto-generierte
+Bücher. Geprüft maschinell durch `scripts/validate-covers.ts` (muss `PASS 72/72` melden):
+
+1. **Szene/Kulisse:** Der heroMotif nennt eine konkrete, zum Thema passende Szene/Kulisse
+   (Orts-/Hintergrundwort) — nicht nur die Figur (z. B. „… in a sunny meadow", „… by a coral reef").
+2. **Ein Fokus-Subjekt:** genau eine klare Hauptfigur/-motiv, keine überladene Aufzählung.
+3. **Länge & Klarheit:** ~4–14 Wörter, keine widersprüchlichen/mehrdeutigen Requisiten
+   (z. B. kein „party hat" bei einem Strand-/Meer-Buch).
+4. **Thema-Konsistenz:** erkennbarer Bezug zur Kategorie/zum Buchtitel (Thema-Schlüsselwort).
+
+Zusätzlich hebt `generateCoverImage` (src/lib/generator/thematic.ts) jedes Cover zentral an:
+Linien- und Farb-Prompt enthalten „single clear focal subject, centered, large in frame,
+recognizable setting, simple uncluttered background, no empty corners". Der technische
+Cover-Guard (`coverMetrics`: Linien-Tinte/Kolorierung, bis 3 Versuche) bleibt zusätzlich aktiv.
+
+---
+
 ## 0. Wie dieses Dokument zu lesen ist
 
 Dieses Dokument ist die **vollständige Produktions-Spezifikation**. Pro Buch findest du:
@@ -207,7 +226,7 @@ durch die recherchierten Trend-Kategorien.
   Blütenform bis zum vollen Kreis. Für Einsteiger, Senioren und alle, die filigrane Muster überfordern.
 - **Beschreibung (DE):** 16 Bold-&-Easy-Mandalas mit großen Flächen und klaren, dicken Konturen.
   Stressfrei auszumalen, perfekt für ruhige Abende oder als Geschenk für die Großeltern.
-- **heroMotif (Cover):** `a bold simple flower mandala with thick clean outlines and large petals`
+- **heroMotif (Cover):** `a bold simple flower mandala on a soft sunrise sky background`
 - **Cover-Prompt:** `coloring book style illustration of a bold simple flower mandala with thick clean outlines and large petals, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a soft circle mandala surrounded by soft clouds
@@ -237,7 +256,7 @@ durch die recherchierten Trend-Kategorien.
 - **Beschreibung (DE):** 20 anspruchsvolle Mandalas, in vier elementare Kapitel gegliedert.
   Erdige Wurzelmuster, fließende Wellen, lodernde Flammen, luftige Federn — meditatives Ausmalen
   mit Konzept.
-- **heroMotif (Cover):** `an intricate mandala split into earth water fire and air quarters`
+- **heroMotif (Cover):** `an intricate four-elements mandala on a starry cosmic background`
 - **Cover-Prompt:** `coloring book style illustration of an intricate mandala split into earth water fire and air quarters, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→20):**
   1. an earth mandala with roots and crystals
@@ -307,7 +326,7 @@ durch die recherchierten Trend-Kategorien.
   bis zum Strauß, den man am Ende heimträgt. Große, klare Blüten zum entspannten Ausmalen.
 - **Beschreibung (DE):** 16 Bold-&-Easy-Wildblumen mit dicken Konturen und großen Flächen. Mohn,
   Kornblume, Margerite, Lavendel — sommerleichtes Ausmalen ohne Gefriemel.
-- **heroMotif (Cover):** `a bold simple bouquet of wildflowers with thick outlines`
+- **heroMotif (Cover):** `a bold simple bouquet of wildflowers in a sunny meadow`
 - **Cover-Prompt:** `coloring book style illustration of a bold simple bouquet of wildflowers with thick outlines, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a poppy bloom over a flower meadow
@@ -336,7 +355,7 @@ durch die recherchierten Trend-Kategorien.
   über das volle Sommerbeet bis zu den Samenständen im Herbst, bereit für den nächsten Zyklus.
 - **Beschreibung (DE):** 18 botanische Seiten, die das Werden und Vergehen im Garten erzählen.
   Keimling, Knospe, volle Blüte, Frucht, Samenstand — meditatives Naturstudium mit feiner Linienführung.
-- **heroMotif (Cover):** `an intricate botanical illustration of a plant life cycle from seed to flower`
+- **heroMotif (Cover):** `a single flowering plant sprouting in a sunny garden bed`
 - **Cover-Prompt:** `coloring book style illustration of an intricate botanical illustration of a plant life cycle from seed to flower, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
   1. a seed packet and scattered seeds on soil
@@ -636,7 +655,7 @@ durch die recherchierten Trend-Kategorien.
   Tarot-Motiv, von der Sonne bis zum Mond, bevölkert von Eulen, Schlangen, Wölfen und Raben.
 - **Beschreibung (DE):** 18 Seiten im Tarot-Stil mit symbolischen Tieren und Ornamenten. Mondkarten,
   Sternenmotive, Krafttiere in dekorativen Rahmen. Mystisch und meditativ.
-- **heroMotif (Cover):** `an ornate tarot-style card with a moth sun and moon symbols`
+- **heroMotif (Cover):** `an ornate tarot card with a moth against a starry night sky`
 - **Cover-Prompt:** `coloring book style illustration of an ornate tarot-style card with a moth sun and moon symbols, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
   1. an ornate tarot frame with a rising sun
@@ -835,7 +854,7 @@ durch die recherchierten Trend-Kategorien.
   Bonsai bis zur Bank unter dem Ahorn. Reduzierte, große Formen für stille Achtsamkeit.
 - **Beschreibung (DE):** 16 Bold-&-Easy-Seiten japanischer Gelassenheit: Bonsai, Laterne, Koi,
   Bambus — mit dicken, ruhigen Linien. Der einfache Einstieg in die Zen-Welt.
-- **heroMotif (Cover):** `a bold simple bonsai tree with a stone lantern`
+- **heroMotif (Cover):** `a bold simple bonsai tree in a raked zen garden`
 - **Cover-Prompt:** `coloring book style illustration of a bold simple bonsai tree with a stone lantern, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a raked sand pattern surrounded by soft clouds
@@ -870,7 +889,7 @@ durch die recherchierten Trend-Kategorien.
   reich verzierten Zuckerschädel und Marigold-Girlanden bis zur großen Parade im Mondlicht.
 - **Beschreibung (DE):** 18 Seiten voller Día-de-los-Muertos-Pracht: ornamentale Sugar Skulls,
   Ringelblumen, Kerzen, Gitarren. Üppig verziert, ein Fest fürs detailverliebte Ausmalen.
-- **heroMotif (Cover):** `an ornate decorated sugar skull with marigold flowers and candles`
+- **heroMotif (Cover):** `an ornate sugar skull with marigolds against a starry night sky`
 - **Cover-Prompt:** `coloring book style illustration of an ornate decorated sugar skull with marigold flowers and candles, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
   1. a ornate sugar skull in the old town
@@ -901,7 +920,7 @@ durch die recherchierten Trend-Kategorien.
   Spinnweben-Kronleuchter, Raben am Fenster, ein verlassener Ballsaal voller Geheimnisse.
 - **Beschreibung (DE):** 18 Seiten gotischer Romantik: schwarze Rosen, Totenkopf-Motten, schmiede-
   eiserne Tore, viktorianische Spiegel. Elegant-dunkel, für Liebhaber des Morbiden.
-- **heroMotif (Cover):** `an ornate gothic rose with thorns a raven and a skull`
+- **heroMotif (Cover):** `an ornate gothic rose with thorns by a moonlit window`
 - **Cover-Prompt:** `coloring book style illustration of an ornate gothic rose with thorns a raven and a skull, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
   1. a ornate rose in the old town
@@ -932,7 +951,7 @@ durch die recherchierten Trend-Kategorien.
   Totenkopf-und-Blumen-Motive ohne Gefriemel, für Gothic-Fans, die es entspannt mögen.
 - **Beschreibung (DE):** 16 Bold-&-Easy-Seiten: schlichte Sugar Skulls mit großen Blüten und dicken
   Linien. Der niederschwellige Einstieg in die Gothic-Welt.
-- **heroMotif (Cover):** `a bold simple sugar skull with two big flowers`
+- **heroMotif (Cover):** `a bold sugar skull wrapped in roses against a night sky`
 - **Cover-Prompt:** `coloring book style illustration of a bold simple sugar skull with two big flowers, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a rose-crowned skull in the old town
@@ -1001,7 +1020,7 @@ durch die recherchierten Trend-Kategorien.
   für eigene Affirmationen lassen Platz zum Beschriften.
 - **Beschreibung (DE):** 18 dekorative Seiten mit Blüten, Herzen und leeren Schmuckbändern, die
   zum Eintragen eigener Affirmationen einladen. Verbindet Achtsamkeit mit kreativem Journaling.
-- **heroMotif (Cover):** `an ornate floral wreath around an empty decorative banner ribbon`
+- **heroMotif (Cover):** `an ornate floral wreath in a peaceful sunlit garden`
 - **Cover-Prompt:** `coloring book style illustration of an ornate floral wreath around an empty decorative banner ribbon, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
   1. a small flower bud with an empty banner below
@@ -1066,7 +1085,7 @@ durch die recherchierten Trend-Kategorien.
   Zahnräder über halbfertige Automaten bis zum großen Luftschiff, das durchs Dachfenster startet.
 - **Beschreibung (DE):** 18 Seiten voll Zahnräder, Messing und Mechanik: Taschenuhren, Roboter-Eulen,
   Luftschiffe, Dampfmaschinen. Detailverliebtes Steampunk-Ausmalen.
-- **heroMotif (Cover):** `a steampunk pocket watch with gears wings and a key`
+- **heroMotif (Cover):** `a steampunk pocket watch on an inventor's workshop desk`
 - **Cover-Prompt:** `coloring book style illustration of a steampunk pocket watch with gears wings and a key, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
   1. a brass gear cluster in the old town
@@ -1128,7 +1147,7 @@ durch die recherchierten Trend-Kategorien.
   Taschenuhr über das alte Grammophon bis zum Koffer voller Erinnerungen.
 - **Beschreibung (DE):** 16 Bold-&-Easy-Seiten mit nostalgischen Objekten: Grammophon, Schreibmaschine,
   Kamera, Schlüssel. Dicke Linien, charmant-retro, leicht auszumalen.
-- **heroMotif (Cover):** `a bold simple vintage gramophone and pocket watch`
+- **heroMotif (Cover):** `a vintage gramophone on a shelf in a steampunk study`
 - **Cover-Prompt:** `coloring book style illustration of a bold simple vintage gramophone and pocket watch, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a antique typewriter in the old town
@@ -1262,7 +1281,7 @@ durch die recherchierten Trend-Kategorien.
   das Flattern von Blüte zu Blüte bis zum großen Schwarm im Abendlicht.
 - **Beschreibung (DE):** 18 Seiten voll filigraner Schmetterlinge mit reich gemusterten Flügeln,
   Blüten und Ranken. Symmetrisch, elegant, ein Klassiker fürs detailverliebte Ausmalen.
-- **heroMotif (Cover):** `an ornate butterfly with intricate patterned wings on flowers`
+- **heroMotif (Cover):** `an ornate butterfly over a sunny flower meadow`
 - **Cover-Prompt:** `coloring book style illustration of an ornate butterfly with intricate patterned wings on flowers, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→18):**
   1. a monarch butterfly over a flower meadow
@@ -1324,7 +1343,7 @@ durch die recherchierten Trend-Kategorien.
   Linien, von der einzelnen Blüte bis zum fröhlichen Flügelschwarm. Entspannt und einsteigerfreundlich.
 - **Beschreibung (DE):** 16 Bold-&-Easy-Seiten mit großen Schmetterlingen, Libellen und Blüten.
   Klare, dicke Konturen, große Flächen — ideal für Senioren und ruhige Pausen.
-- **heroMotif (Cover):** `a bold simple butterfly with big patterned wings on a flower`
+- **heroMotif (Cover):** `a big patterned butterfly in a blooming garden`
 - **Cover-Prompt:** `coloring book style illustration of a bold simple butterfly with big patterned wings on a flower, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a giant ornate butterfly over a flower meadow
@@ -1391,7 +1410,7 @@ durch die recherchierten Trend-Kategorien.
   bis zum großen Tanz. Eine fröhliche Party-Geschichte von Anfang bis Ende.
 - **Beschreibung (DE):** 16 Seiten Party-Spaß mit niedlichen Tieren: Luftballons, Torte, Hütchen,
   Tanz. Das beliebte "Tier-Party"-Thema, kindgerecht und bunt.
-- **heroMotif (Cover):** `cute animals at a birthday party with balloons and cake`
+- **heroMotif (Cover):** `cute animals at a birthday party in a sunny meadow`
 - **Cover-Prompt:** `coloring book style illustration of cute animals at a birthday party with balloons and cake, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a dancing bear in a sunny meadow
@@ -1420,7 +1439,7 @@ durch die recherchierten Trend-Kategorien.
   vom ersten Wackeln des Entenkükens bis zum Einschlafen des Bärenjungen.
 - **Beschreibung (DE):** 16 herzige Tierbabys mit besonders großen, einfachen Formen. Küken, Welpe,
   Kätzchen, Lämmchen — ideal schon für die Kleinsten.
-- **heroMotif (Cover):** `a cute baby kitten and puppy together`
+- **heroMotif (Cover):** `a cute kitten and puppy playing in a flower meadow`
 - **Cover-Prompt:** `coloring book style illustration of a cute baby kitten and puppy together, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a fluffy lion cub in a sunny meadow
@@ -1456,7 +1475,7 @@ durch die recherchierten Trend-Kategorien.
   Bettchen über Pfannkuchen, einen Regenspaziergang und Kakao bis zum Einschlafen mit seinem Teddy.
 - **Beschreibung (DE):** 16 herzerwärmende Cozy-Szenen mit Bär Bruno im angesagten BobbieGoods-Stil.
   Eine durchgehende Wohlfühl-Geschichte zum Ausmalen — für Kinder und Erwachsene, die es kuschelig mögen.
-- **heroMotif (Cover):** `a cute cozy bear in a sweater holding a cup of cocoa`
+- **heroMotif (Cover):** `a cozy bear with cocoa by a window on a snowy day`
 - **Cover-Prompt:** `coloring book style illustration of a cute cozy bear in a sweater holding a cup of cocoa, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. sipping cocoa by the window, Bruno the bear
@@ -1514,7 +1533,7 @@ durch die recherchierten Trend-Kategorien.
   Sandburgen, ein Picknick am Strand bis zum Sonnenuntergang mit Muscheln in der Tasche.
 - **Beschreibung (DE):** 16 sonnige Cozy-Szenen mit Kater Mio am Meer: Strand, Boot, Eis, Muscheln.
   Sommerliche Wohlfühl-Reise im beliebten Charakter-Stil.
-- **heroMotif (Cover):** `a cute cat in a sun hat sitting on a beach with a bucket`
+- **heroMotif (Cover):** `a cute cat in a straw hat building a sandcastle by the sea`
 - **Cover-Prompt:** `coloring book style illustration of a cute cat in a sun hat sitting on a beach with a bucket, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. building a sandcastle on the beach, Mio the cat
@@ -1578,7 +1597,7 @@ durch die recherchierten Trend-Kategorien.
   kuscheln sich am Abend in ihr Nest. Besonders große, einfache Formen für die Kleinsten.
 - **Beschreibung (DE):** 16 super-niedliche Baby-Dinos mit extra dicken Linien. Der sanfte Einstieg
   in die Dino-Welt — schon für Kindergartenkinder geeignet.
-- **heroMotif (Cover):** `a cute baby dinosaur hatching from an egg`
+- **heroMotif (Cover):** `a cute baby dinosaur hatching from an egg in a fern jungle`
 - **Cover-Prompt:** `coloring book style illustration of a cute baby dinosaur hatching from an egg, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a t-rex hatchling in the deep jungle
@@ -1670,7 +1689,7 @@ durch die recherchierten Trend-Kategorien.
   Monstertruck bis zum Pokal auf dem Siegerpodest. Tempo-Geschichte für Speed-Fans.
 - **Beschreibung (DE):** 16 schnelle Fahrzeuge mit dicken Linien: Rennwagen, Motorrad, Monstertruck,
   Go-Kart. Action und Tempo, kindgerecht und bunt.
-- **heroMotif (Cover):** `a cute race car zooming with a checkered flag`
+- **heroMotif (Cover):** `a cute race car speeding along a sunny racetrack`
 - **Cover-Prompt:** `coloring book style illustration of a cute race car zooming with a checkered flag, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a speedy race car in the old town
@@ -1884,7 +1903,7 @@ durch die recherchierten Trend-Kategorien.
   und Feen treffen sich zum Zauberfest. Bunte Fantasie für Fans des Magischen.
 - **Beschreibung (DE):** 16 magische Wesen mit dicken Linien: Einhorn, Pegasus, Mini-Drache, Fee,
   Meerjungfrau. Die ganze Fantasiewelt in einem Buch.
-- **heroMotif (Cover):** `a cute unicorn pegasus and baby dragon together`
+- **heroMotif (Cover):** `a cute unicorn and baby dragon in an enchanted rainbow valley`
 - **Cover-Prompt:** `coloring book style illustration of a cute unicorn pegasus and baby dragon together, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a cute unicorn with a star
@@ -1947,7 +1966,7 @@ durch die recherchierten Trend-Kategorien.
   bringen — eine zarte Heldinnen-Reise von Blüte zu Blüte, bis der ganze Wald funkelt.
 - **Beschreibung (DE):** 16 Seiten mit der wiederkehrenden Fee Lumi: Laternen, Blüten, Glühwürmchen,
   Sterne. Eine poetische Lichtgeschichte zum Ausmalen.
-- **heroMotif (Cover):** `a cute fairy holding a glowing lantern among flowers`
+- **heroMotif (Cover):** `a cute fairy with a glowing lantern in an enchanted forest`
 - **Cover-Prompt:** `coloring book style illustration of a cute fairy holding a glowing lantern among flowers, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. fluttering past a mushroom house, Lumi the fairy
@@ -2040,7 +2059,7 @@ durch die recherchierten Trend-Kategorien.
   durch Höhlen, Schiffswracks und Korallengärten, bis sie die Perle zurück ins Schloss bringt.
 - **Beschreibung (DE):** 16 Seiten mit der Heldin Perla auf Schatzsuche: Höhlen, Wracks, Tintenfisch,
   Schatz. Spannendes Unterwasser-Abenteuer im wiederkehrenden Charakter-Format.
-- **heroMotif (Cover):** `a cute mermaid holding a glowing pearl near a shipwreck`
+- **heroMotif (Cover):** `a cute mermaid holding a glowing pearl by a coral reef`
 - **Cover-Prompt:** `coloring book style illustration of a cute mermaid holding a glowing pearl near a shipwreck, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. swimming over a coral reef, Perla the mermaid
@@ -2069,7 +2088,7 @@ durch die recherchierten Trend-Kategorien.
   der wir Delfin, Schildkröte, Seestern und Co. besuchen. Freundschafts-Geschichte unter Wasser.
 - **Beschreibung (DE):** 16 Seiten mit Meerjungfrauen und niedlichen Meerestieren, dicke Linien.
   Verbindet Meerjungfrauen-Magie mit dem Tier-Liebling-Thema.
-- **heroMotif (Cover):** `a cute mermaid hugging a dolphin friend`
+- **heroMotif (Cover):** `a cute mermaid swimming with a dolphin over a coral reef`
 - **Cover-Prompt:** `coloring book style illustration of a cute mermaid hugging a dolphin friend, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a mermaid with a turtle over the coral reef
@@ -2133,7 +2152,7 @@ durch die recherchierten Trend-Kategorien.
   das seine ersten Schritte macht. Ganz große, einfache Formen für die Allerkleinsten.
 - **Beschreibung (DE):** 15 super-niedliche Bauernhof-Babys mit extra dicken Linien: Küken, Ferkel,
   Lämmchen, Fohlen. Erstes Ausmalen ab dem Kindergarten.
-- **heroMotif (Cover):** `a cute baby chick piglet and lamb together`
+- **heroMotif (Cover):** `a cute chick piglet and lamb in front of a red barn`
 - **Cover-Prompt:** `coloring book style illustration of a cute baby chick piglet and lamb together, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→15):**
   1. a fluffy chick by the red barn
@@ -2195,7 +2214,7 @@ durch die recherchierten Trend-Kategorien.
   Morgen über Törtchen und Donuts bis zur großen Tortenvitrine am Nachmittag. Alles mit Gesicht.
 - **Beschreibung (DE):** 16 super-süße Kawaii-Backwaren mit Gesichtern und dicken Linien: Cupcake,
   Donut, Croissant, Torte. Fröhlich, niedlich, für Klein und Groß.
-- **heroMotif (Cover):** `a cute kawaii cupcake and donut with happy faces`
+- **heroMotif (Cover):** `a cute kawaii cupcake with a happy face in a sunny bakery`
 - **Cover-Prompt:** `coloring book style illustration of a cute kawaii cupcake and donut with happy faces, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a smiling cupcake on a kitchen shelf
@@ -2224,7 +2243,7 @@ durch die recherchierten Trend-Kategorien.
   über Milchshakes und Bubble Tea bis zum riesigen Eisbecher zum Schluss. Erfrischend süß.
 - **Beschreibung (DE):** 16 kawaii Sommer-Leckereien mit Gesichtern: Eiscreme, Milchshake, Bubble Tea,
   Eis am Stiel. Knallbunt und fröhlich.
-- **heroMotif (Cover):** `a cute kawaii ice cream cone and milkshake with faces`
+- **heroMotif (Cover):** `a cute kawaii ice cream cone with a face in an ice cream shop`
 - **Cover-Prompt:** `coloring book style illustration of a cute kawaii ice cream cone and milkshake with faces, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a smiling ice cream cone on a kitchen shelf
@@ -2253,7 +2272,7 @@ durch die recherchierten Trend-Kategorien.
   — die Katze trifft das Sushi, der Panda den Bubble Tea. Verspielte Kawaii-Begegnungen.
 - **Beschreibung (DE):** 16 Seiten mit Kawaii-Tieren und niedlichem Essen kombiniert: Katze mit Sushi,
   Panda mit Bambus, Hund mit Keks. Doppelt süß, doppelt beliebt.
-- **heroMotif (Cover):** `a cute kawaii cat holding sushi with a happy face`
+- **heroMotif (Cover):** `a cute kawaii cat-shaped sushi on a kitchen plate`
 - **Cover-Prompt:** `coloring book style illustration of a cute kawaii cat holding sushi with a happy face, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a cat-shaped cookie on a kitchen shelf
@@ -2346,7 +2365,7 @@ durch die recherchierten Trend-Kategorien.
   kleinen Elefanten, der lernt zu trompeten. Besonders niedlich, besonders einfach.
 - **Beschreibung (DE):** 15 super-niedliche Safari- und Dschungelbabys mit extra dicken Linien:
   Löwenbaby, Elefantenbaby, Äffchen, Giraffenkind. Für die jüngsten Tierfreunde.
-- **heroMotif (Cover):** `a cute baby lion and baby elephant together`
+- **heroMotif (Cover):** `a cute baby lion and baby elephant on a sunny savanna`
 - **Cover-Prompt:** `coloring book style illustration of a cute baby lion and baby elephant together, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→15):**
   1. a lion cub in a sunny meadow
@@ -2409,7 +2428,7 @@ durch die recherchierten Trend-Kategorien.
   Verkleiden bis zum fröhlichen Süßes-oder-Saures-Zug durch die Nachbarschaft.
 - **Beschreibung (DE):** 16 niedlich-gruselige Halloween-Motive: Kürbis, Geist, Hexe, Fledermaus,
   Bonbons. Kindgerecht-spooky, Saisonliebling für Oktober. (Veröffentlichen ab Sommer.)
-- **heroMotif (Cover):** `a cute jack-o-lantern with a friendly ghost and bat`
+- **heroMotif (Cover):** `a cute jack-o-lantern with a friendly ghost in a moonlit pumpkin patch`
 - **Cover-Prompt:** `coloring book style illustration of a cute jack-o-lantern with a friendly ghost and bat, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a smiling jack-o-lantern in a snowy village
@@ -2438,7 +2457,7 @@ durch die recherchierten Trend-Kategorien.
   zum Blütenfest mit dem Osterhasen und seinen Tierfreunden.
 - **Beschreibung (DE):** 16 frühlingshafte Oster-Motive: Osterhase, bemalte Eier, Küken, Blumen,
   Körbchen. Heller, fröhlicher Saisonliebling fürs Frühjahr.
-- **heroMotif (Cover):** `a cute easter bunny with a basket of decorated eggs`
+- **heroMotif (Cover):** `a cute easter bunny with a basket of eggs in a spring meadow`
 - **Cover-Prompt:** `coloring book style illustration of a cute easter bunny with a basket of decorated eggs, bold black outlines with several areas filled in bright vibrant colors, half colored half black-and-white line art, playful, cheerful, white background, no text`
 - **Motiv-Liste (Seite 1→16):**
   1. a cute easter bunny waving
