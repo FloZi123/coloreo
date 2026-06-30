@@ -271,9 +271,27 @@ async function coverMetrics(lineBin: Uint8Array, coloredRaw: Buffer, W: number, 
     if (coloredRaw[j] < 245 || coloredRaw[j + 1] < 245 || coloredRaw[j + 2] < 245) filled++;
   }
   const colorFill = filled / tot; // Anteil kolorierter Pixel in der linken Hälfte
-  const ok = lineInk >= 0.012 && lineInk <= 0.32 && colorFill >= 0.12;
-  const score = (ok ? 10 : 0) + Math.min(colorFill, 0.5) + (lineInk >= 0.012 && lineInk <= 0.32 ? 0.5 : 0);
-  return { ok, score, lineInk, colorFill };
+
+  // Rahmen-Erkennung: durchgehende dunkle Linie nahe einer Kante (horizontal UND vertikal) = Rahmen.
+  const fw = 240, fh = 320;
+  const fg = await sharp(lineBin).resize(fw, fh, { fit: "fill" }).grayscale().raw().toBuffer();
+  const insets = [0.03, 0.045, 0.06, 0.075];
+  let hLine = 0, vLine = 0;
+  for (const r of insets) {
+    for (const yy of [Math.round(fh * r), Math.round(fh * (1 - r))]) {
+      let d = 0; for (let x = 0; x < fw; x++) if (fg[yy * fw + x] < 110) d++;
+      hLine = Math.max(hLine, d / fw);
+    }
+    for (const xx of [Math.round(fw * r), Math.round(fw * (1 - r))]) {
+      let d = 0; for (let y = 0; y < fh; y++) if (fg[y * fw + xx] < 110) d++;
+      vLine = Math.max(vLine, d / fh);
+    }
+  }
+  const frame = hLine >= 0.85 && vLine >= 0.85; // konservativ: nur klare Rahmenlinien
+
+  const ok = lineInk >= 0.012 && lineInk <= 0.32 && colorFill >= 0.12 && !frame;
+  const score = (ok ? 10 : 0) + Math.min(colorFill, 0.5) + (lineInk >= 0.012 && lineInk <= 0.32 ? 0.5 : 0) - (frame ? 1 : 0);
+  return { ok, score, lineInk, colorFill, frame };
 }
 
 // Zentrale Kompositions-/Lesbarkeits-Steuerung für JEDES Cover (Linien- UND Farb-Prompt).
@@ -313,7 +331,7 @@ export async function generateCoverImage(
 
     // Linke Hälfte: Flächen INNERHALB der Linien ausgemalt (Flood-Fill).
     const coloredRaw = await colorizeWithinLines(lineBin, W, H, colorSrc, 70, false, 1.1);
-    const { ok, score, lineInk, colorFill } = await coverMetrics(lineBin, coloredRaw, W, H, MID);
+    const { ok, score, lineInk, colorFill, frame } = await coverMetrics(lineBin, coloredRaw, W, H, MID);
 
     const coloredFull = await sharp(coloredRaw, { raw: { width: W, height: H, channels: 3 } }).png().toBuffer();
     const leftColored = await sharp(coloredFull).extract({ left: 0, top: 0, width: MID, height: H }).toBuffer();
@@ -330,7 +348,7 @@ export async function generateCoverImage(
 
     if (!best || score > best.score) best = { bytes: cover, score };
     if (ok) break;
-    console.warn(`  ⚠ Cover-Versuch ${attempt + 1} schwach (lineInk=${lineInk.toFixed(3)}, colorFill=${colorFill.toFixed(3)}) – wiederhole`);
+    console.warn(`  ⚠ Cover-Versuch ${attempt + 1} schwach (lineInk=${lineInk.toFixed(3)}, colorFill=${colorFill.toFixed(3)}, frame=${frame}) – wiederhole`);
   }
   return best!.bytes;
 }
