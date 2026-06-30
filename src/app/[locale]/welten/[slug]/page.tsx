@@ -1,11 +1,26 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { isLocale, type Locale } from "@/i18n/config";
+import { isLocale, locales, defaultLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getWorldBySlug, getCategoriesByWorld, getRatingsForBooks, tName, tDesc, tTitle, type Book } from "@/lib/data";
 import { createPublicClient } from "@/lib/supabase/public";
 import BookCard from "@/components/BookCard";
 import { Emoji } from "@/components/Emoji";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
+  const { locale: raw, slug } = await params;
+  const locale: Locale = isLocale(raw) ? raw : "de";
+  const world = await getWorldBySlug(slug);
+  const title = world ? tName(world, locale) : "Coloreo";
+  const description = world ? tDesc(world, locale).slice(0, 160) : undefined;
+  const languages = Object.fromEntries(locales.map((l) => [l, `/${l}/welten/${slug}`]));
+  return {
+    title,
+    description,
+    alternates: { canonical: `/${locale}/welten/${slug}`, languages: { ...languages, "x-default": `/${defaultLocale}/welten/${slug}` } },
+  };
+}
 
 export default async function WorldPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale: raw, slug } = await params;

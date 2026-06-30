@@ -1,8 +1,20 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { isLocale, type Locale } from "@/i18n/config";
+import { isLocale, locales, defaultLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getBundles, tTitle, tDesc } from "@/lib/data";
 import { formatPrice } from "@/lib/pricing";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale: Locale = isLocale(raw) ? raw : "de";
+  const dict = getDictionary(locale);
+  const languages = Object.fromEntries(locales.map((l) => [l, `/${l}/bundles`]));
+  return {
+    title: dict.nav.bundles,
+    alternates: { canonical: `/${locale}/bundles`, languages: { ...languages, "x-default": `/${defaultLocale}/bundles` } },
+  };
+}
 
 export default async function BundlesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;

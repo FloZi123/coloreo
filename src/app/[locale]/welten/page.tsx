@@ -1,10 +1,23 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { isLocale, type Locale } from "@/i18n/config";
+import { isLocale, locales, defaultLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getWorlds, tName, tDesc } from "@/lib/data";
 import { Emoji } from "@/components/Emoji";
 
 export const revalidate = 600; // ISR: Katalog-Änderungen erscheinen ohne Redeploy (alle 10 Min)
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale: Locale = isLocale(raw) ? raw : "de";
+  const dict = getDictionary(locale);
+  const languages = Object.fromEntries(locales.map((l) => [l, `/${l}/welten`]));
+  return {
+    title: dict.nav.worlds,
+    description: dict.worlds.subtitle,
+    alternates: { canonical: `/${locale}/welten`, languages: { ...languages, "x-default": `/${defaultLocale}/welten` } },
+  };
+}
 
 export default async function WorldsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;

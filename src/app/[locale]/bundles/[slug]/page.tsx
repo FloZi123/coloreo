@@ -1,9 +1,24 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { isLocale, type Locale } from "@/i18n/config";
+import { isLocale, locales, defaultLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getBundleWithBooks, tTitle, tDesc } from "@/lib/data";
 import { formatPrice } from "@/lib/pricing";
 import AddBundleButton from "@/components/AddBundleButton";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
+  const { locale: raw, slug } = await params;
+  const locale: Locale = isLocale(raw) ? raw : "de";
+  const result = await getBundleWithBooks(slug);
+  const title = result ? tTitle(result.bundle, locale) : "Coloreo";
+  const description = result ? tDesc(result.bundle, locale).slice(0, 160) : undefined;
+  const languages = Object.fromEntries(locales.map((l) => [l, `/${l}/bundles/${slug}`]));
+  return {
+    title,
+    description,
+    alternates: { canonical: `/${locale}/bundles/${slug}`, languages: { ...languages, "x-default": `/${defaultLocale}/bundles/${slug}` } },
+  };
+}
 
 export default async function BundleDetailPage({
   params,

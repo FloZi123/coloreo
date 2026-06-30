@@ -1,5 +1,6 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { isLocale, type Locale } from "@/i18n/config";
+import { isLocale, locales, defaultLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getWorlds, getBooks, getRatingsForBooks, tName, tDesc, tTitle } from "@/lib/data";
 import BookCard from "@/components/BookCard";
@@ -10,6 +11,18 @@ import DownloadCounter from "@/components/DownloadCounter";
 import { Emoji } from "@/components/Emoji";
 
 export const revalidate = 600; // ISR: Katalog-Änderungen erscheinen ohne Redeploy (alle 10 Min)
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale: Locale = isLocale(raw) ? raw : "de";
+  const dict = getDictionary(locale);
+  const languages = Object.fromEntries(locales.map((l) => [l, `/${l}`]));
+  return {
+    title: { absolute: `Coloreo – ${dict.home.heroTitle ?? dict.nav.home}` },
+    description: dict.home.heroSubtitle ?? dict.freebie.text,
+    alternates: { canonical: `/${locale}`, languages: { ...languages, "x-default": `/${defaultLocale}` } },
+  };
+}
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;

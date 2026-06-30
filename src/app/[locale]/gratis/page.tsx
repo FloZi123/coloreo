@@ -1,6 +1,19 @@
-import { isLocale, type Locale } from "@/i18n/config";
+import type { Metadata } from "next";
+import { isLocale, locales, defaultLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import FreebieForm from "@/components/FreebieForm";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale: Locale = isLocale(raw) ? raw : "de";
+  const dict = getDictionary(locale);
+  const languages = Object.fromEntries(locales.map((l) => [l, `/${l}/gratis`]));
+  return {
+    title: dict.freebie.title,
+    description: dict.freebie.text,
+    alternates: { canonical: `/${locale}/gratis`, languages: { ...languages, "x-default": `/${defaultLocale}/gratis` } },
+  };
+}
 
 export default async function FreebiePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
