@@ -51,12 +51,16 @@ export async function makePin(frame: Frame, colored: Buffer, meta: PinMeta): Pro
   const title = esc(meta.title);
   const sub = esc(SOCIAL_I18N[meta.locale ?? "de"].pinSub);
   const disc = esc(SOCIAL_I18N[meta.locale ?? "de"].disclosure); // sichtbare KI-Kennzeichnung
+  // Auto-breite Kennzeichnungs-Pille unten (statt engem Header-Chip → keine Abschneidung, jede Sprache passt).
+  const dF = 22;
+  const dW = Math.min(W - 40, Math.round(disc.length * dF * 0.55) + 28);
+  const dY = H - FOOTER - 58;
   const overlay = Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
       <rect x="0" y="0" width="${W}" height="${HEADER}" fill="rgba(28,24,21,0.92)"/>
       ${wordmarkSvg(W / 2, 62, 44, BRAND.ivory)}
-      <rect x="${W - 196}" y="26" width="172" height="42" rx="21" fill="#00000073"/>
-      <text x="${W - 110}" y="54" text-anchor="middle" font-family="'Segoe UI',Arial,sans-serif" font-size="23" fill="${BRAND.ivory}">${disc}</text>
+      <rect x="20" y="${dY}" width="${dW}" height="40" rx="20" fill="#00000080"/>
+      <text x="${20 + dW / 2}" y="${dY + 27}" text-anchor="middle" font-family="'Segoe UI',Arial,sans-serif" font-size="${dF}" fill="${BRAND.ivory}">${disc}</text>
       <rect x="0" y="${H - FOOTER}" width="${W}" height="${FOOTER}" fill="${BRAND.terracotta}"/>
       <text x="${W / 2}" y="${H - FOOTER + 58}" text-anchor="middle" font-family="${BRAND_FONT}" font-size="44" font-weight="600" fill="${BRAND.ivory}">${title}</text>
       <text x="${W / 2}" y="${H - FOOTER + 100}" text-anchor="middle" font-family="'Segoe UI',Arial,sans-serif" font-size="24" fill="#ffffffcc">${cat} · ${sub}</text>

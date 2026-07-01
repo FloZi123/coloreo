@@ -75,9 +75,14 @@ async function endcardScene(): Promise<Buffer> {
 function overlay(opts: { title?: string; subtitle?: string; progress?: number; scrim?: boolean; disclosure?: string }): Buffer {
   const HEADER = 104, FOOTER = opts.title ? 200 : 0;
   const SANS = "'Segoe UI',Arial,sans-serif";
-  const disc = opts.disclosure
-    ? `<rect x="${TW - 268}" y="36" width="240" height="56" rx="28" fill="#00000085"/><text x="${TW - 148}" y="72" text-anchor="middle" font-family="${SANS}" font-size="30" fill="${BRAND.ivory}">${esc(opts.disclosure)}</text>`
-    : "";
+  // Auto-breite Kennzeichnungs-Pille (passt jede Sprachlänge, keine Abschneidung); über dem Titel-Band bzw. unten.
+  let disc = "";
+  if (opts.disclosure) {
+    const d = esc(opts.disclosure), dF = 28;
+    const dW = Math.min(TW - 60, Math.round(d.length * dF * 0.55) + 40);
+    const dY = TH - (FOOTER || 0) - 92;
+    disc = `<rect x="30" y="${dY}" width="${dW}" height="52" rx="26" fill="#00000085"/><text x="${30 + dW / 2}" y="${dY + 35}" text-anchor="middle" font-family="${SANS}" font-size="${dF}" fill="${BRAND.ivory}">${d}</text>`;
+  }
   const scrim = opts.scrim ? `<linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0.42"/><stop offset="0.25" stop-color="#000" stop-opacity="0"/><stop offset="0.7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.5"/></linearGradient><rect width="${TW}" height="${TH}" fill="url(#g)"/>` : "";
   const prog = opts.progress != null
     ? `<rect x="60" y="${TH - FOOTER - 30}" width="${TW - 120}" height="12" rx="6" fill="#ffffff66"/><rect x="60" y="${TH - FOOTER - 30}" width="${Math.max(12, Math.round((TW - 120) * opts.progress))}" height="12" rx="6" fill="${BRAND.sage}"/>`
