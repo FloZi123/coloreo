@@ -316,23 +316,26 @@ export async function generateCoverImage(
     const lineBin = await binarize(lineRaw);
     const lineFull = await sharp(lineBin).resize(W, H, { fit: "cover" }).toColourspace("srgb").png().toBuffer();
 
-    // Farbquelle: dasselbe Motiv FARBIG & REALISTISCH gerendert.
-    let colorSrc: { data: Buffer; ch: number } | undefined;
+    // Kolorierung wie bei den Social-Pins: img2img DER Linienkunst (deckungsgleich) → natürliche,
+    // ruhige Farben mit weicher Schattierung; Original-Konturen per multiply drüber. KEIN grelles Flat-Fill.
+    const lineForAi = await sharp(lineBin).resize(896, null, { fit: "inside" }).flatten({ background: "#ffffff" }).png().toBuffer();
+    let coloredFull: Buffer;
     try {
-      const colorRaw = await provider.generate(
-        `a colored illustration of ${opts.heroMotif}, ${COVER_STEER}, natural realistic muted colors, soft and believable real-world colors, simple, white background, no text`,
+      const colored = await provider.colorize(
+        new Uint8Array(lineForAi),
+        `fully colored version of this illustration of ${opts.heroMotif}, every area clearly filled with soft natural realistic colors, cozy harmonious earthy palette, gentle colored-pencil and light watercolor shading, warm believable real-world tones, NOT neon, NOT rainbow, NOT oversaturated, NOT garish, NOT random flat block colors, soft daytime light, plain white background, no text`,
       );
-      const { data, info } = await sharp(colorRaw).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).toColourspace("srgb").raw().toBuffer({ resolveWithObject: true });
-      colorSrc = { data, ch: info.channels };
+      const coloredMotif = await sharp(colored).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).modulate({ saturation: 1.08 }).toColourspace("srgb").png().toBuffer();
+      const linesGray = await sharp(lineBin).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).grayscale().toColourspace("srgb").png().toBuffer();
+      coloredFull = await sharp(coloredMotif).composite([{ input: linesGray, blend: "multiply" }]).png().toBuffer();
     } catch {
-      /* ohne Farbquelle → Palette-Fallback */
+      // Notbehelf ohne AI: flache Markenfüllung, damit überhaupt ein Cover entsteht.
+      const raw = await colorizeWithinLines(lineBin, W, H, undefined, 70, false, 1.1);
+      coloredFull = await sharp(raw, { raw: { width: W, height: H, channels: 3 } }).png().toBuffer();
     }
-
-    // Linke Hälfte: Flächen INNERHALB der Linien ausgemalt (Flood-Fill).
-    const coloredRaw = await colorizeWithinLines(lineBin, W, H, colorSrc, 70, false, 1.1);
+    const coloredRaw = await sharp(coloredFull).removeAlpha().raw().toBuffer();
     const { ok, score, lineInk, colorFill, frame } = await coverMetrics(lineBin, coloredRaw, W, H, MID);
 
-    const coloredFull = await sharp(coloredRaw, { raw: { width: W, height: H, channels: 3 } }).png().toBuffer();
     const leftColored = await sharp(coloredFull).extract({ left: 0, top: 0, width: MID, height: H }).toBuffer();
     const rightLines = await sharp(lineFull).extract({ left: MID, top: 0, width: W - MID, height: H }).toBuffer();
     const cover = new Uint8Array(await sharp({ create: { width: W, height: H, channels: 3, background: { r: 255, g: 255, b: 255 } } })

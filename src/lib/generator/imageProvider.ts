@@ -9,6 +9,8 @@ export interface ImageProvider {
   /** Erzeugt ein PNG (Linienkunst) zum Prompt und liefert die Bytes.
    *  opts.seed: fester Seed → reproduzierbar; für Charakter-Konsistenz über die Buchseiten. */
   generate(prompt: string, opts?: { seed?: number }): Promise<Uint8Array>;
+  /** img2img: koloriert ein Eingabebild (Linienkunst) natürlich (flux-dev), deckungsgleich. */
+  colorize(image: Uint8Array, prompt: string, promptStrength?: number): Promise<Uint8Array>;
 }
 
 export function imageProviderConfigured(): boolean {
@@ -26,23 +28,11 @@ class ReplicateProvider implements ImageProvider {
     this.model = (process.env.REPLICATE_MODEL || DEFAULT_MODEL) as `${string}/${string}`;
   }
 
-  /** Führt die Generierung aus und wiederholt bei Rate-Limit (429)/Netzwerkfehlern mit Backoff. */
-  private async runWithRetry(prompt: string, maxRetries = 8, seed?: number): Promise<unknown> {
-    const isFlux = this.model.includes("flux");
-    const isDev = this.model.includes("flux-dev");
-    const input: Record<string, unknown> = { prompt, aspect_ratio: "3:4", output_format: "png" };
-    if (seed !== undefined) input.seed = seed;
-    if (isFlux) {
-      input.num_outputs = 1;
-      input.megapixels = "1";
-      if (isDev) {
-        input.num_inference_steps = 30;
-        input.guidance = 3.5;
-      }
-    }
+  /** Führt ein Modell aus und wiederholt bei Rate-Limit (429)/Netzwerkfehlern mit Backoff. */
+  private async runModel(model: `${string}/${string}`, input: Record<string, unknown>, maxRetries = 8): Promise<unknown> {
     for (let attempt = 0; ; attempt++) {
       try {
-        return await this.client.run(this.model, { input });
+        return await this.client.run(model, { input });
       } catch (e) {
         const err = e as { message?: string; cause?: { code?: string } };
         const msg = (err.message ?? String(e)) + " " + (err.cause?.code ?? "");
@@ -55,19 +45,14 @@ class ReplicateProvider implements ImageProvider {
     }
   }
 
-  async generate(prompt: string, opts?: { seed?: number }): Promise<Uint8Array> {
-    const output = await this.runWithRetry(prompt, 8, opts?.seed);
-
-    // Replicate-SDK liefert je nach Version: FileOutput[], FileOutput, URL-String[] oder URL-String.
+  /** Replicate-Ausgabe (FileOutput[]/FileOutput/URL-String) → Bytes. */
+  private async toBytes(output: unknown): Promise<Uint8Array> {
     const first = Array.isArray(output) ? output[0] : output;
     if (!first) throw new Error("Replicate: keine Ausgabe erhalten");
-
-    // FileOutput mit .blob()
     if (typeof first === "object" && first !== null && typeof (first as { blob?: unknown }).blob === "function") {
       const blob = await (first as { blob: () => Promise<Blob> }).blob();
       return new Uint8Array(await blob.arrayBuffer());
     }
-    // FileOutput mit .url()
     let url: string | null = null;
     if (typeof first === "object" && first !== null && typeof (first as { url?: unknown }).url === "function") {
       url = String((first as { url: () => unknown }).url());
@@ -78,6 +63,29 @@ class ReplicateProvider implements ImageProvider {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Replicate: Bild-Download fehlgeschlagen (${res.status})`);
     return new Uint8Array(await res.arrayBuffer());
+  }
+
+  async generate(prompt: string, opts?: { seed?: number }): Promise<Uint8Array> {
+    const isFlux = this.model.includes("flux");
+    const isDev = this.model.includes("flux-dev");
+    const input: Record<string, unknown> = { prompt, aspect_ratio: "3:4", output_format: "png" };
+    if (opts?.seed !== undefined) input.seed = opts.seed;
+    if (isFlux) {
+      input.num_outputs = 1;
+      input.megapixels = "1";
+      if (isDev) { input.num_inference_steps = 30; input.guidance = 3.5; }
+    }
+    return this.toBytes(await this.runModel(this.model, input));
+  }
+
+  /** img2img-Kolorierung (flux-dev) EINES Eingabebildes – deckungsgleich zur Linienkunst. */
+  async colorize(image: Uint8Array, prompt: string, promptStrength = 0.85): Promise<Uint8Array> {
+    const dataUri = `data:image/png;base64,${Buffer.from(image).toString("base64")}`;
+    const input: Record<string, unknown> = {
+      image: dataUri, prompt, prompt_strength: promptStrength,
+      num_inference_steps: 34, guidance: 3.5, output_format: "png", megapixels: "1",
+    };
+    return this.toBytes(await this.runModel("black-forest-labs/flux-dev", input));
   }
 }
 
