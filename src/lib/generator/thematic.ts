@@ -360,7 +360,7 @@ async function compositionScore(lineBin: Uint8Array): Promise<number> {
   return Math.max(0, bigFrac - 2 * edgeDens - Math.abs(ink - 0.1));
 }
 
-/** Rendert EIN Cover für einen festen Seed (Linienkunst → img2img → multiply → vintage → Rahmen). */
+/** Rendert EIN Cover für einen festen Seed (Linienkunst → img2img-Kolorierung → vintage → Rahmen). */
 async function renderOneCover(provider: ImageProvider, opts: CoverOpts, seed: number): Promise<{ bytes: Uint8Array; score: number; ok: boolean }> {
   const W = 600, H = 800, MID = Math.round(W / 2);
   const overlay = Buffer.from(brandingOverlay(W, H));
@@ -372,9 +372,9 @@ async function renderOneCover(provider: ImageProvider, opts: CoverOpts, seed: nu
   let colored = lineFull;
   try {
     const ai = await provider.colorize(new Uint8Array(lineForAi), COLOR_PROMPT, 0.85, seed);
-    const aiPng = await sharp(ai).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).toColourspace("srgb").png().toBuffer();
-    const linesGray = await sharp(lineBin).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).grayscale().toColourspace("srgb").png().toBuffer();
-    colored = await sharp(aiPng).composite([{ input: linesGray, blend: "multiply" }]).png().toBuffer();
+    // img2img-Ergebnis DIREKT als eine kohärente Ebene nutzen – KEIN multiply der Original-Linien
+    // mehr (das erzeugte bei img2img-Verzug das „zwei Bilder übereinander"-Doppelbild).
+    colored = await sharp(ai).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).toColourspace("srgb").png().toBuffer();
   } catch { /* ohne Kolorierung → Linienkunst als Notbehelf */ }
   const coloredVintage = await vintageTreat(colored, W, H);
   const coloredRaw = await sharp(coloredVintage).removeAlpha().raw().toBuffer();
