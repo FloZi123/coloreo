@@ -28,9 +28,15 @@ function conceptHero(slug: string): string {
 }
 
 async function main() {
+  const ALL = process.argv.includes("--all"); // FREIGABE-GATE: voller Katalog NUR mit --all
   const only = process.argv.slice(2).filter((a) => !a.startsWith("--"));
   let slugs = only;
   if (!slugs.length) {
+    if (!ALL) {
+      console.error("Freigabe-Gate: Kein Slug angegeben. Voller Katalog-Lauf NUR mit --all (ausdrückliche Freigabe).");
+      console.error("Beispiele: npx tsx scripts/regen-covers.ts <slug> [<slug> …]");
+      process.exit(1);
+    }
     const { data } = await sb.from("books").select("slug").eq("status", "published").not("cover_url", "is", null);
     slugs = (data ?? []).map((b) => b.slug);
   }
@@ -47,7 +53,7 @@ async function main() {
       catName = c?.name_de ?? "";
     }
     try {
-      const png = await generateCoverImage(provider, { title: b?.title_de ?? slug, categoryName: catName, heroMotif: hero, pages: b?.page_count ?? 18 });
+      const png = await generateCoverImage(provider, { heroMotif: hero, slug, variant: 0, title: b?.title_de ?? slug, categoryName: catName, pages: b?.page_count ?? 18 });
       const up = await sb.storage.from("covers").upload(`${slug}.png`, png, { contentType: "image/png", upsert: true });
       if (up.error) throw up.error;
       const base = (b?.cover_url ?? `${SUPA}/storage/v1/object/public/covers/${slug}.png`).split("?")[0];

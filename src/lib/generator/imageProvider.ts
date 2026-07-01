@@ -9,8 +9,9 @@ export interface ImageProvider {
   /** Erzeugt ein PNG (Linienkunst) zum Prompt und liefert die Bytes.
    *  opts.seed: fester Seed → reproduzierbar; für Charakter-Konsistenz über die Buchseiten. */
   generate(prompt: string, opts?: { seed?: number }): Promise<Uint8Array>;
-  /** img2img: koloriert ein Eingabebild (Linienkunst) natürlich (flux-dev), deckungsgleich. */
-  colorize(image: Uint8Array, prompt: string, promptStrength?: number): Promise<Uint8Array>;
+  /** img2img: koloriert ein Eingabebild (Linienkunst) natürlich (flux-dev), deckungsgleich.
+   *  seed: fester Seed → reproduzierbare Kolorierung. */
+  colorize(image: Uint8Array, prompt: string, promptStrength?: number, seed?: number): Promise<Uint8Array>;
 }
 
 export function imageProviderConfigured(): boolean {
@@ -79,12 +80,13 @@ class ReplicateProvider implements ImageProvider {
   }
 
   /** img2img-Kolorierung (flux-dev) EINES Eingabebildes – deckungsgleich zur Linienkunst. */
-  async colorize(image: Uint8Array, prompt: string, promptStrength = 0.85): Promise<Uint8Array> {
+  async colorize(image: Uint8Array, prompt: string, promptStrength = 0.85, seed?: number): Promise<Uint8Array> {
     const dataUri = `data:image/png;base64,${Buffer.from(image).toString("base64")}`;
     const input: Record<string, unknown> = {
       image: dataUri, prompt, prompt_strength: promptStrength,
       num_inference_steps: 34, guidance: 3.5, output_format: "png", megapixels: "1",
     };
+    if (seed !== undefined) input.seed = seed;
     return this.toBytes(await this.runModel("black-forest-labs/flux-dev", input));
   }
 }

@@ -166,14 +166,19 @@ function pdfText(s: string): string {
     .replace(/[^\x20-\xFF]/g, "");
 }
 
+/**
+ * Dezentes Cover-Branding: leichter Inset-Rahmen (Palette aus brand.ts) + kleine Fraunces-Wortmarke
+ * auf einer subtilen Pille (auf beliebiger Kunst lesbar). KEIN Titel/Benefit/Seitenzahl, KEIN KI-Text.
+ */
 function brandingOverlay(w: number, h: number): string {
-  // Sprachneutral: NUR die Coloreo-Wortmarke (kein eingebrannter Titel/Kategorie → i18n-sicher).
-  // Titel, Kategorie und Seitenzahl stehen lokalisiert als HTML auf der Storefront.
-  // Wortmarke aus dem zentralen erdigen Branding (src/lib/brand.ts).
-  const wordmark = wordmarkSvg(w / 2, 50, 36, BRAND.ivory);
+  const inset = Math.round(w * 0.025);
+  const pillW = Math.round(w * 0.34), pillH = Math.round(h * 0.05);
+  const pillX = (w - pillW) / 2, pillY = Math.round(h * 0.028);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
-    <rect x="0" y="0" width="${w}" height="76" fill="rgba(28,24,21,0.78)"/>
-    ${wordmark}
+    <rect x="${inset}" y="${inset}" width="${w - 2 * inset}" height="${h - 2 * inset}" rx="${Math.round(w * 0.02)}" fill="none" stroke="${BRAND.ivory}" stroke-opacity="0.9" stroke-width="${Math.round(w * 0.007)}"/>
+    <rect x="${inset}" y="${inset}" width="${w - 2 * inset}" height="${h - 2 * inset}" rx="${Math.round(w * 0.02)}" fill="none" stroke="${BRAND.ink}" stroke-opacity="0.18" stroke-width="${Math.round(w * 0.002)}"/>
+    <rect x="${pillX}" y="${pillY}" width="${pillW}" height="${pillH}" rx="${Math.round(pillH / 2)}" fill="${BRAND.paper}" fill-opacity="0.82"/>
+    ${wordmarkSvg(w / 2, pillY + Math.round(pillH * 0.68), Math.round(h * 0.036), BRAND.ink)}
   </svg>`;
 }
 
@@ -298,59 +303,72 @@ async function coverMetrics(lineBin: Uint8Array, coloredRaw: Buffer, W: number, 
 // der rechten Hälfte bleibt durch das LINEART-Präfix in buildMotifPrompt erhalten.
 const COVER_STEER = "single clear focal subject, centered, large in frame, recognizable setting, simple uncluttered background, no empty corners";
 
-/** Cover (Stil B – linke Hälfte ausgemalt, rechte Linienkunst) + Branding-Overlay (600×800).
- *  Auto-Qualitäts-Guard: bis zu 3 Versuche; verwirft blasse/gebrochene oder unkolorierte Cover. */
+/**
+ * Gedämpfte Vintage-Behandlung: leichte Entsättigung + feines Korn/Papier-Textur (feTurbulence),
+ * damit die Farbe handgemacht/vintage statt glänzend-KI wirkt. Thumbnail bleibt motiv-stark.
+ */
+export async function vintageTreat(img: Buffer, W: number, H: number): Promise<Buffer> {
+  const grain = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">` +
+      `<filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="t"/>` +
+      `<feColorMatrix in="t" type="saturate" values="0"/></filter>` +
+      `<rect width="${W}" height="${H}" filter="url(#n)" opacity="0.05"/></svg>`,
+  );
+  try {
+    return await sharp(img).resize(W, H, { fit: "cover" }).modulate({ saturation: 0.9, brightness: 1.0 })
+      .composite([{ input: grain, blend: "multiply" }]).png().toBuffer();
+  } catch {
+    // Falls das Korn-SVG nicht rendert: nur Entsättigung (kein harter Fehler).
+    return sharp(img).resize(W, H, { fit: "cover" }).modulate({ saturation: 0.9 }).png().toBuffer();
+  }
+}
+
+/**
+ * VOLL koloriertes, gedämpft-vintage Hero-Cover (600×800) – KEIN Split, kein Trennstrich, kein
+ * eingebrannter Titel/Benefit/Seitenzahl, kein KI-Text (Disclosure lebt auf der Produktseite).
+ * Reproduzierbar: fester, aus slug (+ Variante) abgeleiteter Seed; Modell/Parameter/Seed werden geloggt.
+ * Auto-Qualitäts-Guard: bis zu 3 Versuche (Seed + Versuchs-Offset, deterministisch).
+ */
 export async function generateCoverImage(
   provider: ImageProvider,
-  opts: { title: string; categoryName: string; heroMotif: string; pages: number }
+  opts: { heroMotif: string; slug?: string; variant?: number; title?: string; categoryName?: string; pages?: number },
 ): Promise<Uint8Array> {
   const W = 600, H = 800, MID = Math.round(W / 2);
-  const divider = Buffer.from(`<svg width="${W}" height="${H}"><rect x="${MID - 1}" y="0" width="2" height="${H}" fill="#1a1a1a"/></svg>`);
   const overlay = Buffer.from(brandingOverlay(W, H));
-  let best: { bytes: Uint8Array; score: number } | null = null;
+  const seedBase = hashSeed(`${opts.slug ?? opts.heroMotif}#${opts.variant ?? 0}`);
+  const COLOR_PROMPT = `fully colored version of this illustration of ${opts.heroMotif}, soft natural realistic colors, cozy harmonious earthy palette, warm believable real-world tones, gentle colored-pencil and light watercolor shading, every area clearly colored (no white gaps), NOT neon, NOT rainbow, NOT oversaturated, NOT garish, soft daytime light, plain white background, no text`;
+  let best: { bytes: Uint8Array; score: number; seed: number } | null = null;
 
   for (let attempt = 0; attempt < 3; attempt++) {
-    // Linienkunst des Hauptmotivs (weißer Grund per Konstruktion → saubere Konturen).
-    // Kein fester Seed → jeder Versuch variiert (sonst würde ein schlechtes Ergebnis nur wiederholt).
-    const lineRaw = await provider.generate(buildMotifPrompt("all", `${opts.heroMotif}, ${COVER_STEER}`, attempt));
+    const seed = seedBase + attempt; // deterministisch, aber über Versuche variiert
+    // Linienkunst des Motivs (fester Seed → reproduzierbar).
+    const lineRaw = await provider.generate(buildMotifPrompt("all", `${opts.heroMotif}, ${COVER_STEER}`, attempt), { seed });
     const lineBin = await binarize(lineRaw);
     const lineFull = await sharp(lineBin).resize(W, H, { fit: "cover" }).toColourspace("srgb").png().toBuffer();
 
-    // Kolorierung wie bei den Social-Pins: img2img DER Linienkunst (deckungsgleich) → natürliche,
-    // ruhige Farben mit weicher Schattierung; Original-Konturen per multiply drüber. KEIN grelles Flat-Fill.
+    // Deckungsgleiche img2img-Kolorierung + Original-Konturen per multiply (satt/geschichtet).
     const lineForAi = await sharp(lineBin).resize(896, null, { fit: "inside" }).flatten({ background: "#ffffff" }).png().toBuffer();
-    let coloredFull: Buffer;
+    let colored = lineFull;
     try {
-      const colored = await provider.colorize(
-        new Uint8Array(lineForAi),
-        `fully colored version of this illustration of ${opts.heroMotif}, every area clearly filled with soft natural realistic colors, cozy harmonious earthy palette, gentle colored-pencil and light watercolor shading, warm believable real-world tones, NOT neon, NOT rainbow, NOT oversaturated, NOT garish, NOT random flat block colors, soft daytime light, plain white background, no text`,
-      );
-      const coloredMotif = await sharp(colored).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).modulate({ saturation: 1.08 }).toColourspace("srgb").png().toBuffer();
+      const ai = await provider.colorize(new Uint8Array(lineForAi), COLOR_PROMPT, 0.85, seed);
+      const aiPng = await sharp(ai).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).toColourspace("srgb").png().toBuffer();
       const linesGray = await sharp(lineBin).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).grayscale().toColourspace("srgb").png().toBuffer();
-      coloredFull = await sharp(coloredMotif).composite([{ input: linesGray, blend: "multiply" }]).png().toBuffer();
+      colored = await sharp(aiPng).composite([{ input: linesGray, blend: "multiply" }]).png().toBuffer();
     } catch {
-      // Notbehelf ohne AI: flache Markenfüllung, damit überhaupt ein Cover entsteht.
-      const raw = await colorizeWithinLines(lineBin, W, H, undefined, 70, false, 1.1);
-      coloredFull = await sharp(raw, { raw: { width: W, height: H, channels: 3 } }).png().toBuffer();
+      /* ohne Kolorierung → Linienkunst als Notbehelf */
     }
-    const coloredRaw = await sharp(coloredFull).removeAlpha().raw().toBuffer();
+    const coloredVintage = await vintageTreat(colored, W, H);
+
+    // Metriken auf der Kunst OHNE Marken-Overlay (sonst würde der Inset-Rahmen als Frame erkannt).
+    const coloredRaw = await sharp(coloredVintage).removeAlpha().raw().toBuffer();
     const { ok, score, lineInk, colorFill, frame } = await coverMetrics(lineBin, coloredRaw, W, H, MID);
+    const cover = new Uint8Array(await sharp(coloredVintage).composite([{ input: overlay, left: 0, top: 0 }]).png().toBuffer());
 
-    const leftColored = await sharp(coloredFull).extract({ left: 0, top: 0, width: MID, height: H }).toBuffer();
-    const rightLines = await sharp(lineFull).extract({ left: MID, top: 0, width: W - MID, height: H }).toBuffer();
-    const cover = new Uint8Array(await sharp({ create: { width: W, height: H, channels: 3, background: { r: 255, g: 255, b: 255 } } })
-      .composite([
-        { input: leftColored, left: 0, top: 0 },
-        { input: rightLines, left: MID, top: 0 },
-        { input: divider, left: 0, top: 0 },
-        { input: overlay, left: 0, top: 0 },
-      ])
-      .png()
-      .toBuffer());
-
-    if (!best || score > best.score) best = { bytes: cover, score };
+    if (!best || score > best.score) best = { bytes: cover, score, seed };
     if (ok) break;
-    console.warn(`  ⚠ Cover-Versuch ${attempt + 1} schwach (lineInk=${lineInk.toFixed(3)}, colorFill=${colorFill.toFixed(3)}, frame=${frame}) – wiederhole`);
+    console.warn(`  ⚠ Cover-Versuch ${attempt + 1} schwach (lineInk=${lineInk.toFixed(3)}, colorFill=${colorFill.toFixed(3)}, frame=${frame}, seed=${seed}) – wiederhole`);
   }
+  // Reproduzierbarkeits-Protokoll: Modell + Parameter + gewählter Seed.
+  console.log(`  ▸ cover ${opts.slug ?? opts.heroMotif}: model=black-forest-labs/flux-dev(img2img) prompt_strength=0.85 vintage(sat0.9+grain) seed=${best!.seed}`);
   return best!.bytes;
 }

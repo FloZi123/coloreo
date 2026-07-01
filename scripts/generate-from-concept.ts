@@ -249,7 +249,7 @@ Antworte NUR als JSON: {"de":"...","en":"..."}` }],
 
     if (COVERS_ONLY) {
       // Nur das (jetzt text-freie) Cover neu erzeugen – Seiten/Beschreibungen/DB bleiben unangetastet.
-      const cover = await generateCoverImage(provider, { title: b.titleDe, categoryName: b.catName, heroMotif: b.heroMotif, pages: b.pages });
+      const cover = await generateCoverImage(provider, { heroMotif: b.heroMotif, slug: b.slug, variant: 0, title: b.titleDe, categoryName: b.catName, pages: b.pages });
       await sb.storage.from("covers").upload(`${b.slug}.png`, cover, { contentType: "image/png", upsert: true });
       console.log("  ✓ Cover (nur Cover, text-frei)");
       results.push({ slug: b.slug, cover: `${SUPA}/storage/v1/object/public/covers/${b.slug}.png` });
@@ -271,7 +271,7 @@ Antworte NUR als JSON: {"de":"...","en":"..."}` }],
     // Cover (heroMotif bei Charakter-Büchern um den Figuren-Anker ergänzt → Cover matcht die Seiten)
     const anchor = CHARACTER[b.slug];
     const coverHero = anchor ? `${b.heroMotif}, ${anchor}` : b.heroMotif;
-    const cover = await generateCoverImage(provider, { title: b.titleDe, categoryName: b.catName, heroMotif: coverHero, pages: b.pages });
+    const cover = await generateCoverImage(provider, { heroMotif: coverHero, slug: b.slug, variant: 0, title: b.titleDe, categoryName: b.catName, pages: b.pages });
     await sb.storage.from("covers").upload(`${b.slug}.png`, cover, { contentType: "image/png", upsert: true });
     const ver = Date.now(); // Cache-Busting → CDN/Browser laden die NEUEN Cover/Vorschauen
     const coverUrl = `${SUPA}/storage/v1/object/public/covers/${b.slug}.png?v=${ver}`;
