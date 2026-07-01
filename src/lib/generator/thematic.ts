@@ -3,6 +3,7 @@ import sharp from "sharp";
 import { trace } from "potrace";
 import type { ImageProvider } from "./imageProvider";
 import { hashSeed } from "./art";
+import { BRAND, wordmarkSvg } from "../brand";
 
 type Audience = "adult" | "kids" | "all";
 
@@ -166,12 +167,10 @@ function pdfText(s: string): string {
 }
 
 function brandingOverlay(w: number, h: number): string {
-  const brand = "'Fredoka', 'Baloo 2', 'Segoe UI', Arial, sans-serif";
   // Sprachneutral: NUR die Coloreo-Wortmarke (kein eingebrannter Titel/Kategorie → i18n-sicher).
   // Titel, Kategorie und Seitenzahl stehen lokalisiert als HTML auf der Storefront.
-  const wordmark = `<text x="${w / 2}" y="50" text-anchor="middle" font-family="${brand}" font-size="36" font-weight="700" letter-spacing="-1">` +
-    `<tspan fill="#FBF7F0">c</tspan><tspan fill="#FF5A4D">o</tspan><tspan fill="#FBF7F0">l</tspan>` +
-    `<tspan fill="#3B8EEA">o</tspan><tspan fill="#FBF7F0">re</tspan><tspan fill="#3FBF87">o</tspan></text>`;
+  // Wortmarke aus dem zentralen erdigen Branding (src/lib/brand.ts).
+  const wordmark = wordmarkSvg(w / 2, 50, 36, BRAND.ivory);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
     <rect x="0" y="0" width="${w}" height="76" fill="rgba(28,24,21,0.78)"/>
     ${wordmark}

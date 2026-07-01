@@ -1,17 +1,11 @@
 import sharp from "sharp";
 import type { Frame } from "./frames";
 import { SOCIAL_I18N } from "./strings";
+import { BRAND, BRAND_FONT, wordmarkSvg } from "../brand";
 import type { Locale } from "../../i18n/config";
 
-// Aktuelle Coloreo-CI
-const PAPER = { r: 250, g: 247, b: 240 };
-
-/** coloreo-Wortmarke als SVG-<text> (farbige o's). base = Grundbuchstaben-Farbe. */
-function wordmarkSvg(cx: number, y: number, size: number, base: string): string {
-  return `<text x="${cx}" y="${y}" text-anchor="middle" font-family="'Fredoka','Baloo 2','Segoe UI',Arial,sans-serif" font-size="${size}" font-weight="700" letter-spacing="-1">` +
-    `<tspan fill="${base}">c</tspan><tspan fill="#FF5A4D">o</tspan><tspan fill="${base}">l</tspan>` +
-    `<tspan fill="#3B8EEA">o</tspan><tspan fill="${base}">re</tspan><tspan fill="#3FBF87">o</tspan></text>`;
-}
+// Erdiges Coloreo-Branding (Papier-BG)
+const PAPER = { r: 245, g: 240, b: 230 };
 
 function esc(s: string): string {
   return s.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]!));
@@ -60,12 +54,12 @@ export async function makePin(frame: Frame, colored: Buffer, meta: PinMeta): Pro
   const overlay = Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
       <rect x="0" y="0" width="${W}" height="${HEADER}" fill="rgba(28,24,21,0.92)"/>
-      ${wordmarkSvg(W / 2, 62, 44, "#FAF7F0")}
+      ${wordmarkSvg(W / 2, 62, 44, BRAND.ivory)}
       <rect x="${W - 196}" y="26" width="172" height="42" rx="21" fill="#00000073"/>
-      <text x="${W - 110}" y="54" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="23" fill="#FAF7F0">${disc}</text>
-      <rect x="0" y="${H - FOOTER}" width="${W}" height="${FOOTER}" fill="#FF5A4D"/>
-      <text x="${W / 2}" y="${H - FOOTER + 58}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="44" font-weight="700" fill="#ffffff">${title}</text>
-      <text x="${W / 2}" y="${H - FOOTER + 100}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="24" fill="#ffffffcc">${cat} · ${sub}</text>
+      <text x="${W - 110}" y="54" text-anchor="middle" font-family="'Segoe UI',Arial,sans-serif" font-size="23" fill="${BRAND.ivory}">${disc}</text>
+      <rect x="0" y="${H - FOOTER}" width="${W}" height="${FOOTER}" fill="${BRAND.terracotta}"/>
+      <text x="${W / 2}" y="${H - FOOTER + 58}" text-anchor="middle" font-family="${BRAND_FONT}" font-size="44" font-weight="600" fill="${BRAND.ivory}">${title}</text>
+      <text x="${W / 2}" y="${H - FOOTER + 100}" text-anchor="middle" font-family="'Segoe UI',Arial,sans-serif" font-size="24" fill="#ffffffcc">${cat} · ${sub}</text>
     </svg>`,
   );
 

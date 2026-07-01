@@ -1,6 +1,6 @@
 <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-  <rect width="64" height="64" rx="14" fill="#FAF7F0"/>
-  <text x="32" y="44" text-anchor="middle" font-family="Fredoka, Nunito, Arial, sans-serif" font-weight="700" font-size="40" letter-spacing="-2">
-    <tspan fill="#221E1B">c</tspan><tspan fill="#FF5A4D">o</tspan>
+  <rect width="64" height="64" rx="14" fill="#FBF8F2"/>
+  <text x="32" y="44" text-anchor="middle" font-family="Fraunces, Georgia, 'Times New Roman', serif" font-weight="600" font-size="40" letter-spacing="-1">
+    <tspan fill="#3A352E">c</tspan><tspan fill="#C0714E">o</tspan>
   </text>
 </svg>

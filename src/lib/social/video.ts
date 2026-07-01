@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import ffmpegPath from "ffmpeg-static";
 import type { Frame } from "./frames";
 import { SOCIAL_I18N } from "./strings";
+import { BRAND, BRAND_FONT, wordmarkSvg as wordmark } from "../brand";
 import type { Locale } from "../../i18n/config";
 
 /** Seite + ihre fertig kolorierte Version. */
@@ -19,11 +20,6 @@ const SW = Math.round((TW * SCALE) / 2) * 2, SH = Math.round((TH * SCALE) / 2) *
 const DOMAIN = "coloreo.shop";
 const MOOD = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "public", "mood");
 
-function wordmark(cx: number, y: number, size: number, base: string): string {
-  return `<text x="${cx}" y="${y}" text-anchor="middle" font-family="'Fredoka','Baloo 2','Segoe UI',Arial,sans-serif" font-size="${size}" font-weight="700" letter-spacing="-1">` +
-    `<tspan fill="${base}">c</tspan><tspan fill="#FF5A4D">o</tspan><tspan fill="${base}">l</tspan>` +
-    `<tspan fill="#3B8EEA">o</tspan><tspan fill="${base}">re</tspan><tspan fill="#3FBF87">o</tspan></text>`;
-}
 const esc = (s: string) => s.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]!));
 
 /** Verwischter Schreibtisch-Hintergrund (Mood-Bild) in Szenengröße. */
@@ -78,32 +74,34 @@ async function endcardScene(): Promise<Buffer> {
 /** Fixes UI-Overlay (1080×1920, transparent): Kopf-Wortmarke, optional Fortschritt + Titel-Band. */
 function overlay(opts: { title?: string; subtitle?: string; progress?: number; scrim?: boolean; disclosure?: string }): Buffer {
   const HEADER = 104, FOOTER = opts.title ? 200 : 0;
+  const SANS = "'Segoe UI',Arial,sans-serif";
   const disc = opts.disclosure
-    ? `<rect x="${TW - 268}" y="36" width="240" height="56" rx="28" fill="#00000085"/><text x="${TW - 148}" y="72" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="30" fill="#FAF7F0">${esc(opts.disclosure)}</text>`
+    ? `<rect x="${TW - 268}" y="36" width="240" height="56" rx="28" fill="#00000085"/><text x="${TW - 148}" y="72" text-anchor="middle" font-family="${SANS}" font-size="30" fill="${BRAND.ivory}">${esc(opts.disclosure)}</text>`
     : "";
   const scrim = opts.scrim ? `<linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0.42"/><stop offset="0.25" stop-color="#000" stop-opacity="0"/><stop offset="0.7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.5"/></linearGradient><rect width="${TW}" height="${TH}" fill="url(#g)"/>` : "";
   const prog = opts.progress != null
-    ? `<rect x="60" y="${TH - FOOTER - 30}" width="${TW - 120}" height="12" rx="6" fill="#ffffff66"/><rect x="60" y="${TH - FOOTER - 30}" width="${Math.max(12, Math.round((TW - 120) * opts.progress))}" height="12" rx="6" fill="#FF5A4D"/>`
+    ? `<rect x="60" y="${TH - FOOTER - 30}" width="${TW - 120}" height="12" rx="6" fill="#ffffff66"/><rect x="60" y="${TH - FOOTER - 30}" width="${Math.max(12, Math.round((TW - 120) * opts.progress))}" height="12" rx="6" fill="${BRAND.sage}"/>`
     : "";
   const title = opts.title
-    ? `<rect x="0" y="${TH - FOOTER}" width="${TW}" height="${FOOTER}" fill="#FF5A4D"/>` +
-      `<text x="${TW / 2}" y="${TH - FOOTER + 84}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="58" font-weight="700" fill="#fff">${esc(opts.title)}</text>` +
-      (opts.subtitle ? `<text x="${TW / 2}" y="${TH - FOOTER + 144}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="33" fill="#ffffffd9">${esc(opts.subtitle)}</text>` : "")
+    ? `<rect x="0" y="${TH - FOOTER}" width="${TW}" height="${FOOTER}" fill="${BRAND.terracotta}"/>` +
+      `<text x="${TW / 2}" y="${TH - FOOTER + 84}" text-anchor="middle" font-family="${BRAND_FONT}" font-size="58" font-weight="600" fill="${BRAND.ivory}">${esc(opts.title)}</text>` +
+      (opts.subtitle ? `<text x="${TW / 2}" y="${TH - FOOTER + 144}" text-anchor="middle" font-family="${SANS}" font-size="33" fill="#ffffffd9">${esc(opts.subtitle)}</text>` : "")
     : "";
   return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${TW}" height="${TH}">${scrim}` +
-    `<rect x="0" y="0" width="${TW}" height="${HEADER}" fill="rgba(28,24,21,0.5)"/>${wordmark(TW / 2, 70, 50, "#FAF7F0")}${disc}${prog}${title}</svg>`);
+    `<rect x="0" y="0" width="${TW}" height="${HEADER}" fill="rgba(28,24,21,0.5)"/>${wordmark(TW / 2, 70, 50, BRAND.ivory)}${disc}${prog}${title}</svg>`);
 }
 
 function endcardOverlay(cta: string, disclosure?: string): Buffer {
+  const SANS = "'Segoe UI',Arial,sans-serif";
   const disc = disclosure
-    ? `<text x="${TW / 2}" y="${TH - 70}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="30" fill="#6f675c">${esc(disclosure)}</text>`
+    ? `<text x="${TW / 2}" y="${TH - 70}" text-anchor="middle" font-family="${SANS}" font-size="30" fill="${BRAND.ink}">${esc(disclosure)}</text>`
     : "";
   return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${TW}" height="${TH}">` +
-    `<rect width="${TW}" height="${TH}" fill="#FAF7F0" fill-opacity="0.82"/>` +
-    wordmark(TW / 2, TH / 2 - 50, 150, "#221E1B") +
-    `<text x="${TW / 2}" y="${TH / 2 + 36}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="46" font-weight="600" fill="#6f675c">${DOMAIN}</text>` +
-    `<rect x="${TW / 2 - 320}" y="${TH / 2 + 120}" width="640" height="98" rx="49" fill="#FF5A4D"/>` +
-    `<text x="${TW / 2}" y="${TH / 2 + 184}" text-anchor="middle" font-family="'Fredoka','Segoe UI',Arial,sans-serif" font-size="38" font-weight="700" fill="#fff">${cta}</text>${disc}</svg>`);
+    `<rect width="${TW}" height="${TH}" fill="${BRAND.paper}" fill-opacity="0.9"/>` +
+    wordmark(TW / 2, TH / 2 - 50, 150, BRAND.ink) +
+    `<text x="${TW / 2}" y="${TH / 2 + 36}" text-anchor="middle" font-family="${SANS}" font-size="46" font-weight="600" fill="${BRAND.ink}">${DOMAIN}</text>` +
+    `<rect x="${TW / 2 - 320}" y="${TH / 2 + 120}" width="640" height="98" rx="49" fill="${BRAND.sage}"/>` +
+    `<text x="${TW / 2}" y="${TH / 2 + 184}" text-anchor="middle" font-family="${SANS}" font-size="38" font-weight="700" fill="${BRAND.ivory}">${cta}</text>${disc}</svg>`);
 }
 
 /** Ken-Burns-Frame: zoomt langsam in die Szene und legt das Overlay darüber. */

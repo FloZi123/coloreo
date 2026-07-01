@@ -1,13 +1,14 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyUnsubToken } from "@/lib/emailJobs";
+import { BRAND, wordmarkHtml } from "@/lib/brand";
 
 export const runtime = "nodejs";
 
 function page(msg: string): Response {
   return new Response(
     `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-     <div style="font-family:Segoe UI,Arial,sans-serif;max-width:480px;margin:80px auto;text-align:center;color:#221E1B">
-       <div style="font-size:30px;font-weight:bold;letter-spacing:-1px">c<span style="color:#FF5A4D">o</span>l<span style="color:#3B8EEA">o</span>re<span style="color:#3FBF87">o</span></div>
+     <div style="font-family:Segoe UI,Arial,sans-serif;max-width:480px;margin:80px auto;text-align:center;color:${BRAND.ink}">
+       <div style="font-size:30px;font-weight:bold;letter-spacing:-0.5px">${wordmarkHtml(BRAND.ink)}</div>
        <p style="margin-top:24px;font-size:17px">${msg}</p>
      </div>`,
     { headers: { "content-type": "text/html; charset=utf-8" } },

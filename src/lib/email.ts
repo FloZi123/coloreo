@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import type { Locale } from "@/i18n/config";
 import { unsubToken } from "@/lib/emailJobs";
+import { BRAND, wordmarkHtml } from "@/lib/brand";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -107,13 +108,13 @@ async function send(to: string, subject: string, html: string, extraHeaders?: Re
 
 /** coloreo-Wortmarke (farbige o's) als Mail-Kopf. */
 function layout(title: string, inner: string): string {
-  const wm = `<span style="color:#FAF7F0">c</span><span style="color:#FF5A4D">o</span><span style="color:#FAF7F0">l</span><span style="color:#3B8EEA">o</span><span style="color:#FAF7F0">re</span><span style="color:#3FBF87">o</span>`;
-  return `<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:560px;margin:0 auto;color:#221E1B">
-    <div style="background:#221E1B;padding:18px 24px;border-radius:16px 16px 0 0;font-size:26px;font-weight:bold;letter-spacing:-1px">${wm}</div>
-    <div style="border:1px solid #e3dacb;border-top:none;padding:24px;border-radius:0 0 16px 16px;background:#faf7f0">
+  const wm = wordmarkHtml(BRAND.ivory);
+  return `<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:560px;margin:0 auto;color:${BRAND.ink}">
+    <div style="background:${BRAND.ink};padding:18px 24px;border-radius:16px 16px 0 0;font-size:26px;font-weight:bold;letter-spacing:-0.5px">${wm}</div>
+    <div style="border:1px solid #e4dccb;border-top:none;padding:24px;border-radius:0 0 16px 16px;background:${BRAND.paper}">
       <h2 style="margin-top:0;font-weight:700">${title}</h2>${inner}
     </div>
-    <p style="text-align:center;color:#9a9388;font-size:12px;margin-top:16px">© 2026 Coloreo · <a href="${SITE}" style="color:#FF5A4D;text-decoration:none">coloreo.shop</a></p>
+    <p style="text-align:center;color:#9a9388;font-size:12px;margin-top:16px">© 2026 Coloreo · <a href="${SITE}" style="color:${BRAND.terracotta};text-decoration:none">coloreo.shop</a></p>
   </div>`;
 }
 
@@ -155,7 +156,7 @@ const M: Record<Locale, Msg> = {
   },
 };
 
-const BTN = "background:#FF5A4D;color:#fff;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:bold;display:inline-block";
+const BTN = `background:${BRAND.sage};color:${BRAND.ivory};padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:bold;display:inline-block`;
 
 export async function sendOrderConfirmation(opts: {
   email: string;
@@ -165,7 +166,7 @@ export async function sendOrderConfirmation(opts: {
 }): Promise<void> {
   const t = M[opts.locale] ?? M.en;
   const links = opts.downloads
-    .map((d) => `<li style="margin:8px 0"><a href="${d.url}" style="color:#FF5A4D;font-weight:bold">${d.title}</a> – ${t.downloadPdf}</li>`)
+    .map((d) => `<li style="margin:8px 0"><a href="${d.url}" style="color:${BRAND.terracotta};font-weight:bold">${d.title}</a> – ${t.downloadPdf}</li>`)
     .join("");
   const html = layout(
     t.orderTitle,
@@ -255,7 +256,7 @@ export async function sendCrossSell(o: { email: string; locale: string }): Promi
 }
 export async function sendReviewRequest(o: { email: string; locale: string; books: { title: string; url: string }[] }): Promise<void> {
   const t = mk(o.locale);
-  const list = o.books.map((b) => `<li style="margin:6px 0"><a href="${b.url}" style="color:#FF5A4D;font-weight:bold">${b.title}</a></li>`).join("");
+  const list = o.books.map((b) => `<li style="margin:6px 0"><a href="${b.url}" style="color:${BRAND.terracotta};font-weight:bold">${b.title}</a></li>`).join("");
   await send(o.email, t.revSubj, marketingLayout(t.revTitle, `<p>${t.revBody}</p><ul>${list}</ul>`, o.email, o.locale), unsubHeaders(o.email));
 }
 export async function sendWinBack(o: { email: string; locale: string; coupon?: string }): Promise<void> {
