@@ -54,7 +54,7 @@ async function main() {
   const sheetW = gap + cands.length * (TW + gap), sheetH = gap * 2 + labelH + (m0.height ?? TW);
   await sharp({ create: { width: sheetW, height: sheetH, channels: 3, background: { r: 245, g: 240, b: 230 } } })
     .composite(thumbs).png().toFile(join(dir, "_contact-sheet.png"));
-  writeFileSync(join(dir, "candidates.json"), JSON.stringify({ slug: HERO.slug, n: N, presorted: "cleanliness_desc", candidates: meta }, null, 2));
+  writeFileSync(join(dir, "candidates.json"), JSON.stringify({ slug: HERO.slug, heroMotif: HERO.hero, variant: 0, n: N, presorted: "cleanliness_desc", candidates: meta }, null, 2));
   console.log(`FERTIG · ${N} Kandidaten + Kontaktbogen + candidates.json (vorsortiert). Auswahl: select=<seed>`);
 }
 main().catch((e) => { console.error("FEHLER:", e instanceof Error ? e.stack : e); process.exit(1); });
