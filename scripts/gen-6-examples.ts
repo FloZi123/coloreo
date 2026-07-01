@@ -18,7 +18,7 @@ const hero = (slug: string) => {
 const OUT = join(root, ".cover-examples", "validate6");
 mkdirSync(OUT, { recursive: true });
 
-const SLUGS = [
+const DEFAULT_SLUGS = [
   "cottagecore-tag-im-landhaus",
   "mandala-reise-durch-den-tag",
   "safari-abenteuer",
@@ -26,6 +26,7 @@ const SLUGS = [
   "botanik-gewaechshaus",
   "kawaii-baeckerei",
 ];
+const SLUGS = process.argv.slice(2).length ? process.argv.slice(2) : DEFAULT_SLUGS;
 
 async function main() {
   const provider = getImageProvider();
