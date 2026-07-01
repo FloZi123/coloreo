@@ -321,11 +321,11 @@ export async function vintageTreat(img: Buffer, W: number, H: number): Promise<B
       `<rect width="${W}" height="${H}" filter="url(#n)" opacity="0.05"/></svg>`,
   );
   try {
-    return await sharp(img).resize(W, H, { fit: "cover" }).modulate({ saturation: 0.9, brightness: 1.0 })
+    return await sharp(img).resize(W, H, { fit: "cover" }).modulate({ saturation: 0.96, brightness: 1.0 })
       .composite([{ input: grain, blend: "multiply" }]).png().toBuffer();
   } catch {
-    // Falls das Korn-SVG nicht rendert: nur Entsättigung (kein harter Fehler).
-    return sharp(img).resize(W, H, { fit: "cover" }).modulate({ saturation: 0.9 }).png().toBuffer();
+    // Falls das Korn-SVG nicht rendert: nur leichte Entsättigung (kein harter Fehler).
+    return sharp(img).resize(W, H, { fit: "cover" }).modulate({ saturation: 0.96 }).png().toBuffer();
   }
 }
 
@@ -364,14 +364,14 @@ async function compositionScore(lineBin: Uint8Array): Promise<number> {
 /** Rendert EIN Cover für einen festen Seed (Linienkunst → img2img-Kolorierung → vintage → Rahmen). */
 async function renderOneCover(provider: ImageProvider, opts: CoverOpts, seed: number): Promise<{ bytes: Uint8Array; score: number; ok: boolean }> {
   const W = 600, H = 800, MID = Math.round(W / 2);
-  const COLOR_PROMPT = `fully colored version of this illustration of ${opts.heroMotif}, soft natural realistic colors, cozy harmonious earthy palette, warm believable real-world tones, gentle colored-pencil and light watercolor shading, every area clearly colored (no white gaps), NOT neon, NOT rainbow, NOT oversaturated, NOT garish, soft daytime light, plain white background, ${NOTEXT}`;
+  const COLOR_PROMPT = `fully colored version of this illustration of ${opts.heroMotif}, the ENTIRE main subject completely filled with rich color, every area fully colored, no white or uncolored areas, natural realistic colors, warm cozy earthy palette, believable real-world tones, gentle colored-pencil and watercolor shading, NOT neon, NOT rainbow, NOT oversaturated, NOT garish, soft daytime light, plain white background, ${NOTEXT}`;
   const lineRaw = await provider.generate(buildMotifPrompt("all", `${opts.heroMotif}, ${COVER_STEER}, ${NOTEXT}`, seed % 6), { seed });
   const lineBin = await binarize(lineRaw);
   const lineFull = await sharp(lineBin).resize(W, H, { fit: "cover" }).toColourspace("srgb").png().toBuffer();
   const lineForAi = await sharp(lineBin).resize(896, null, { fit: "inside" }).flatten({ background: "#ffffff" }).png().toBuffer();
   let colored = lineFull;
   try {
-    const ai = await provider.colorize(new Uint8Array(lineForAi), COLOR_PROMPT, 0.85, seed);
+    const ai = await provider.colorize(new Uint8Array(lineForAi), COLOR_PROMPT, 0.9, seed);
     // img2img-Ergebnis DIREKT als eine kohärente Ebene nutzen – KEIN multiply der Original-Linien
     // mehr (das erzeugte bei img2img-Verzug das „zwei Bilder übereinander"-Doppelbild).
     colored = await sharp(ai).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).toColourspace("srgb").png().toBuffer();
