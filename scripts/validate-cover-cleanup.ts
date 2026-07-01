@@ -15,7 +15,9 @@ const ok = (m: string) => console.log("  ✓ " + m);
 
 const thematic = read("src/lib/generator/thematic.ts");
 const pins = read("src/lib/social/pins.ts");
-const cover = thematic.match(/export async function generateCoverImage[\s\S]*?\n}/)?.[0] ?? "";
+// Render-Logik liegt in generateCoverImage UND renderOneCover (Best-of-N-Refactor) → beide prüfen.
+const cover = (thematic.match(/export async function generateCoverImage[\s\S]*?\n}/)?.[0] ?? "") +
+  (thematic.match(/async function renderOneCover[\s\S]*?\n}/)?.[0] ?? "");
 
 // ── 1) KEINE BUCHSTABEN IM BILD-PROMPT ───────────────────────────────────────
 const NOTEXT_RE = /no text, no letters, no words, no title, no banner, no signage/;

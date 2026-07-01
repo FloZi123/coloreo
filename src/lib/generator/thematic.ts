@@ -170,7 +170,8 @@ function pdfText(s: string): string {
  * Dezentes Cover-Branding: leichter Inset-Rahmen (Palette aus brand.ts) + kleine Fraunces-Wortmarke
  * auf einer subtilen Pille (auf beliebiger Kunst lesbar). KEIN Titel/Benefit/Seitenzahl, KEIN KI-Text.
  */
-function brandingOverlay(w: number, h: number): string {
+/** Optionaler Marken-Overlay (Inset-Rahmen + Wortmarke) – aktuell NICHT auf dem Cover verwendet (clean/full-bleed). */
+export function brandingOverlay(w: number, h: number): string {
   const inset = Math.round(w * 0.025);
   const pillW = Math.round(w * 0.34), pillH = Math.round(h * 0.05);
   const pillX = (w - pillW) / 2, pillY = Math.round(h * 0.028);
@@ -363,7 +364,6 @@ async function compositionScore(lineBin: Uint8Array): Promise<number> {
 /** Rendert EIN Cover für einen festen Seed (Linienkunst → img2img-Kolorierung → vintage → Rahmen). */
 async function renderOneCover(provider: ImageProvider, opts: CoverOpts, seed: number): Promise<{ bytes: Uint8Array; score: number; ok: boolean }> {
   const W = 600, H = 800, MID = Math.round(W / 2);
-  const overlay = Buffer.from(brandingOverlay(W, H));
   const COLOR_PROMPT = `fully colored version of this illustration of ${opts.heroMotif}, soft natural realistic colors, cozy harmonious earthy palette, warm believable real-world tones, gentle colored-pencil and light watercolor shading, every area clearly colored (no white gaps), NOT neon, NOT rainbow, NOT oversaturated, NOT garish, soft daytime light, plain white background, ${NOTEXT}`;
   const lineRaw = await provider.generate(buildMotifPrompt("all", `${opts.heroMotif}, ${COVER_STEER}, ${NOTEXT}`, seed % 6), { seed });
   const lineBin = await binarize(lineRaw);
@@ -380,7 +380,8 @@ async function renderOneCover(provider: ImageProvider, opts: CoverOpts, seed: nu
   const coloredRaw = await sharp(coloredVintage).removeAlpha().raw().toBuffer();
   const m = await coverMetrics(lineBin, coloredRaw, W, H, MID);
   const comp = await compositionScore(lineBin);
-  const cover = new Uint8Array(await sharp(coloredVintage).composite([{ input: overlay, left: 0, top: 0 }]).png().toBuffer());
+  // Clean/full-bleed: nur die Kunst, KEIN Rahmen und KEINE Wortmarke auf dem Cover.
+  const cover = new Uint8Array(coloredVintage);
   return { bytes: cover, score: m.score + 4 * comp, ok: m.ok }; // Komposition stark gewichtet
 }
 
