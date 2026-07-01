@@ -301,7 +301,9 @@ async function coverMetrics(lineBin: Uint8Array, coloredRaw: Buffer, W: number, 
 // Zentrale Kompositions-/Lesbarkeits-Steuerung für JEDES Cover (Linien- UND Farb-Prompt).
 // Hebt Thema-Lesbarkeit + Komposition über alle Bücher an; der reine-Linienkunst-Charakter
 // der rechten Hälfte bleibt durch das LINEART-Präfix in buildMotifPrompt erhalten.
-const COVER_STEER = "single clear focal subject, centered, large in frame, recognizable setting, simple uncluttered background, no empty corners";
+// Harte Kompositions-Direktiven: EIN klares Hauptmotiv, ruhige Nebenelemente, viel Freiraum,
+// KEINE überlappenden/verschmelzenden Motive → weniger KI-Überlagerungs-Artefakte.
+const COVER_STEER = "single clear focal subject, calm supporting elements only, generous negative space, no overlapping subjects, clear separation between elements, well-composed, uncluttered, centered, recognizable setting";
 // Hart: KEINE Buchstaben/Bänder im Bild (Text war verhunzt) und KEIN mitgenerierter Rahmen
 // (der Marken-Rahmen wird als sauberer Vektor separat komponiert → keine doppelten Rahmenlinien).
 const NOTEXT = "no text, no letters, no words, no title, no banner, no signage, no frame, no border, no decorative border";
@@ -326,52 +328,99 @@ export async function vintageTreat(img: Buffer, W: number, H: number): Promise<B
   }
 }
 
+export interface CoverOpts { heroMotif: string; slug?: string; variant?: number; seed?: number; title?: string; categoryName?: string; pages?: number }
+
 /**
- * VOLL koloriertes, gedämpft-vintage Hero-Cover (600×800) – KEIN Split, kein Trennstrich, kein
- * eingebrannter Titel/Benefit/Seitenzahl, kein KI-Text (Disclosure lebt auf der Produktseite).
- * Reproduzierbar: fester, aus slug (+ Variante) abgeleiteter Seed; Modell/Parameter/Seed werden geloggt.
- * Auto-Qualitäts-Guard: bis zu 3 Versuche (Seed + Versuchs-Offset, deterministisch).
+ * Kompositions-Sauberkeit (höher = sauberer): große, klar getrennte weiße Freiflächen minus
+ * Wimmel-/Kantendichte, moderate Tinten-Belegung. Heuristik zur Vorsortierung von Best-of-N-Kandidaten
+ * (überladene/überlappende Motive erhalten weniger Punkte).
  */
-export async function generateCoverImage(
-  provider: ImageProvider,
-  opts: { heroMotif: string; slug?: string; variant?: number; title?: string; categoryName?: string; pages?: number },
-): Promise<Uint8Array> {
+async function compositionScore(lineBin: Uint8Array): Promise<number> {
+  const { data, info } = await sharp(lineBin).resize(200, null, { fit: "inside" }).grayscale().raw().toBuffer({ resolveWithObject: true });
+  const w = info.width, h = info.height, N = w * h;
+  const isLine = (i: number) => data[i] < 110;
+  let dark = 0, edges = 0;
+  for (let i = 0; i < N; i++) { if (isLine(i)) dark++; if (i % w && isLine(i) !== isLine(i - 1)) edges++; }
+  const ink = dark / N, edgeDens = edges / N;
+  // Zwei größte weiße Regionen (Flood-Fill) → klar getrennte Flächen / Freiraum.
+  const label = new Uint8Array(N); const stack: number[] = []; let biggest = 0, second = 0;
+  for (let s = 0; s < N; s++) {
+    if (label[s] || isLine(s)) continue;
+    let size = 0; stack.length = 0; stack.push(s); label[s] = 1;
+    while (stack.length) {
+      const q = stack.pop()!; size++; const x = q % w, y = (q / w) | 0;
+      if (x > 0 && !label[q - 1] && !isLine(q - 1)) { label[q - 1] = 1; stack.push(q - 1); }
+      if (x < w - 1 && !label[q + 1] && !isLine(q + 1)) { label[q + 1] = 1; stack.push(q + 1); }
+      if (y > 0 && !label[q - w] && !isLine(q - w)) { label[q - w] = 1; stack.push(q - w); }
+      if (y < h - 1 && !label[q + w] && !isLine(q + w)) { label[q + w] = 1; stack.push(q + w); }
+    }
+    if (size > biggest) { second = biggest; biggest = size; } else if (size > second) second = size;
+  }
+  const bigFrac = (biggest + second) / N;
+  return Math.max(0, bigFrac - 2 * edgeDens - Math.abs(ink - 0.1));
+}
+
+/** Rendert EIN Cover für einen festen Seed (Linienkunst → img2img → multiply → vintage → Rahmen). */
+async function renderOneCover(provider: ImageProvider, opts: CoverOpts, seed: number): Promise<{ bytes: Uint8Array; score: number; ok: boolean }> {
   const W = 600, H = 800, MID = Math.round(W / 2);
   const overlay = Buffer.from(brandingOverlay(W, H));
-  const seedBase = hashSeed(`${opts.slug ?? opts.heroMotif}#${opts.variant ?? 0}`);
   const COLOR_PROMPT = `fully colored version of this illustration of ${opts.heroMotif}, soft natural realistic colors, cozy harmonious earthy palette, warm believable real-world tones, gentle colored-pencil and light watercolor shading, every area clearly colored (no white gaps), NOT neon, NOT rainbow, NOT oversaturated, NOT garish, soft daytime light, plain white background, ${NOTEXT}`;
-  let best: { bytes: Uint8Array; score: number; seed: number } | null = null;
+  const lineRaw = await provider.generate(buildMotifPrompt("all", `${opts.heroMotif}, ${COVER_STEER}, ${NOTEXT}`, seed % 6), { seed });
+  const lineBin = await binarize(lineRaw);
+  const lineFull = await sharp(lineBin).resize(W, H, { fit: "cover" }).toColourspace("srgb").png().toBuffer();
+  const lineForAi = await sharp(lineBin).resize(896, null, { fit: "inside" }).flatten({ background: "#ffffff" }).png().toBuffer();
+  let colored = lineFull;
+  try {
+    const ai = await provider.colorize(new Uint8Array(lineForAi), COLOR_PROMPT, 0.85, seed);
+    const aiPng = await sharp(ai).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).toColourspace("srgb").png().toBuffer();
+    const linesGray = await sharp(lineBin).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).grayscale().toColourspace("srgb").png().toBuffer();
+    colored = await sharp(aiPng).composite([{ input: linesGray, blend: "multiply" }]).png().toBuffer();
+  } catch { /* ohne Kolorierung → Linienkunst als Notbehelf */ }
+  const coloredVintage = await vintageTreat(colored, W, H);
+  const coloredRaw = await sharp(coloredVintage).removeAlpha().raw().toBuffer();
+  const m = await coverMetrics(lineBin, coloredRaw, W, H, MID);
+  const comp = await compositionScore(lineBin);
+  const cover = new Uint8Array(await sharp(coloredVintage).composite([{ input: overlay, left: 0, top: 0 }]).png().toBuffer());
+  return { bytes: cover, score: m.score + 4 * comp, ok: m.ok }; // Komposition stark gewichtet
+}
 
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const seed = seedBase + attempt; // deterministisch, aber über Versuche variiert
-    // Linienkunst des Motivs (fester Seed → reproduzierbar).
-    const lineRaw = await provider.generate(buildMotifPrompt("all", `${opts.heroMotif}, ${COVER_STEER}, ${NOTEXT}`, attempt), { seed });
-    const lineBin = await binarize(lineRaw);
-    const lineFull = await sharp(lineBin).resize(W, H, { fit: "cover" }).toColourspace("srgb").png().toBuffer();
-
-    // Deckungsgleiche img2img-Kolorierung + Original-Konturen per multiply (satt/geschichtet).
-    const lineForAi = await sharp(lineBin).resize(896, null, { fit: "inside" }).flatten({ background: "#ffffff" }).png().toBuffer();
-    let colored = lineFull;
-    try {
-      const ai = await provider.colorize(new Uint8Array(lineForAi), COLOR_PROMPT, 0.85, seed);
-      const aiPng = await sharp(ai).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).toColourspace("srgb").png().toBuffer();
-      const linesGray = await sharp(lineBin).resize(W, H, { fit: "cover" }).flatten({ background: "#ffffff" }).grayscale().toColourspace("srgb").png().toBuffer();
-      colored = await sharp(aiPng).composite([{ input: linesGray, blend: "multiply" }]).png().toBuffer();
-    } catch {
-      /* ohne Kolorierung → Linienkunst als Notbehelf */
-    }
-    const coloredVintage = await vintageTreat(colored, W, H);
-
-    // Metriken auf der Kunst OHNE Marken-Overlay (sonst würde der Inset-Rahmen als Frame erkannt).
-    const coloredRaw = await sharp(coloredVintage).removeAlpha().raw().toBuffer();
-    const { ok, score, lineInk, colorFill, frame } = await coverMetrics(lineBin, coloredRaw, W, H, MID);
-    const cover = new Uint8Array(await sharp(coloredVintage).composite([{ input: overlay, left: 0, top: 0 }]).png().toBuffer());
-
-    if (!best || score > best.score) best = { bytes: cover, score, seed };
-    if (ok) break;
-    console.warn(`  ⚠ Cover-Versuch ${attempt + 1} schwach (lineInk=${lineInk.toFixed(3)}, colorFill=${colorFill.toFixed(3)}, frame=${frame}, seed=${seed}) – wiederhole`);
+/**
+ * VOLL koloriertes, gedämpft-vintage Hero-Cover (600×800) – kein Split/Text/Modell-Rahmen.
+ * Reproduzierbar: fester, aus slug(+Variante) abgeleiteter Seed; bei gesetztem opts.seed wird
+ * GENAU dieses Cover reproduziert (menschliche Best-of-N-Auswahl). Sonst best-of-3 (auto).
+ */
+export async function generateCoverImage(provider: ImageProvider, opts: CoverOpts): Promise<Uint8Array> {
+  const seedBase = hashSeed(`${opts.slug ?? opts.heroMotif}#${opts.variant ?? 0}`);
+  if (opts.seed !== undefined) {
+    const r = await renderOneCover(provider, opts, opts.seed);
+    console.log(`  ▸ cover ${opts.slug ?? opts.heroMotif}: FIX seed=${opts.seed} (menschliche Auswahl) model=black-forest-labs/flux-dev(img2img) ps=0.85 vintage(sat0.9+grain)`);
+    return r.bytes;
   }
-  // Reproduzierbarkeits-Protokoll: Modell + Parameter + gewählter Seed.
-  console.log(`  ▸ cover ${opts.slug ?? opts.heroMotif}: model=black-forest-labs/flux-dev(img2img) prompt_strength=0.85 vintage(sat0.9+grain) seed=${best!.seed}`);
+  let best: { bytes: Uint8Array; score: number; seed: number } | null = null;
+  for (let i = 0; i < 3; i++) {
+    const seed = seedBase + i;
+    const r = await renderOneCover(provider, opts, seed);
+    if (!best || r.score > best.score) best = { bytes: r.bytes, score: r.score, seed };
+    if (r.ok) break;
+  }
+  console.log(`  ▸ cover ${opts.slug ?? opts.heroMotif}: seed=${best!.seed} score=${best!.score.toFixed(3)} model=black-forest-labs/flux-dev(img2img) ps=0.85 vintage(sat0.9+grain) [best-of, auto]`);
   return best!.bytes;
+}
+
+/**
+ * Best-of-N-Kandidaten für die menschliche Endauswahl: N feste, geloggte Seeds (slug#variant + Index),
+ * vorsortiert nach Kompositions-Sauberkeit (sauberster zuerst). Keine Auto-Übernahme – der Mensch wählt.
+ */
+export async function generateCoverCandidates(provider: ImageProvider, opts: CoverOpts, n = 4): Promise<{ seed: number; bytes: Uint8Array; score: number }[]> {
+  const seedBase = hashSeed(`${opts.slug ?? opts.heroMotif}#${opts.variant ?? 0}`);
+  const cands: { seed: number; bytes: Uint8Array; score: number }[] = [];
+  for (let i = 0; i < n; i++) {
+    const seed = seedBase + i;
+    const r = await renderOneCover(provider, opts, seed);
+    cands.push({ seed, bytes: r.bytes, score: r.score });
+    console.log(`  ▸ Kandidat ${i} slug=${opts.slug ?? opts.heroMotif} seed=${seed} score=${r.score.toFixed(3)}`);
+  }
+  cands.sort((a, b) => b.score - a.score);
+  console.log(`  ▸ Vorsortierung (sauberster zuerst): ${cands.map((c) => `seed${c.seed}=${c.score.toFixed(2)}`).join(", ")}`);
+  return cands;
 }
