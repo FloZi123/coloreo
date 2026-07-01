@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { isLocale, locales, defaultLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
-import { getWorlds, getBooks, getRatingsForBooks, tName, tDesc, tTitle } from "@/lib/data";
+import { getBooks, getRatingsForBooks, tTitle } from "@/lib/data";
 import BookCard from "@/components/BookCard";
+import AudienceNav, { AUDIENCE_LABELS, COLLECTION_HREF } from "@/components/AudienceNav";
 import FreebieForm from "@/components/FreebieForm";
 import JsonLd from "@/components/JsonLd";
 import TrustBadges from "@/components/TrustBadges";
 import DownloadCounter from "@/components/DownloadCounter";
-import { Emoji } from "@/components/Emoji";
 
 export const revalidate = 600; // ISR: Katalog-Änderungen erscheinen ohne Redeploy (alle 10 Min)
 
@@ -28,11 +28,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const { locale: raw } = await params;
   const locale: Locale = isLocale(raw) ? raw : "de";
   const dict = getDictionary(locale);
-  const [worlds, featured] = await Promise.all([
-    getWorlds(),
-    getBooks({ featured: true, limit: 8 }),
-  ]);
+  const featured = await getBooks({ featured: true, limit: 8 });
   const books = featured.length ? featured : await getBooks({ limit: 8 });
+  const aud = AUDIENCE_LABELS[locale] ?? AUDIENCE_LABELS.de;
   const ratings = await getRatingsForBooks(books.map((b) => b.id));
   const p = (path: string) => `/${locale}${path}`;
 
@@ -61,8 +59,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <div className="mt-8 flex flex-wrap gap-3">
             {/* Haupt-CTA: Gratis-Probeseite → E-Mail (Anti-Stress-Einstieg) */}
             <Link href={p("/gratis")} className="btn-primary px-7 py-3.5">{dict.home.freebieTitle}</Link>
-            <Link href={p("/welten")} className="rounded-full border-2 border-ink px-7 py-3.5 font-extrabold text-ink transition hover:bg-ink hover:text-paper">
-              {dict.home.heroCta}
+            {/* Sekundär: Held/Anti-Stress-Kollektion (Cottagecore) */}
+            <Link href={p(COLLECTION_HREF)} className="rounded-full border-2 border-ink px-7 py-3.5 font-extrabold text-ink transition hover:bg-ink hover:text-paper">
+              {aud.collection}
             </Link>
           </div>
         </div>
@@ -172,24 +171,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </div>
       </section>
 
-      {/* WELTEN */}
+      {/* ZIELGRUPPEN-NAVIGATION (statt 6-Welten-Grid) — Erwachsene / Kinder */}
       <section className="container-page py-8">
-        <h2 className="mb-8 font-display text-2xl font-bold md:text-3xl">{dict.home.exploreWorlds}</h2>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {worlds.map((w) => (
-            <Link
-              key={w.id}
-              href={p(`/welten/${w.slug}`)}
-              className="group card overflow-hidden p-6 transition hover:-translate-y-1 hover:shadow-lg"
-              style={{ borderColor: w.accent ?? undefined }}
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl text-2xl" style={{ background: (w.accent ?? "#7C4DFF") + "22" }}><Emoji emoji={w.emoji} label={tName(w, locale)} /></div>
-              <h3 className="mt-4 font-display text-xl font-bold">{tName(w, locale)}</h3>
-              <p className="mt-1 text-sm text-ink-soft">{tDesc(w, locale)}</p>
-              <span className="mt-3 inline-block text-sm font-semibold" style={{ color: w.accent ?? "#7C4DFF" }}>{dict.home.explore} →</span>
-            </Link>
-          ))}
-        </div>
+        <AudienceNav locale={locale} />
         <div className="mt-6 text-center">
           <Link href={p("/kategorien")} className="text-sm font-semibold text-primary hover:underline">{dict.home.browseCategories} →</Link>
         </div>

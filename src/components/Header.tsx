@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useCart } from "@/lib/cart/store";
 import Logo from "@/components/Logo";
 import CurrencySwitcher from "@/components/CurrencySwitcher";
+import { AUDIENCE_LABELS, AUDIENCE_HREF } from "@/components/AudienceNav";
 import { locales, localeMeta, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 
@@ -26,11 +27,13 @@ export default function Header({
   const restPath = pathname.replace(/^\/(de|en|fr|es|it|nl)(?=\/|$)/, "") || "";
   const hrefFor = (l: Locale) => `/${l}${restPath}`;
 
+  // IA-Fokus: Welten NICHT mehr im Hauptmenü (URLs bleiben bestehen). Führung über Zielgruppen.
+  const aud = AUDIENCE_LABELS[locale] ?? AUDIENCE_LABELS.de;
   const links = [
-    { href: p("/welten"), label: dict.nav.worlds },
+    { href: p(AUDIENCE_HREF.adults), label: aud.adults },
+    { href: p(AUDIENCE_HREF.kids), label: aud.kids },
     { href: p("/kategorien"), label: dict.nav.categories },
     { href: p("/bundles"), label: dict.nav.bundles },
-    { href: p("/bundle-builder"), label: dict.nav.bundleBuilder },
     { href: p("/gratis"), label: dict.nav.freebies },
     { href: p("/bibliothek"), label: dict.nav.library },
   ];
