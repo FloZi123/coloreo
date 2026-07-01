@@ -302,6 +302,9 @@ async function coverMetrics(lineBin: Uint8Array, coloredRaw: Buffer, W: number, 
 // Hebt Thema-Lesbarkeit + Komposition über alle Bücher an; der reine-Linienkunst-Charakter
 // der rechten Hälfte bleibt durch das LINEART-Präfix in buildMotifPrompt erhalten.
 const COVER_STEER = "single clear focal subject, centered, large in frame, recognizable setting, simple uncluttered background, no empty corners";
+// Hart: KEINE Buchstaben/Bänder im Bild (Text war verhunzt) und KEIN mitgenerierter Rahmen
+// (der Marken-Rahmen wird als sauberer Vektor separat komponiert → keine doppelten Rahmenlinien).
+const NOTEXT = "no text, no letters, no words, no title, no banner, no signage, no frame, no border, no decorative border";
 
 /**
  * Gedämpfte Vintage-Behandlung: leichte Entsättigung + feines Korn/Papier-Textur (feTurbulence),
@@ -336,13 +339,13 @@ export async function generateCoverImage(
   const W = 600, H = 800, MID = Math.round(W / 2);
   const overlay = Buffer.from(brandingOverlay(W, H));
   const seedBase = hashSeed(`${opts.slug ?? opts.heroMotif}#${opts.variant ?? 0}`);
-  const COLOR_PROMPT = `fully colored version of this illustration of ${opts.heroMotif}, soft natural realistic colors, cozy harmonious earthy palette, warm believable real-world tones, gentle colored-pencil and light watercolor shading, every area clearly colored (no white gaps), NOT neon, NOT rainbow, NOT oversaturated, NOT garish, soft daytime light, plain white background, no text`;
+  const COLOR_PROMPT = `fully colored version of this illustration of ${opts.heroMotif}, soft natural realistic colors, cozy harmonious earthy palette, warm believable real-world tones, gentle colored-pencil and light watercolor shading, every area clearly colored (no white gaps), NOT neon, NOT rainbow, NOT oversaturated, NOT garish, soft daytime light, plain white background, ${NOTEXT}`;
   let best: { bytes: Uint8Array; score: number; seed: number } | null = null;
 
   for (let attempt = 0; attempt < 3; attempt++) {
     const seed = seedBase + attempt; // deterministisch, aber über Versuche variiert
     // Linienkunst des Motivs (fester Seed → reproduzierbar).
-    const lineRaw = await provider.generate(buildMotifPrompt("all", `${opts.heroMotif}, ${COVER_STEER}`, attempt), { seed });
+    const lineRaw = await provider.generate(buildMotifPrompt("all", `${opts.heroMotif}, ${COVER_STEER}, ${NOTEXT}`, attempt), { seed });
     const lineBin = await binarize(lineRaw);
     const lineFull = await sharp(lineBin).resize(W, H, { fit: "cover" }).toColourspace("srgb").png().toBuffer();
 

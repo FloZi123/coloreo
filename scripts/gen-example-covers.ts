@@ -1,5 +1,7 @@
-/** Erzeugt Beispiel-Cover (NICHT im Shop) für neue Themen-Ideen → nur lokale PNGs zum Sichten. */
-import { readFileSync, writeFileSync } from "node:fs";
+/** Erzeugt Beispiel-Cover (NICHT im Shop) zum Sichten/Validieren → nach .cover-examples/.
+ *  Freigabe-Gate: nur Beispiele (Hero-Buch + max. 1 weiteres). Fester Seed je slug#variant.
+ *  Variante via CLI: npx tsx scripts/gen-example-covers.ts <slug>=<variant> … (Default siehe EX). */
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { getImageProvider } from "../src/lib/generator/imageProvider";
@@ -10,25 +12,31 @@ for (const l of readFileSync(join(root, ".env.local"), "utf8").split("\n")) {
   const m = l.match(/^([A-Z0-9_]+)=(.*)$/);
   if (m && !process.env[m[1]]) process.env[m[1]] = m[2].trim().replace(/^"|"$/g, "");
 }
-const OUT = process.argv[2] || root; // Zielordner als Argument (z. B. scratchpad)
+const OUT = join(root, ".cover-examples");
+mkdirSync(OUT, { recursive: true });
 
-// FREIGABE-GATE: max. 4 Beispiele – Hero-Cottagecore in 2 Varianten (A/B) + 2 weitere Themen.
-const COTTAGE = "a cozy thatched cottage with a flower garden climbing roses and a smoking chimney, trees and clouds behind";
-const EX = [
-  { slug: "cottagecore-tag-im-landhaus", variant: 0, hero: COTTAGE },
-  { slug: "cottagecore-tag-im-landhaus", variant: 1, hero: COTTAGE },
-  { slug: "tarot-der-mond", variant: 0, hero: "an ornate tarot card The Moon, a large crescent moon with a serene face, two tall towers, a howling wolf, a crayfish in the water, decorative celestial star and vine border, symmetrical mystical illustration" },
-  { slug: "muertos-calavera", variant: 0, hero: "an ornate decorated sugar skull calavera with marigold flowers roses candles and swirling symmetrical patterns, Day of the Dead folk art" },
-];
+// Hero-Buch + max. 1 weiteres. Motive OHNE Text-/Rahmen-Trigger (keine „card"/„title"/„border").
+const EX: Record<string, { hero: string }> = {
+  "cottagecore-tag-im-landhaus": { hero: "a cozy thatched cottage with a flower garden climbing roses and a smoking chimney, trees and clouds behind" },
+  "tarot-der-mond": { hero: "a large ornate crescent moon with a calm serene face in a starry night sky above two distant towers, a howling wolf on a hill, vines and flowers" },
+};
+
+// Variant-Overrides: <slug>=<variant>
+const overrides = new Map<string, number>();
+for (const a of process.argv.slice(2)) {
+  const m = a.match(/^(.+)=(\d+)$/);
+  if (m) overrides.set(m[1], Number(m[2]));
+}
 
 async function main() {
   const provider = getImageProvider();
-  for (const e of EX) {
-    const png = await generateCoverImage(provider, { heroMotif: e.hero, slug: e.slug, variant: e.variant });
-    const fp = join(OUT, `example-${e.slug}-v${e.variant}.png`);
+  for (const [slug, e] of Object.entries(EX)) {
+    const variant = overrides.get(slug) ?? 0;
+    const png = await generateCoverImage(provider, { heroMotif: e.hero, slug, variant });
+    const fp = join(OUT, `${slug}-v${variant}.png`);
     writeFileSync(fp, Buffer.from(png));
-    console.log("✓", `${e.slug} v${e.variant}`, "→", fp);
+    console.log("✓", `${slug} v${variant}`, "→", fp);
   }
-  console.log("FERTIG · 4 Beispiele (kein Katalog-Lauf)");
+  console.log("FERTIG · Beispiele (kein Katalog-Lauf)");
 }
 main().catch((e) => { console.error("FEHLER:", e instanceof Error ? e.stack : e); process.exit(1); });
