@@ -59,9 +59,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <h1 className="mt-5 font-display text-5xl font-bold leading-[1.02] md:text-6xl">{dict.home.heroTitle}</h1>
           <p className="mt-5 max-w-[46ch] text-lg text-muted">{dict.home.heroSubtitle}</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={p("/welten")} className="btn-primary px-7 py-3.5">{dict.home.heroCta}</Link>
-            <Link href={p("/bundles")} className="rounded-full border-2 border-ink px-7 py-3.5 font-extrabold text-ink transition hover:bg-ink hover:text-paper">
-              {dict.home.heroCtaBundles}
+            {/* Haupt-CTA: Gratis-Probeseite → E-Mail (Anti-Stress-Einstieg) */}
+            <Link href={p("/gratis")} className="btn-primary px-7 py-3.5">{dict.home.freebieTitle}</Link>
+            <Link href={p("/welten")} className="rounded-full border-2 border-ink px-7 py-3.5 font-extrabold text-ink transition hover:bg-ink hover:text-paper">
+              {dict.home.heroCta}
             </Link>
           </div>
         </div>
@@ -70,7 +71,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <img
             src="/mood/hero.webp"
             alt={dict.home.heroImgAlt}
-            className="aspect-[16/11] w-full rounded-[1.75rem] object-cover shadow-xl"
+            className="aspect-[16/11] w-full rounded-[1rem] object-cover shadow-lg"
           />
           <div className="absolute -bottom-4 -left-4 hidden items-center gap-2.5 rounded-2xl bg-paper px-4 py-3 shadow-lg sm:flex">
             <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full text-white" style={{ background: "var(--color-success)" }}>
@@ -93,9 +94,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <section style={{ background: "var(--color-beige)" }}>
         <div className="container-page grid gap-6 py-10 sm:grid-cols-3">
           {[
-            { c: "#FF5A4D", t: dict.home.featureBoldLines, d: dict.home.featureBoldLinesDesc },
-            { c: "#3FBF87", t: dict.home.featureInstantPdf, d: dict.home.featureInstantPdfDesc },
-            { c: "#3B8EEA", t: dict.home.featureAllAges, d: dict.home.featureAllAgesDesc },
+            { c: "var(--color-primary)", t: dict.home.featureBoldLines, d: dict.home.featureBoldLinesDesc },
+            { c: "var(--color-accent)", t: dict.home.featureInstantPdf, d: dict.home.featureInstantPdfDesc },
+            { c: "var(--color-secondary)", t: dict.home.featureAllAges, d: dict.home.featureAllAgesDesc },
           ].map((f) => (
             <div key={f.t} className="flex items-start gap-3.5">
               <span className="h-10 w-10 flex-none rounded-xl" style={{ background: f.c }} />

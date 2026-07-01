@@ -3,6 +3,7 @@ import Logo from "@/components/Logo";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import PaymentMarks from "@/components/PaymentMarks";
+import AiDisclosureBadge from "@/components/AiDisclosureBadge";
 
 export default function Footer({
   locale,
@@ -47,8 +48,10 @@ export default function Footer({
         </div>
       </div>
       <div className="border-t py-6" style={{ borderColor: "#3a352f" }}>
-        <div className="container-page mb-4 flex justify-center">
+        <div className="container-page mb-4 flex flex-col items-center gap-3">
           <PaymentMarks locale={locale} />
+          {/* Ehrliche KI-Kennzeichnung – dezent im Footer (EU-AI-Act), nicht im Hero. */}
+          <AiDisclosureBadge locale={locale} />
         </div>
         <div className="text-center text-xs" style={{ color: "#7a7268" }}>
           © {year} coloreo. {dict.footer.rights}

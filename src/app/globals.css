@@ -1,31 +1,40 @@
 @import "tailwindcss";
 
+/*
+ * Anti-Stress-Palette (gedämpft/erdig/elegant) — Front-Door-Default: COTTAGECORE.
+ * Held-Akzent-Map (per Nische umschaltbar — nur --color-primary/-dark/-soft + --color-accent tauschen):
+ *   • Cottagecore (Standard): Primär Sage #7A8B6E · Akzent Terracotta #C0714E
+ *   • Mond/Celestial:         Primär Indigo #3E3A6E · Akzent Gold #C9A24B (auf Creme/Nachtblau)
+ *   • Dark Academia:          Primär Oxblood #7A3B34 / Forest #3C4A3E · Akzent Alt-Gold #B08D57
+ * Standard bleibt Cottagecore, bis der Pinterest-Save-Test eine Nische bestätigt.
+ */
 @theme {
-  --color-paper: #faf7f0;
-  --color-beige: #f3ecdf;
-  --color-surface: #ffffff;
-  --color-ink: #221e1b;
-  --color-ink-soft: #4a443d;
-  --color-muted: #6f675c;
-  --color-line: #e3dacb;
+  --color-paper: #f5f0e6;        /* warmes Ivory */
+  --color-beige: #efe7d6;
+  --color-surface: #fbf8f2;
+  --color-ink: #3a352e;          /* warmes Dunkelbraun */
+  --color-ink-soft: #5a544a;
+  --color-muted: #837b6e;
+  --color-line: #e4dccb;
 
-  --color-primary: #ff5a4d;
-  --color-primary-dark: #e8483c;
-  --color-primary-soft: #ffe9e6;
-  --color-primary-foreground: #ffffff;
+  --color-primary: #7a8b6e;      /* Sage (erdiger Primärton – ersetzt Coral) */
+  --color-primary-dark: #67785b;
+  --color-primary-soft: #e7eadf;
+  --color-primary-foreground: #fbf8f2;
 
-  --color-accent: #ffc23c;
-  --color-accent-soft: #fff3d6;
-  --color-gold: #ffc23c;
-  --color-blue: #3b8eea;
-  --color-purple: #9b6ce0;
-  --color-success: #3fbf87;
+  --color-accent: #c0714e;       /* Terracotta */
+  --color-accent-soft: #f1e0d5;
+  --color-secondary: #c99aa0;    /* Altrosa (sekundärer Akzent) */
+  --color-gold: #c9a24b;         /* gedämpftes Alt-Gold (kein Coral/Neon) */
+  --color-blue: #6d86a3;         /* gedämpftes Blaugrau */
+  --color-purple: #8b7aa6;       /* gedämpftes Mauve */
+  --color-success: #6f8f6a;      /* erdiges Grün */
 
   --font-sans: var(--font-body);
   --font-display: var(--font-display);
 
-  --radius-xl: 1.25rem;
-  --radius-2xl: 1.5rem;
+  --radius-xl: 0.875rem;         /* dezenter/eleganter statt bouncy */
+  --radius-2xl: 1rem;
 }
 
 :root {
@@ -45,8 +54,8 @@ body {
 }
 
 h1, h2, h3, h4, .font-display {
-  font-family: var(--font-display), "Fredoka", system-ui, sans-serif;
-  letter-spacing: -0.01em;
+  font-family: var(--font-display), "Fraunces", Georgia, "Times New Roman", serif;
+  letter-spacing: -0.005em;
 }
 
 @layer utilities {
@@ -59,7 +68,7 @@ h1, h2, h3, h4, .font-display {
   .card {
     background: var(--color-surface);
     border: 1px solid var(--color-line);
-    border-radius: 1.25rem;
+    border-radius: 0.875rem;
   }
   .btn-primary {
     background: var(--color-primary);

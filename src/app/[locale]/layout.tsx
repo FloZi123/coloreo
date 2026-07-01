@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Nunito, Fredoka } from "next/font/google";
+import { Nunito, Fraunces } from "next/font/google";
 import { notFound } from "next/navigation";
 import { isLocale, locales, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
@@ -16,7 +16,7 @@ import PostHogProvider from "@/components/PostHogProvider";
 import ConsentBanner from "@/components/ConsentBanner";
 
 const body = Nunito({ subsets: ["latin"], weight: ["400", "600", "700", "800"], variable: "--font-body", display: "swap" });
-const display = Fredoka({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-display", display: "swap" });
+const display = Fraunces({ subsets: ["latin"], weight: ["400", "500", "600", "700"], style: ["normal", "italic"], variable: "--font-display", display: "swap" });
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
