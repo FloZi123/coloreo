@@ -18,9 +18,11 @@ async function outputToBytes(output: unknown): Promise<Uint8Array> {
 export type Audience = "kids" | "all" | "adult";
 
 /**
- * Realistische Kolorierung EINER Linienkunst-Seite (wie bei den Covern):
- * 1) flux-dev img2img koloriert das Blatt natürlich,
- * 2) daraus wird je Fläche der reale Farbton gesampelt und INNERHALB der Linien flach gefüllt.
+ * Realistische, RUHIGE Kolorierung EINER Linienkunst-Seite (Anti-Stress/Cottagecore).
+ * 1) flux-dev img2img koloriert das Blatt mit weichen, natürlichen Tönen,
+ * 2) die AI-Farben werden leicht entsättigt (kein Neon/Regenbogen),
+ * 3) die ORIGINAL-Konturen werden per multiply sauber darübergelegt → „in den Linien",
+ *    ohne den grellen Paint-by-Numbers-Flächenfüller.
  * Liefert ein PNG (W×H). WIRFT bei Fehler – KEIN stiller s/w-Fallback (AI-Kolorierung ist Pflicht).
  * `audience` koppelt den Detailgrad (kids einfacher, adult feiner) – reiner img2img-Prompt.
  */
@@ -28,27 +30,29 @@ export async function realisticColored(rep: Replicate, frame: Frame, W: number, 
   const lineForAi = await sharp(frame.png).resize(896, null, { fit: "inside" }).flatten({ background: "#ffffff" }).png().toBuffer();
   const dataUri = `data:image/png;base64,${lineForAi.toString("base64")}`;
   const detail = audience === "kids"
-    ? "simple flat clean colors with minimal shading, "
+    ? "simple soft clean colors, "
     : audience === "adult"
-      ? "rich nuanced shading and subtle tonal variation, "
-      : "clean natural colors with gentle soft shading, ";
+      ? "delicate subtle colored-pencil shading, "
+      : "gentle soft natural shading, ";
   const out = await rep.run("black-forest-labs/flux-dev", {
     input: {
       image: dataUri,
-      prompt: `fully colored version of this illustration, ${detail}rich vibrant natural realistic colors, every area filled with its true real-world color including the sky and background, soft colored daytime sky, no large plain white areas, very colorful and saturated, bright cheerful daylight palette, NOT grayscale, NOT monochrome, NOT a dark or night scene, no black background, no text`,
-      prompt_strength: 0.82,
-      num_inference_steps: 32,
-      guidance: 4,
+      // Klar koloriert, aber ruhig/natürlich – ausdrücklich KEIN Neon/Regenbogen/Übersättigung.
+      prompt: `fully colored version of this illustration, ${detail}every area clearly filled with soft natural realistic colors, cozy harmonious earthy palette, gentle colored-pencil and light watercolor shading, warm believable real-world tones, NOT neon, NOT rainbow, NOT oversaturated, NOT garish, NOT random flat block colors, soft daytime light, plain white background, no text`,
+      prompt_strength: 0.85,
+      num_inference_steps: 34,
+      guidance: 3.5,
       output_format: "png",
       megapixels: "1",
     },
   });
   const colBytes = await outputToBytes(out);
-  // Farbquelle aufhellen/sättigen, damit dunkle Renderbereiche nicht zu schwarzen Füllungen werden
-  const { data, info } = await sharp(colBytes).resize(W, H, { fit: "fill" }).flatten({ background: "#ffffff" })
-    .modulate({ brightness: 1.16, saturation: 1.28 }).toColourspace("srgb").raw().toBuffer({ resolveWithObject: true });
-  const raw = await colorizeWithinLines(frame.png, W, H, { data, ch: info.channels }, 108, true);
-  return sharp(raw, { raw: { width: W, height: H, channels: 3 } }).png().toBuffer();
+  // Natürliche AI-Farben – klar sichtbar, aber ruhig (leicht über neutral, kein Neon).
+  const colored = await sharp(colBytes).resize(W, H, { fit: "fill" }).flatten({ background: "#ffffff" })
+    .modulate({ saturation: 1.08, brightness: 1.0 }).toColourspace("srgb").png().toBuffer();
+  // Original-Konturen (schwarz auf weiß) per multiply darüber → saubere, scharfe Linien über der Färbung.
+  const lines = await sharp(frame.png).resize(W, H, { fit: "fill" }).flatten({ background: "#ffffff" }).grayscale().toColourspace("srgb").png().toBuffer();
+  return sharp(colored).composite([{ input: lines, blend: "multiply" }]).png().toBuffer();
 }
 
 /** Flache Markenfüllung (kein AI) – Fallback / --flat. */
